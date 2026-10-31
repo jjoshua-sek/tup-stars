@@ -29,6 +29,7 @@ import { logAuditEvent } from "@/lib/utils/audit";
 import { formatManilaDate } from "@/lib/utils/time";
 import {
   CASE_STATUS_META,
+  APPLICATION_STATUS_LABELS,
   CLEARANCE_STATUS_META,
   ID_STATUS_META,
   type CaseStatus,
@@ -36,9 +37,12 @@ import {
   type IdValidationStatus,
 } from "@/types/osa";
 import { concernCategoryLabel } from "@/lib/validations/concern";
+import { CONCERN_STATUSES as CONCERN_STATUS_STYLES } from "@/components/concerns/status-badge";
+import { SESSION_STATUS_LABELS, SESSION_TYPE_LABELS } from "@/lib/osa/guidance-labels";
+import { followUpStatusLabel, followUpTypeLabel } from "@/lib/risk/follow-up-labels";
 
 export const metadata: Metadata = {
-  title: "Student Record",
+  title: "Student record",
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -192,6 +196,15 @@ const DOCUMENT_LABELS: Record<string, string> = {
   transcript: "Transcript",
 };
 
+const DOCUMENT_STATUS_LABELS: Record<string, string> = {
+  uploaded: "Uploaded",
+  extracting: "Being read",
+  extracted: "Read, needs checking",
+  verification_failed: "Could not be read",
+  verified: "Verified",
+  rejected: "Rejected",
+};
+
 const APPELLATE_BODY_LABELS: Record<string, string> = {
   vpaa_or_campus_director: "VPAA / Campus Director",
   office_of_the_president: "Office of the President",
@@ -255,7 +268,7 @@ export default async function StaffStudentRecordPage({
   if (!staff || !access) {
     return (
       <RestrictedNotice
-        title="Student Record"
+        title="Student record"
         audience="Student records are open to OSA staff, guidance, the disciplinary committees, and — for clearance and ID matters only — the Registrar and Cashier."
       />
     );
@@ -475,15 +488,17 @@ export default async function StaffStudentRecordPage({
         <GlanceStrip items={glance} />
 
         {!access.osaRecord && (
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
             You are seeing the clearance and ID parts of this record. Disciplinary, early-warning
             and guidance records are limited to OSA staff.
           </p>
         )}
 
-        <div className={access.osaRecord ? "grid gap-6 lg:grid-cols-3" : "grid gap-6 md:grid-cols-2"}>
+        {/* A side column only on very wide screens: the menu takes 16rem, and
+            at larger text sizes a narrower column would squeeze every row. */}
+        <div className={access.osaRecord ? "grid gap-6 2xl:grid-cols-3" : "grid gap-6 xl:grid-cols-2"}>
           {access.osaRecord && (
-            <div className="space-y-6 lg:col-span-2">
+            <div className="space-y-6 2xl:col-span-2">
               <DisciplineSection
                 cases={cases ?? []}
                 service={service ?? []}
@@ -512,21 +527,26 @@ export default async function StaffStudentRecordPage({
 
               {access.guidance ? (
                 <RecordSection
-                  title="Guidance"
+                  title="Guidance sessions"
                   icon={HeartHandshake}
                   count={guidance?.length}
                   href="/staff/guidance"
-                  hrefLabel="Open guidance"
+                  hrefLabel="Open Guidance sessions"
                 >
                   {guidance && guidance.length > 0 ? (
                     <RowList>
                       {guidance.map((session) => (
                         <Row key={session.id}>
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-base">{humanize(session.session_type)}</span>
+                            <span className="text-base">
+                              {SESSION_TYPE_LABELS[session.session_type] ?? humanize(session.session_type)}
+                            </span>
                             <span className="flex items-center gap-2">
-                              <ToneBadge label={humanize(session.status)} tone="neutral" />
-                              <span className="font-mono text-sm text-muted-foreground">
+                              <ToneBadge
+                                label={SESSION_STATUS_LABELS[session.status] ?? humanize(session.status)}
+                                tone="neutral"
+                              />
+                              <span className="text-sm text-muted-foreground">
                                 {formatManilaDate(session.scheduled_at ?? session.created_at)}
                               </span>
                             </span>
@@ -537,12 +557,12 @@ export default async function StaffStudentRecordPage({
                   ) : (
                     <EmptyLine>No guidance sessions on record.</EmptyLine>
                   )}
-                  <p className="mt-3 text-sm text-muted-foreground">
+                  <p className="mt-3 text-base text-muted-foreground">
                     Scheduling only. Session notes stay on the guidance screen, with the counselor.
                   </p>
                 </RecordSection>
               ) : (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Counselling records are kept by Guidance and are not shown on this page.
                 </p>
               )}
@@ -555,6 +575,7 @@ export default async function StaffStudentRecordPage({
               icon={ClipboardCheck}
               count={clearance.length}
               href="/staff/clearance"
+              hrefLabel="Open Clearance requests"
             >
               {clearance.length > 0 ? (
                 <RowList>
@@ -566,13 +587,13 @@ export default async function StaffStudentRecordPage({
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-base">
                             {REQUEST_TYPE_LABELS[request.request_type] ?? humanize(request.request_type)}
-                            <span className="ml-1.5 font-mono text-sm text-muted-foreground">
+                            <span className="ml-1.5 whitespace-nowrap font-mono text-sm text-muted-foreground">
                               {request.request_number}
                             </span>
                           </span>
                           <ToneBadge label={meta.label} tone={meta.tone} />
                         </div>
-                        <p className="mt-0.5 text-sm text-muted-foreground">
+                        <p className="mt-0.5 text-base text-muted-foreground">
                           Filed {formatManilaDate(request.created_at)}
                           {openHolds > 0 && (
                             <span className="text-red-700">
@@ -595,6 +616,7 @@ export default async function StaffStudentRecordPage({
               icon={BadgeCheck}
               count={idValidations.length}
               href="/staff/id-validation"
+              hrefLabel="Open ID validation"
             >
               {idValidations.length > 0 ? (
                 <RowList>
@@ -608,7 +630,7 @@ export default async function StaffStudentRecordPage({
                           <span className="text-base">
                             {validation.semester}, {validation.school_year}
                             {isCurrent && (
-                              <span className="ml-1.5 text-sm text-muted-foreground">(this term)</span>
+                              <span className="ml-1.5 text-base text-muted-foreground">(this term)</span>
                             )}
                           </span>
                           <ToneBadge label={meta.label} tone={meta.tone} />
@@ -629,6 +651,7 @@ export default async function StaffStudentRecordPage({
                   icon={GraduationCap}
                   count={scholarships?.length}
                   href="/staff/scholarships"
+                  hrefLabel="Open Scholarships"
                 >
                   {scholarships && scholarships.length > 0 ? (
                     <RowList>
@@ -639,7 +662,7 @@ export default async function StaffStudentRecordPage({
                               {application.scholarships?.name ?? "Scholarship"}
                             </span>
                             <ToneBadge
-                              label={humanize(application.status)}
+                              label={APPLICATION_STATUS_LABELS[application.status] ?? humanize(application.status)}
                               tone={
                                 application.status === "awarded"
                                   ? "success"
@@ -649,7 +672,7 @@ export default async function StaffStudentRecordPage({
                               }
                             />
                           </div>
-                          <p className="mt-0.5 text-sm text-muted-foreground">
+                          <p className="mt-0.5 text-base text-muted-foreground">
                             {application.semester ? `${application.semester}, ` : ""}
                             {application.school_year}
                           </p>
@@ -666,6 +689,7 @@ export default async function StaffStudentRecordPage({
                   icon={FileText}
                   count={documents?.length}
                   href="/staff/documents"
+                  hrefLabel="Open Check documents"
                 >
                   {documents && documents.length > 0 ? (
                     <RowList>
@@ -676,7 +700,7 @@ export default async function StaffStudentRecordPage({
                               {DOCUMENT_LABELS[document.document_type] ?? humanize(document.document_type)}
                             </span>
                             <ToneBadge
-                              label={humanize(document.processing_status)}
+                              label={DOCUMENT_STATUS_LABELS[document.processing_status] ?? humanize(document.processing_status)}
                               tone={
                                 document.processing_status === "verified"
                                   ? "success"
@@ -687,7 +711,7 @@ export default async function StaffStudentRecordPage({
                               }
                             />
                           </div>
-                          <p className="mt-0.5 text-sm text-muted-foreground">
+                          <p className="mt-0.5 text-base text-muted-foreground">
                             {document.semester}, {document.school_year} · uploaded{" "}
                             {formatManilaDate(document.uploaded_at)}
                           </p>
@@ -704,6 +728,7 @@ export default async function StaffStudentRecordPage({
                   icon={MessageSquareWarning}
                   count={concerns?.length}
                   href="/staff/concerns"
+                  hrefLabel="Open Student concerns"
                 >
                   {concerns && concerns.length > 0 ? (
                     <RowList>
@@ -715,9 +740,10 @@ export default async function StaffStudentRecordPage({
                           >
                             {concern.subject_line}
                           </Link>
-                          <p className="mt-0.5 text-sm text-muted-foreground">
-                            {concernCategoryLabel(concern.category)} · {humanize(concern.status)}
-                            {concern.urgency_level ? ` · ${concern.urgency_level} urgency` : ""} ·{" "}
+                          <p className="mt-0.5 text-base text-muted-foreground">
+                            {concernCategoryLabel(concern.category)} ·{" "}
+                            {CONCERN_STATUS_STYLES[concern.status as keyof typeof CONCERN_STATUS_STYLES]?.label ?? humanize(concern.status)}
+                            {concern.urgency_level ? ` · ${humanize(concern.urgency_level)} urgency` : ""} ·{" "}
                             {formatManilaDate(concern.created_at)}
                           </p>
                         </Row>
@@ -756,7 +782,7 @@ function IdentityCard({
     ["Year level", student.year_level],
     ["Campus", student.campus],
     ["Scholastic status", student.scholastic_status],
-    ["Mobile", student.cellphone ?? "—"],
+    ["Mobile", student.cellphone ?? "Not given"],
     ["Personal email", student.email_address],
   ];
 
@@ -780,13 +806,13 @@ function IdentityCard({
           {initials}
         </div>
 
-        <dl className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2 2xl:grid-cols-4">
           {details.map(([label, value]) => (
             <div key={label} className="min-w-0">
               <dt className="text-sm font-semibold text-muted-foreground">
                 {label}
               </dt>
-              <dd className="truncate text-base" title={value}>
+              <dd className="break-words text-base font-medium">
                 {value}
               </dd>
             </div>
@@ -820,7 +846,7 @@ function DisciplineSection({
   const openAppeals = appeals.filter((appeal) => appeal.status === "window_open" || appeal.status === "filed");
 
   return (
-    <RecordSection title="Discipline" icon={Gavel} count={cases.length} href="/staff/cases" hrefLabel="All cases">
+    <RecordSection title="Discipline" icon={Gavel} count={cases.length} href="/staff/cases" hrefLabel="Open Discipline cases">
       {cases.length > 0 ? (
         <RowList>
           {cases.map((violationCase) => {
@@ -831,11 +857,11 @@ function DisciplineSection({
                   <span className="flex min-w-0 flex-wrap items-center gap-2">
                     <Link
                       href={`/staff/cases/${violationCase.id}`}
-                      className="font-mono text-sm font-medium text-tup-maroon-600 underline-offset-2 hover:underline"
+                      className="whitespace-nowrap font-mono text-sm font-medium text-tup-maroon-700 underline-offset-2 hover:underline"
                     >
                       {violationCase.case_number}
                     </Link>
-                    <span className="truncate text-base">
+                    <span className="text-base">
                       {violationCase.violation_types?.name ?? "Unclassified offense"}
                     </span>
                   </span>
@@ -850,10 +876,10 @@ function DisciplineSection({
                     <ToneBadge label={meta.label} tone={meta.tone} />
                   </span>
                 </div>
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  Incident {formatManilaDate(violationCase.incident_date)} · filed{" "}
+                <p className="mt-0.5 text-base text-muted-foreground">
+                  Incident {formatManilaDate(violationCase.incident_date)} · Filed{" "}
                   {formatManilaDate(violationCase.created_at)}
-                  {violationCase.sanction_applied ? ` · sanction: ${violationCase.sanction_applied}` : ""}
+                  {violationCase.sanction_applied ? ` · Sanction: ${violationCase.sanction_applied}` : ""}
                 </p>
               </Row>
             );
@@ -868,7 +894,7 @@ function DisciplineSection({
           {openService.map((row) => {
             const completed = Number(row.hours_completed);
             return (
-              <p key={row.id} className="text-sm">
+              <p key={row.id} className="text-base">
                 <span className="font-medium">Community service:</span>{" "}
                 <span className="tabular-nums">
                   {completed} of {row.hours_required} hours
@@ -880,7 +906,7 @@ function DisciplineSection({
             );
           })}
           {openAppeals.map((appeal) => (
-            <p key={appeal.id} className="text-sm">
+            <p key={appeal.id} className="text-base">
               <span className="font-medium">
                 {appeal.status === "filed" ? "Appeal filed" : "Appeal window open"}:
               </span>{" "}
@@ -904,7 +930,7 @@ function DisciplineSection({
         from being read as a guarantee.
       */}
       {!viewerSeesConfidential && (
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="mt-4 text-base text-muted-foreground">
           Cases referred to CODI are visible only to cleared personnel and are not counted here.
         </p>
       )}
@@ -922,23 +948,24 @@ function EarlyWarningSection({
   interventions: InterventionRow[];
 }) {
   return (
-    <RecordSection title="Early warning" icon={Activity} href="/staff/risk" hrefLabel="Risk queue">
+    <RecordSection title="Early warning" icon={Activity} href="/staff/risk" hrefLabel="Open At-risk students">
       {risk ? (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
-            <p className="font-mono text-2xl font-semibold tabular-nums">
+            <p className="text-2xl font-semibold tabular-nums">
+              <span className="sr-only">Risk score </span>
               {Math.round(risk.risk_score * 100)}
               <span className="text-base text-muted-foreground">%</span>
             </p>
             <ToneBadge label={RISK_TIER_META[risk.risk_tier].label} tone={TIER_TONE[risk.risk_tier]} />
             {risk.lowConfidence && <ToneBadge label="Low confidence" tone="neutral" />}
-            <span className="text-sm text-muted-foreground">
-              {Math.round(risk.dataCompleteness * 100)}% of signals on file
+            <span className="text-base text-muted-foreground">
+              {Math.round(risk.dataCompleteness * 100)}% of the data on file
             </span>
           </div>
 
           <div>
-            <p className="mb-1.5 text-sm font-semibold text-muted-foreground">
+            <p className="mb-1.5 text-base font-semibold">
               What raises the score
             </p>
             {risk.topRiskFactors.length === 0 ? (
@@ -946,12 +973,12 @@ function EarlyWarningSection({
             ) : (
               <ul className="space-y-1.5">
                 {risk.topRiskFactors.slice(0, 3).map((factor) => (
-                  <li key={factor.feature} className="text-sm">
+                  <li key={factor.feature} className="text-base">
                     <span className="font-medium">{factor.label}</span>
                     {factor.imputed && (
-                      <span className="ml-1 text-sm text-muted-foreground">(assumed — no data)</span>
+                      <span className="ml-1 text-sm text-muted-foreground">(assumed: no data yet)</span>
                     )}
-                    <span className="block text-sm text-muted-foreground">{factor.explanation}</span>
+                    <span className="block text-base text-muted-foreground">{factor.explanation}</span>
                   </li>
                 ))}
               </ul>
@@ -963,21 +990,21 @@ function EarlyWarningSection({
       )}
 
       <div className="mt-4 border-t border-border pt-4">
-        <p className="mb-1.5 text-sm font-semibold text-muted-foreground">
-          Interventions
+        <p className="mb-1.5 text-base font-semibold">
+          Follow-ups
         </p>
         {interventions.length > 0 ? (
           <RowList>
             {interventions.map((intervention) => (
               <Row key={intervention.id}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-base">{humanize(intervention.intervention_type)}</span>
+                  <span className="text-base">{followUpTypeLabel(intervention.intervention_type)}</span>
                   <span className="flex items-center gap-2">
                     <ToneBadge
-                      label={humanize(intervention.status)}
+                      label={followUpStatusLabel(intervention.status)}
                       tone={intervention.status === "completed" ? "success" : "info"}
                     />
-                    <span className="font-mono text-sm text-muted-foreground">
+                    <span className="text-sm text-muted-foreground">
                       {formatManilaDate(intervention.scheduled_for ?? intervention.created_at)}
                     </span>
                   </span>
@@ -986,7 +1013,7 @@ function EarlyWarningSection({
             ))}
           </RowList>
         ) : (
-          <EmptyLine>None opened.</EmptyLine>
+          <EmptyLine>None started.</EmptyLine>
         )}
       </div>
     </RecordSection>

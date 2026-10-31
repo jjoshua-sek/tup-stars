@@ -5,6 +5,7 @@ import { CaretLeftIcon as ChevronLeft, CaretRightIcon as ChevronRight, Magnifyin
 import { EmptyState } from "@/components/osa/empty-state";
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
 import { PageHeader } from "@/components/shared/page-header";
+import { buttonVariants } from "@/components/ui/button";
 import { getStaffContext } from "@/lib/osa/staff-context";
 import { recordAccess } from "@/lib/students/access";
 import { DIRECTORY_COLUMNS } from "@/lib/students/columns";
@@ -14,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Students",
+  title: "Student records",
 };
 
 const PAGE_SIZE = 25;
@@ -47,7 +48,7 @@ export default async function StaffStudentsPage({
   if (!staff || !recordAccess(staff)) {
     return (
       <RestrictedNotice
-        title="Students"
+        title="Student records"
         audience="The student directory is open to OSA staff, guidance, the disciplinary committees, the Registrar and the Cashier."
       />
     );
@@ -92,19 +93,19 @@ export default async function StaffStudentsPage({
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Students" }]}
-        title="Students"
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Student records" }]}
+        title="Student records"
         description="Find a student by name, student number or program, then open their record."
       />
 
       <form method="get" className="mb-5 flex flex-wrap items-end gap-3" role="search">
         <div className="min-w-0 flex-1 basis-64">
-          <label htmlFor="student-search" className="mb-1 block text-sm font-medium">
+          <label htmlFor="student-search" className="mb-1 block text-base font-medium">
             Name, student number or program
           </label>
           <div className="relative">
             <Search
-              className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden="true"
             />
             <input
@@ -113,20 +114,20 @@ export default async function StaffStudentsPage({
               type="search"
               defaultValue={query}
               placeholder="e.g. Dela Cruz, TUPM-24-0123, BSIT"
-              className="h-9 w-full rounded-md border border-input bg-background pl-8 pr-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-tup-maroon-600/40"
+              className="h-11 w-full rounded-md border border-input bg-background pl-9 pr-3 text-base outline-none focus-visible:ring-3 focus-visible:ring-tup-maroon-600/30"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="student-year" className="mb-1 block text-sm font-medium">
+          <label htmlFor="student-year" className="mb-1 block text-base font-medium">
             Year level
           </label>
           <select
             id="student-year"
             name="year"
             defaultValue={year ?? ""}
-            className="h-9 rounded-md border border-input bg-background px-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-tup-maroon-600/40"
+            className="h-11 rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-3 focus-visible:ring-tup-maroon-600/30"
           >
             <option value="">All years</option>
             {YEAR_LEVELS.map((level) => (
@@ -139,17 +140,17 @@ export default async function StaffStudentsPage({
 
         <button
           type="submit"
-          className="h-9 rounded-md bg-tup-maroon-600 px-4 text-base font-medium text-white hover:bg-tup-maroon-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tup-maroon-600/40 focus-visible:ring-offset-2"
+          className="h-11 rounded-md bg-tup-maroon-600 px-5 text-base font-medium text-white hover:bg-tup-maroon-700 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-tup-maroon-600/40 focus-visible:ring-offset-2"
         >
-          Search
+          Find student
         </button>
 
         {filtered && (
           <Link
             href="/staff/students"
-            className="h-9 content-center text-base text-muted-foreground underline-offset-2 hover:underline"
+            className="h-11 content-center text-base font-medium text-tup-maroon-700 underline-offset-2 hover:underline"
           >
-            Clear
+            Clear the search
           </Link>
         )}
       </form>
@@ -166,7 +167,7 @@ export default async function StaffStudentsPage({
         />
       ) : (
         <>
-          <p className="mb-2 text-sm text-muted-foreground">
+          <p className="mb-2 text-base text-muted-foreground">
             <span className="tabular-nums">{total}</span> student{total === 1 ? "" : "s"}
             {filtered ? " match" : ""}
             {pageCount > 1 && (
@@ -178,75 +179,49 @@ export default async function StaffStudentsPage({
             )}
           </p>
 
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full min-w-[640px] text-left text-base">
-              <thead className="border-b border-border bg-muted/40 text-sm text-muted-foreground font-medium">
-                <tr>
-                  <th scope="col" className="px-4 py-2.5 font-semibold">
-                    Student
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-semibold">
-                    Number
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-semibold">
-                    Program
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-semibold">
-                    Year level
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-semibold">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {students.map((student) => (
-                  <tr key={student.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-2.5">
-                      <Link
-                        href={`/staff/students/${student.id}`}
-                        className="font-medium text-tup-maroon-600 underline-offset-2 hover:underline"
-                      >
+          {/* A list rather than a table: the whole row opens the record. */}
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            {students.map((student) => (
+              <li key={student.id}>
+                <Link
+                  href={`/staff/students/${student.id}`}
+                  className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-muted/40 focus-visible:bg-muted/50 focus-visible:outline-none"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-base">
+                      <span className="text-lg font-semibold">
                         {student.last_name}, {student.first_name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2.5 font-mono text-sm tabular-nums">
-                      {student.student_number}
-                    </td>
-                    <td className="px-4 py-2.5">{student.program}</td>
-                    <td className="px-4 py-2.5">{student.year_level}</td>
-                    <td
-                      className={cn(
-                        "px-4 py-2.5",
-                        student.scholastic_status !== "Regular" && "font-medium text-amber-800",
-                      )}
-                    >
-                      {student.scholastic_status}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </span>
+                      <span className="ml-2 whitespace-nowrap font-mono text-sm text-muted-foreground">
+                        {student.student_number}
+                      </span>
+                    </span>
+                    <span className="block text-base text-muted-foreground">
+                      {student.program}, {student.year_level}
+                      {" · "}
+                      <span className={cn(student.scholastic_status !== "Regular" && "font-medium text-amber-800")}>
+                        {student.scholastic_status}
+                      </span>
+                    </span>
+                  </span>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground/60" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
 
           {pageCount > 1 && (
             <nav aria-label="Pages" className="mt-4 flex items-center justify-between text-base">
               {page > 1 ? (
-                <Link
-                  href={hrefFor(page - 1)}
-                  className="inline-flex items-center gap-1 text-tup-maroon-600 underline-offset-2 hover:underline"
-                >
-                  <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Previous
+                <Link href={hrefFor(page - 1)} className={cn(buttonVariants({ variant: "outline" }), "gap-1")}>
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Previous page
                 </Link>
               ) : (
                 <span />
               )}
               {page < pageCount && (
-                <Link
-                  href={hrefFor(page + 1)}
-                  className="inline-flex items-center gap-1 text-tup-maroon-600 underline-offset-2 hover:underline"
-                >
-                  Next <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                <Link href={hrefFor(page + 1)} className={cn(buttonVariants({ variant: "outline" }), "gap-1")}>
+                  Next page <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               )}
             </nav>

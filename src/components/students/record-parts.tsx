@@ -43,12 +43,12 @@ export function RecordSection({
 }) {
   return (
     <section className="rounded-xl border border-border bg-card">
-      <header className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+      <header className="flex flex-wrap items-center justify-between gap-x-3 border-b border-border px-5 py-2">
         <h2 className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
           <Icon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           {title}
           {count !== undefined && (
-            <span className="text-sm font-normal tabular-nums text-muted-foreground">
+            <span className="rounded-full bg-muted px-2 text-sm font-normal tabular-nums text-muted-foreground">
               {count}
             </span>
           )}
@@ -56,10 +56,10 @@ export function RecordSection({
         {href && (
           <Link
             href={href}
-            className="inline-flex items-center gap-1 text-sm font-medium text-tup-maroon-600 underline-offset-2 hover:underline"
+            className="inline-flex min-h-10 items-center gap-1 text-base font-medium text-tup-maroon-700 underline-offset-2 hover:underline"
           >
             {hrefLabel}
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         )}
       </header>
@@ -156,12 +156,12 @@ export function NoticeLog({ notices }: { notices: NoticeRow[] }) {
           <Row key={notice.id}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
               <p className="text-base font-medium">{notice.title}</p>
-              <span className="font-mono text-sm tabular-nums text-muted-foreground">
+              <span className="text-sm tabular-nums text-muted-foreground">
                 {formatManilaDateTime(notice.created_at)}
               </span>
             </div>
-            <p className={cn("mt-1 flex items-start gap-1.5 text-sm", TONE_TEXT[evidence.tone])}>
-              <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <p className={cn("mt-1 flex items-start gap-1.5 text-base", TONE_TEXT[evidence.tone])}>
+              <Icon className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />
               {evidence.headline}
             </p>
             {facts.length > 0 && (

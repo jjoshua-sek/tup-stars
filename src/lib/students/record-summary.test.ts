@@ -75,7 +75,7 @@ describe("describeService", () => {
     for (const status of ["undeliverable", "bounced"]) {
       const evidence = describeService({ ...unread, email_status: status });
       expect(evidence.tone, status).toBe("danger");
-      expect(evidence.headline, status).toMatch(/serve it by hand/);
+      expect(evidence.headline, status).toMatch(/Serve it by hand/);
     }
   });
 
@@ -85,7 +85,7 @@ describe("describeService", () => {
 
     expect(evidence.email).toBe("not_emailed");
     expect(evidence.emailedTo).toBeNull();
-    expect(evidence.headline).toBe("Portal only — not yet opened");
+    expect(evidence.headline).toBe("Shown in the portal only, not yet opened");
   });
 
   it("does not report an address for mail that never went", () => {

@@ -81,19 +81,19 @@ export function describeService(notice: NoticeDelivery): ServiceEvidence {
     return { ...base, tone: "success", headline: "Opened in the portal" };
   }
   if (email === "sent") {
-    return { ...base, tone: "info", headline: "Emailed — not yet opened in the portal" };
+    return { ...base, tone: "info", headline: "Emailed, not yet opened in the portal" };
   }
   if (email === "in_flight") {
-    return { ...base, tone: "warning", headline: "Email still being delivered — not yet opened" };
+    return { ...base, tone: "warning", headline: "Email still being delivered, not yet opened" };
   }
   if (email === "failed") {
     return {
       ...base,
       tone: "danger",
-      headline: "Email could not be delivered and the notice is unopened — serve it by hand",
+      headline: "Email could not be delivered and the notice is unopened. Serve it by hand.",
     };
   }
-  return { ...base, tone: "warning", headline: "Portal only — not yet opened" };
+  return { ...base, tone: "warning", headline: "Shown in the portal only, not yet opened" };
 }
 
 function emailOutcome(notice: NoticeDelivery): EmailOutcome {
