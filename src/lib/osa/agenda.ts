@@ -1,4 +1,6 @@
-import { HEARING_STATUS_LABELS, type HearingStatus } from "@/types/osa";
+import { HEARING_STATUS_LABELS, HEARING_TYPE_LABELS, type HearingStatus } from "@/types/osa";
+import { SESSION_TYPE_LABELS } from "@/lib/osa/guidance-labels";
+import { followUpTypeLabel } from "@/lib/risk/follow-up-labels";
 import { manilaWallClock, startOfManilaDay } from "@/lib/utils/time";
 
 /**
@@ -152,7 +154,7 @@ export function upcomingAgenda(
       kind: "hearing",
       day: manilaDay(new Date(h.scheduled_start)),
       at: h.scheduled_start,
-      title: `${humanize(h.hearing_type)} · ${caseLabel(h.case_number)}`,
+      title: `${HEARING_TYPE_LABELS[h.hearing_type] ?? humanize(h.hearing_type)} · ${caseLabel(h.case_number)}`,
       detail: `${who(h.student)} · ${h.venue}`,
       href: `/staff/cases/${h.case_id}`,
       badge: { label: HEARING_STATUS_LABELS[h.status as HearingStatus] ?? humanize(h.status), tone: hearingTone(h.status) },
@@ -167,7 +169,7 @@ export function upcomingAgenda(
       day: manilaDay(new Date(s.scheduled_at)),
       at: s.scheduled_at,
       title: "Guidance session",
-      detail: `${who(s.student)} · ${humanize(s.session_type)}`,
+      detail: `${who(s.student)} · ${SESSION_TYPE_LABELS[s.session_type] ?? humanize(s.session_type)}`,
       href: "/staff/guidance",
       badge: null,
     });
@@ -180,7 +182,7 @@ export function upcomingAgenda(
       kind: "intervention",
       day: manilaDay(new Date(i.scheduled_for)),
       at: i.scheduled_for,
-      title: humanize(i.intervention_type),
+      title: followUpTypeLabel(i.intervention_type),
       detail: who(i.student),
       href: "/staff/interventions",
       badge: null,
@@ -250,7 +252,7 @@ export function needsAttention(sources: AgendaSources, now: Date): AgendaEntry[]
         : `Hearing passed without an outcome · ${caseLabel(h.case_number)}`,
       detail: notSummoned
         ? `${who(h.student)}. Book a new date.`
-        : `${who(h.student)}. Record what happened, or that someone did not attend.`,
+        : `${who(h.student)}. Move the case to Hearing held, or record that someone did not attend.`,
       href: `/staff/cases/${h.case_id}`,
       badge: { label: notSummoned ? "Rebook" : "Record outcome", tone: "danger" },
     });
@@ -292,7 +294,7 @@ export function needsAttention(sources: AgendaSources, now: Date): AgendaEntry[]
       day: manilaDay(new Date(s.scheduled_at)),
       at: s.scheduled_at,
       title: "Guidance session not recorded",
-      detail: `${who(s.student)}. Mark it completed, missed or rescheduled.`,
+      detail: `${who(s.student)}. Mark it held, missed or rescheduled.`,
       href: "/staff/guidance",
       badge: { label: "Record", tone: "warning" },
     });
@@ -305,7 +307,7 @@ export function needsAttention(sources: AgendaSources, now: Date): AgendaEntry[]
       kind: "intervention",
       day: manilaDay(new Date(i.scheduled_for)),
       at: i.scheduled_for,
-      title: `${humanize(i.intervention_type)} date passed`,
+      title: `${followUpTypeLabel(i.intervention_type)} date passed`,
       detail: `${who(i.student)}. Update its status.`,
       href: "/staff/interventions",
       badge: { label: "Update", tone: "warning" },
@@ -321,7 +323,7 @@ export function needsAttention(sources: AgendaSources, now: Date): AgendaEntry[]
       day: manilaDay(new Date(alert.last_detected_at)),
       at: alert.last_detected_at,
       title: alert.status === "revoked" ? `Revoked ID refused at ${gate}` : `Suspended ID used at ${gate}`,
-      detail: `${who(alert.student)}${scans}. Follow up, then mark it reviewed on Gates & Access.`,
+      detail: `${who(alert.student)}${scans}. Follow up, then mark it reviewed on Campus gates.`,
       href: "/staff/gates",
       badge: { label: "Intervene", tone: "danger" },
     });

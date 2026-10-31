@@ -150,39 +150,42 @@ export default async function StaffCalendarPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Overview", href: "/staff/dashboard" }, { label: "Calendar" }]}
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Calendar" }]}
         title="Calendar"
-        description="Hearings, counselling, interventions and deadlines for the next two weeks — and anything that passed without being recorded."
+        description="Hearings, counselling, follow-ups and deadlines for the next two weeks, and anything that passed without being recorded. Press any line to open it."
       />
 
       {overdue.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3 flex items-center gap-2 text-base font-semibold">
-            <AlertTriangle className="h-4 w-4 text-red-700" />
+          <h2 className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+            <AlertTriangle className="h-5 w-5 text-red-700" />
             Needs attention
-            <span className="text-base font-normal text-muted-foreground">({overdue.length})</span>
+            <span className="rounded-full bg-red-100 px-2 text-base font-normal tabular-nums text-red-800">{overdue.length}</span>
           </h2>
+          <p className="mb-3 mt-0.5 text-base text-muted-foreground">
+            These dates have passed and nothing was recorded. Oldest first.
+          </p>
           <ul className="divide-y divide-border overflow-hidden rounded-xl border border-red-200 bg-card">
             {overdue.map((entry) => (
-              <EntryRow key={entry.key} entry={entry} when={entry.at ? formatManila(entry.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : dayLabel(entry.day)} />
+              <EntryRow key={entry.key} entry={entry} wide when={entry.at ? formatManila(entry.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : dayLabel(entry.day)} />
             ))}
           </ul>
         </section>
       )}
 
       <section>
-        <h2 className="mb-3 text-base font-semibold">Next {DAYS_AHEAD} days</h2>
+        <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">The next {DAYS_AHEAD} days</h2>
         {days.length === 0 ? (
           <EmptyState
             icon={CalendarCheck}
             title="Nothing scheduled"
-            description="Hearings, guidance sessions, interventions and deadlines you can see will appear here."
+            description="Hearings, guidance sessions, follow-ups and deadlines you can see will appear here."
           />
         ) : (
           <div className="space-y-5">
             {days.map(({ day, entries }) => (
               <div key={day}>
-                <h3 className="mb-2 flex items-baseline gap-2 text-base font-semibold">
+                <h3 className="mb-2 flex items-baseline gap-2 text-base font-semibold text-tup-maroon-700">
                   {dayLabel(day)}
                   {day === today && <ToneBadge label="Today" tone="info" />}
                   {day === tomorrow && <ToneBadge label="Tomorrow" tone="neutral" />}
@@ -207,13 +210,37 @@ function dayLabel(day: string): string {
   return formatManila(manilaInstant(year, month - 1, date, 12 * 60), { weekday: "long", month: "long", day: "numeric" });
 }
 
-function EntryRow({ entry, when }: { entry: AgendaEntry; when: string }) {
+/** Case numbers (OSA-2026-0001) and student numbers stay on one line. */
+const CODE = /\b[A-Z]{2,5}-\d{2,4}-\d{3,4}\b/g;
+
+function Unbroken({ text }: { text: string }) {
+  const parts = text.split(CODE);
+  const codes = text.match(CODE) ?? [];
+  return (
+    <>
+      {parts.map((part, index) => (
+        <span key={index}>
+          {part}
+          {codes[index] && <span className="whitespace-nowrap">{codes[index]}</span>}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** One line of the agenda. `wide` leaves room for a date as well as a time. */
+function EntryRow({ entry, when, wide = false }: { entry: AgendaEntry; when: string; wide?: boolean }) {
   return (
     <li>
-      <Link href={entry.href} className="flex items-start gap-4 px-4 py-3 transition-colors hover:bg-muted/50">
-        <span className="w-24 shrink-0 pt-0.5 font-mono text-sm text-muted-foreground">{when}</span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-base font-medium">{entry.title}</span>
+      <Link
+        href={entry.href}
+        className="flex flex-wrap items-start gap-x-4 gap-y-1 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/60 focus-visible:outline-none sm:flex-nowrap"
+      >
+        <span className={`${wide ? "sm:w-36" : "sm:w-24"} shrink-0 pt-0.5 text-base font-semibold tabular-nums`}>{when}</span>
+        <span className="min-w-0 flex-1 basis-60">
+          <span className="block text-base font-medium">
+            <Unbroken text={entry.title} />
+          </span>
           <span className="block text-base text-muted-foreground">{entry.detail}</span>
         </span>
         {entry.badge && <ToneBadge label={entry.badge.label} tone={entry.badge.tone} />}
