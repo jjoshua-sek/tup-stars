@@ -184,7 +184,7 @@ function DeliveryNote({ status, sentAt }: { status: string | null; sentAt: strin
       : status === "queued" || status === "sending"
         ? "Email is on its way to your institutional address"
         : status === "undeliverable" || status === "bounced"
-          ? "The email could not be delivered — the OSA has been told, and this notice still stands"
+          ? "The email could not be delivered. The OSA has been told, and this notice still stands"
           : "The email has not gone out yet; it will be retried";
 
   const failed = status === "undeliverable" || status === "bounced";

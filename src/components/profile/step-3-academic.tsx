@@ -142,7 +142,7 @@ export function Step3Academic({
           {/* Editable: LRN */}
           <div className="space-y-1.5">
             <Label className="text-sm">
-              Learner Reference Number (LRN) — optional
+              Learner Reference Number (LRN), optional
             </Label>
             <Input
               {...register("lrn")}

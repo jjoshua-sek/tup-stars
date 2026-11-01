@@ -11,7 +11,7 @@ import {
 } from "@/lib/utils/profile-completeness";
 
 export const metadata: Metadata = {
-  title: "My Profile",
+  title: "My profile",
 };
 
 // Always re-fetch — student data may have just been written this turn

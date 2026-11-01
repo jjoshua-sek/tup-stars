@@ -119,7 +119,7 @@ export function ApologyLetterPanel({ caseId, caseNumber }: ApologyLetterPanelPro
       <div>
         <p className="text-base font-semibold">Apology letter for {caseNumber}</p>
         <ul className="mt-1.5 ml-4 list-disc space-y-0.5 text-sm text-muted-foreground">
-          <li>Say what happened, in your own words — no need for formal language.</li>
+          <li>Say what happened, in your own words. There is no need for formal language.</li>
           <li>Acknowledge who was affected and how.</li>
           <li>Say what you will do differently. This is the part that matters most.</li>
         </ul>
@@ -170,7 +170,7 @@ export function ApologyLetterPanel({ caseId, caseNumber }: ApologyLetterPanelPro
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Once submitted you can&apos;t edit it — the OSA reads the version you send. If they
+        Once submitted you can&apos;t edit it: the OSA reads the version you send. If they
         ask for changes, you&apos;ll be able to submit a revised letter here.
       </p>
     </form>

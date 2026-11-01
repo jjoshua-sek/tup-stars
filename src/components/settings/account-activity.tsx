@@ -52,7 +52,7 @@ export async function AccountActivity({ userId }: { userId: string }) {
                   {note && <span className="block text-sm text-muted-foreground">{note}</span>}
                 </td>
                 <td className="py-2 pr-4">{describeUserAgent(row.user_agent)}</td>
-                <td className="py-2 font-mono text-sm">{row.ip_address ?? "—"}</td>
+                <td className="py-2 font-mono text-sm">{row.ip_address ?? "Not recorded"}</td>
               </tr>
             );
           })}

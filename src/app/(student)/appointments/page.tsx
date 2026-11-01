@@ -12,7 +12,7 @@ import { formatManila, formatManilaTime, isUpcoming } from "@/lib/utils/time";
 import { HEARING_STATUS_LABELS, HEARING_TYPE_LABELS, type HearingStatus } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "My Appointments",
+  title: "My appointments",
 };
 
 const HEARING_TONE: Record<HearingStatus, Tone> = {
@@ -109,8 +109,8 @@ export default async function AppointmentsPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My Appointments" }]}
-        title="My Appointments"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My appointments" }]}
+        title="My appointments"
         description="Meetings the OSA has scheduled for you, and counselling sessions you've booked."
       />
 
@@ -167,7 +167,7 @@ export default async function AppointmentsPage() {
 
                     <p className="mt-3 rounded-lg bg-muted p-3 text-sm leading-relaxed">
                       Bring your validated TUP ID. If this time genuinely does not work,
-                      reply through <strong>Concerns</strong> before the date — the OSA can
+                      reply through <strong>Concerns</strong> before the date. The OSA can
                       re-run the scheduler against your class schedule.
                     </p>
                   </li>

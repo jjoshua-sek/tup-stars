@@ -111,7 +111,7 @@ export default async function ScholarshipsPage() {
           )}
           .{" "}
           <span className="text-muted-foreground">
-            This portal does not submit applications for you — it tells you what you
+            This portal does not submit applications for you. It tells you what you
             qualify for and what to bring.
           </span>
         </p>
@@ -205,7 +205,7 @@ export default async function ScholarshipsPage() {
                     </h3>
                     {requirements.length === 0 ? (
                       <p className="text-base text-muted-foreground">
-                        Requirements not published yet — ask at the OSA window.
+                        Requirements not published yet. Ask at the OSA window.
                       </p>
                     ) : (
                       <ul className="space-y-1.5">

@@ -158,7 +158,7 @@ export function Step4Photo({
         setMode("choose");
         toast.success(
           provisional
-            ? "Provisional photo saved — you can replace it anytime"
+            ? "Provisional photo saved. You can replace it anytime."
             : "Photo saved"
         );
       }
@@ -393,7 +393,7 @@ export function Step4Photo({
         {/* Optional height & weight */}
         <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
           <p className="text-sm font-semibold text-muted-foreground">
-            Physical Info — optional
+            Physical information (optional)
           </p>
           <div className="grid sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">

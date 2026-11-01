@@ -48,7 +48,7 @@ export function PhotoChoiceDialog({
             How will you use this photo?
           </DialogTitle>
           <DialogDescription>
-            Both options accept the photo — choose based on whether you plan
+            Both options accept the photo. Choose based on whether you plan
             to replace it later.
           </DialogDescription>
         </DialogHeader>
@@ -78,7 +78,7 @@ export function PhotoChoiceDialog({
                 Set as my profile photo
               </p>
               <p className="text-sm text-muted-foreground">
-                I&apos;m happy with this photo — no reminders needed.
+                I&apos;m happy with this photo. No reminders needed.
               </p>
             </div>
           </button>
@@ -94,7 +94,7 @@ export function PhotoChoiceDialog({
             </div>
             <div className="flex-1 space-y-0.5">
               <p className="font-medium text-amber-900 dark:text-amber-200">
-                Use for now — I&apos;ll update later
+                Use for now, I&apos;ll update later
               </p>
               <p className="text-sm text-muted-foreground">
                 Acceptable for now, but I want a reminder to replace it.

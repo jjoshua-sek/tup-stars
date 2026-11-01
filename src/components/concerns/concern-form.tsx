@@ -104,7 +104,7 @@ export function ConcernForm({ trigger }: ConcernFormProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display">
             <Sparkles className="h-5 w-5 text-primary" />
-            Submit a Concern
+            Submit a concern
           </DialogTitle>
           <DialogDescription>
             Describe your issue and our AI will help route it to the right

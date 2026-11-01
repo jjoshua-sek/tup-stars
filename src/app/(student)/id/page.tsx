@@ -64,13 +64,13 @@ const STATUS_GUIDANCE: Record<IdValidationStatus | "none", string> = {
   pending:
     "Your request is queued with the OSA. Bring your physical ID to the OSA window to have the term sticker applied.",
   under_review: "The OSA is verifying your photo and records. No action needed right now.",
-  validated: "Your ID opens the campus turnstiles. Keep it with you — gates scan the printed QR.",
+  validated: "Your ID opens the campus turnstiles. Keep it with you: gates scan the printed QR.",
   rejected:
     "The OSA could not validate your ID. Fix the issue noted below, then request validation again.",
   expired:
     "Last term's validation has lapsed. Request validation for the current term to keep using the gates.",
   suspended:
-    "Campus access is on hold. This cannot be lifted online — please report to the OSA in person.",
+    "Campus access is on hold. This cannot be lifted online. Please report to the OSA in person.",
   revoked:
     "This ID has been reported lost or revoked. Request a replacement card at the OSA before using the gates.",
   surrendered:
@@ -245,7 +245,7 @@ export default async function DigitalIdPage() {
                 ) : (
                   <Clock className="h-4 w-4" />
                 )}
-                <p className="text-base font-semibold">ID validation — {statusMeta.label}</p>
+                <p className="text-base font-semibold">ID validation: {statusMeta.label}</p>
               </div>
               <span className="text-sm opacity-70 font-medium">
                 {term.semester}
@@ -368,7 +368,7 @@ export default async function DigitalIdPage() {
 
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           <strong className="text-foreground">Data minimization:</strong> a gate scan reveals
-          only your first name, initial, masked student number and photo — never your contact
+          only your first name, initial, masked student number and photo, never your contact
           details, grades, or disciplinary record. Access logs are kept for {describeAccessLogRetention(retention)} and are
           visible to you here, in line with RA 10173 §11 and your right to be informed.
         </p>

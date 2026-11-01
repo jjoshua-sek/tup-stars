@@ -25,7 +25,6 @@ import {
   ScanIcon,
   ShieldWarningIcon,
   SignOutIcon,
-  SquaresFourIcon,
   UserGearIcon,
   UserIcon,
   UsersIcon,
@@ -58,10 +57,10 @@ const studentSections: NavSection[] = [
   {
     label: "Main",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: SquaresFourIcon },
-      { label: "My Appointments", href: "/appointments", icon: CalendarBlankIcon },
+      { label: "Home", href: "/dashboard", icon: HouseIcon },
+      { label: "My appointments", href: "/appointments", icon: CalendarBlankIcon },
       { label: "Notifications", href: "/notifications", icon: BellIcon },
-      { label: "My Violations", href: "/violations", icon: ShieldWarningIcon },
+      { label: "My violations", href: "/violations", icon: ShieldWarningIcon },
       { label: "Concerns", href: "/concerns", icon: ChatTextIcon },
     ],
   },
@@ -71,14 +70,14 @@ const studentSections: NavSection[] = [
       { label: "Scholarships", href: "/scholarships", icon: MedalIcon },
       { label: "Clearance", href: "/clearance", icon: ClipboardTextIcon },
       { label: "Digital ID", href: "/id", icon: IdentificationCardIcon },
-      { label: "Academic Records", href: "/records", icon: FileTextIcon },
+      { label: "Academic records", href: "/records", icon: FileTextIcon },
     ],
   },
   {
     label: "Account",
     items: [
       { label: "Profile", href: "/profile", icon: UserIcon },
-      { label: "My Schedule", href: "/availability", icon: CalendarIcon },
+      { label: "My schedule", href: "/availability", icon: CalendarIcon },
       { label: "Settings", href: "/settings", icon: GearSixIcon },
     ],
   },

@@ -26,7 +26,7 @@ export function AvatarWithDot({
   return (
     <div
       className="relative inline-block"
-      title={isProvisional ? "Provisional photo — student plans to replace it" : undefined}
+      title={isProvisional ? "Provisional photo: the student plans to replace it" : undefined}
     >
       <Avatar className={className}>
         {src && <AvatarImage src={src} alt="" />}

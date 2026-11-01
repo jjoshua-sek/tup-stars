@@ -95,13 +95,13 @@ export default async function HelpPage() {
                 <tbody className="divide-y divide-border">
                   {[
                     ["Raise a problem or ask the OSA for help", "Concerns"],
-                    ["See a summons or a meeting schedule", "My Appointments"],
-                    ["Submit an apology letter or check a case", "My Violations"],
+                    ["See a summons or a meeting schedule", "My appointments"],
+                    ["Submit an apology letter or check a case", "My violations"],
                     ["Find scholarships I qualify for", "Scholarships"],
                     ["Request a Good Moral certificate or clearance", "Clearance"],
                     ["Validate my ID for the term or show my QR code", "Digital ID"],
-                    ["Upload my COR or rating slip", "Academic Records"],
-                    ["Tell the OSA when I have classes", "My Schedule"],
+                    ["Upload my COR or rating slip", "Academic records"],
+                    ["Tell the OSA when I have classes", "My schedule"],
                     ["Change my password or email settings", "Settings"],
                   ].map(([want, where]) => (
                     <tr key={want}>

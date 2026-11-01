@@ -274,7 +274,7 @@ export function Step1Personal({
               <Field
                 label="Cellphone"
                 error={errors.cellphone?.message}
-                hint="e.g. 09171234567 — any common format works"
+                hint="For example 09171234567. Any common format works."
               >
                 <Input {...register("cellphone")} disabled={isPending} placeholder="+63" />
               </Field>
@@ -341,7 +341,7 @@ export function Step1Personal({
               <div className="flex-1 space-y-3">
                 <div>
                   <p className="text-sm font-semibold text-primary">
-                    Data Privacy Act Consent — Required
+                    Data Privacy Act consent (required)
                   </p>
                   <p className="text-base mt-1">
                     Per RA 10173, we need your explicit consent before

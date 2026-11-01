@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { AvailabilityBlockRow } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "My Schedule",
+  title: "My schedule",
 };
 
 const DAY_ORDER = [
@@ -69,8 +69,8 @@ export default async function AvailabilityPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My Schedule" }]}
-        title="My Schedule"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My schedule" }]}
+        title="My schedule"
         description={`When you're in class during ${term.label}. The OSA uses this to avoid scheduling meetings over your subjects.`}
       />
 
@@ -80,11 +80,11 @@ export default async function AvailabilityPage() {
           <span>
             <strong className="text-ai-accent">Faster option:</strong> upload your
             Certificate of Registration under{" "}
-            <strong>Academic Records</strong>. Once the OSA verifies it, your subjects and
-            their meeting times are filled in here automatically —
+            <strong>Academic records</strong>. Once the OSA verifies it, your subjects and
+            their meeting times are filled in here automatically.
             {importedCount > 0
               ? ` ${importedCount} block${importedCount === 1 ? "" : "s"} came from your COR.`
-              : " nothing has been imported yet."}
+              : " Nothing has been imported yet."}
           </span>
         </p>
       </div>
@@ -130,7 +130,7 @@ export default async function AvailabilityPage() {
 
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
         Only the OSA scheduling function reads these times, and only to find a meeting slot.
-        Blocks imported from a verified COR can&apos;t be deleted here — ask the OSA if one
+        Blocks imported from a verified COR can&apos;t be deleted here. Ask the OSA if one
         is wrong.
       </p>
     </div>

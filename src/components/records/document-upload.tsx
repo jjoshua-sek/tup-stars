@@ -113,7 +113,7 @@ export function DocumentUpload({
           setReading(true);
           const extraction = await extractMyDocument(result.documentId);
           setReading(false);
-          if (extraction.error) toast.message("Saved — the OSA will read it.", {
+          if (extraction.error) toast.message("Saved. The OSA will read it.", {
             description: extraction.error,
           });
           else toast.success(extraction.message ?? "Read.");

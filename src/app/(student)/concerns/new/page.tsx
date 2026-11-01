@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ConcernFormInline } from "@/components/concerns/concern-form-inline";
 
 export const metadata: Metadata = {
-  title: "File a Concern",
+  title: "Submit a concern",
 };
 
 export default function NewConcernPage() {
@@ -17,8 +17,8 @@ export default function NewConcernPage() {
           { label: "Concerns", href: "/concerns" },
           { label: "New" },
         ]}
-        title="File a new concern."
-        description="Describe your concern in detail. You may write in English, Filipino, or Taglish — the system handles all three."
+        title="Submit a concern"
+        description="Describe your concern in detail. You may write in English, Filipino, or Taglish; the system handles all three."
       />
 
       {/* Two-column layout: form (left, ~2/3) + info card (right, ~1/3) */}
@@ -34,7 +34,7 @@ export default function NewConcernPage() {
               Your concern is stored in the unified queue and timestamped.
             </Step>
             <Step n={2}>
-              An AI summary is generated to help staff triage faster — your
+              An AI summary helps staff sort concerns faster. Your
               original text is always visible to reviewers.
             </Step>
             <Step n={3}>

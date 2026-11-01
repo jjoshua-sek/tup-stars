@@ -102,7 +102,7 @@ export function DpaConsentDialog({
                 Data Privacy Act Notice
               </DialogTitle>
               <DialogDescription>
-                Republic Act No. 10173 — please read before consenting
+                Republic Act No. 10173. Please read before consenting.
               </DialogDescription>
             </div>
           </div>

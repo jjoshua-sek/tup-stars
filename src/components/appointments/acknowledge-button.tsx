@@ -19,7 +19,7 @@ export function AcknowledgeButton({ hearingId }: { hearingId: string }) {
         startTransition(async () => {
           const result = await acknowledgeHearing(hearingId);
           if (result.error) toast.error(result.error);
-          else toast.success("Thanks — the OSA can see you've been notified.");
+          else toast.success("Thanks. The OSA can see you've been notified.");
         })
       }
       className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"

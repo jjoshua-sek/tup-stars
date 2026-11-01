@@ -1,5 +1,6 @@
 import { FileAppealForm } from "@/components/violations/file-appeal-form";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CalendarIcon as CalendarDays, MapPinIcon as MapPin, ShieldCheckIcon as ShieldCheck } from "@phosphor-icons/react/ssr";
 
@@ -8,7 +9,7 @@ import { ToneBadge, type Tone } from "@/components/osa/tone-badge";
 import { ApologyLetterPanel } from "@/components/violations/apology-letter-panel";
 import { SignSettlementButton } from "@/components/violations/settlement-agreement";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatsCard } from "@/components/shared/stats-card";
+import { GlanceStrip } from "@/components/students/record-parts";
 import {
   appealWindow,
   resolveAppealRoute,
@@ -20,7 +21,7 @@ import { formatManilaLongDate } from "@/lib/utils/time";
 import { CASE_STATUS_META, type ViolationCaseWithRelations } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "My Violations",
+  title: "My violations",
 };
 
 interface ApologyLetterSummary {
@@ -173,27 +174,24 @@ export default async function ViolationsPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My Violations" }]}
-        title="My Violations"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "My violations" }]}
+        title="My violations"
         description="Your disciplinary record with the Office of Student Affairs, and where each case stands."
       />
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-3">
-        <StatsCard label="Minor offenses" value={minorCount} icon={ShieldCheck} />
-        <StatsCard
-          label="Major offenses"
-          value={majorCount}
-          icon={ShieldCheck}
-          iconTone={majorCount > 0 ? "danger" : "neutral"}
-        />
-        <StatsCard
-          label="Still open"
-          value={openCount}
-          icon={CalendarDays}
-          iconTone={openCount > 0 ? "warn" : "neutral"}
-          trend={openCount > 0 ? "Open cases can hold up clearance" : "Nothing pending"}
-          trendTone={openCount > 0 ? "warn" : "neutral"}
-        />
+      <div className="mb-6">
+      <GlanceStrip
+        items={[
+          { key: "minor", label: "Minor offenses", value: String(minorCount), tone: "neutral" },
+          { key: "major", label: "Major offenses", value: String(majorCount), tone: majorCount > 0 ? "danger" : "neutral" },
+          {
+            key: "open",
+            label: "Still open",
+            value: openCount > 0 ? `${openCount}, which can hold up clearance` : "None",
+            tone: openCount > 0 ? "warning" : "success",
+          },
+        ]}
+      />
       </div>
 
       {cases.length === 0 ? (
@@ -483,7 +481,7 @@ export default async function ViolationsPage() {
                           <SignSettlementButton settlementId={settlement.id} />
                           <p className="mt-1.5 text-sm text-muted-foreground">
                             Read the terms carefully. If you don&apos;t agree with them, talk
-                            to the OSA before accepting — mediation can continue.
+                            to the OSA before accepting. Mediation can continue.
                           </p>
                         </div>
                       )}
@@ -499,9 +497,12 @@ export default async function ViolationsPage() {
                 )}
 
                 {!statusMeta?.isTerminal && (
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    Check <strong className="text-foreground">My Appointments</strong> for any
-                    meeting scheduled for this case.
+                  <p className="mt-3 text-base text-muted-foreground">
+                    Any meeting set for this case is on{" "}
+                    <Link href="/appointments" className="font-medium text-tup-maroon-700 underline-offset-2 hover:underline">
+                      My appointments
+                    </Link>
+                    .
                   </p>
                 )}
               </li>

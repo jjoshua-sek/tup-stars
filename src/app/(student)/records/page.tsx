@@ -13,7 +13,7 @@ import { formatManilaDate } from "@/lib/utils/time";
 import type { AcademicDocument, AcademicSnapshot } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "Academic Records",
+  title: "Academic records",
 };
 
 const DOC_LABELS: Record<string, string> = {
@@ -32,7 +32,7 @@ const PROCESSING_META: Record<string, { label: string; tone: Tone; hint: string 
   extracted: {
     label: "Needs verification",
     tone: "warning",
-    hint: "Extracted — an OSA officer still has to confirm the numbers.",
+    hint: "Read by the system. An OSA officer still has to confirm the numbers.",
   },
   verification_failed: {
     label: "Could not read",
@@ -99,8 +99,8 @@ export default async function RecordsPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Academic Records" }]}
-        title="Academic Records"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Academic records" }]}
+        title="Academic records"
         description="Upload the Certificate of Registration and rating slip you get from the TUP ERS. The OSA verifies them, and your class schedule fills in automatically."
       />
 
@@ -150,7 +150,7 @@ export default async function RecordsPage() {
                       </td>
                       <td className="px-4 py-2.5 font-mono tabular-nums">
                         <span className="inline-flex items-center gap-1.5">
-                          {snapshot.gwa != null ? Number(snapshot.gwa).toFixed(2) : "—"}
+                          {snapshot.gwa != null ? Number(snapshot.gwa).toFixed(2) : "Not yet"}
                           {delta != null && Math.abs(delta) >= 0.01 && (
                             <span
                               className={
@@ -168,12 +168,12 @@ export default async function RecordsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-2.5 tabular-nums">
-                        {snapshot.units_passed ?? "—"}/{snapshot.units_enrolled ?? "—"}
+                        {snapshot.units_passed ?? "?"} of {snapshot.units_enrolled ?? "?"}
                       </td>
                       <td className="px-4 py-2.5 tabular-nums">
-                        {snapshot.units_failed ?? "—"}
+                        {snapshot.units_failed ?? "Not yet"}
                       </td>
-                      <td className="px-4 py-2.5">{snapshot.scholastic_status ?? "—"}</td>
+                      <td className="px-4 py-2.5">{snapshot.scholastic_status ?? "Not yet"}</td>
                     </tr>
                   );
                 })}

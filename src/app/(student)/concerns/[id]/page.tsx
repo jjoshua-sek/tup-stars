@@ -27,7 +27,7 @@ import { RECEIVED_VIA_LABEL, receivedVia } from "@/lib/concerns/intake";
 import { concernCategoryLabel } from "@/lib/validations/concern";
 
 export const metadata: Metadata = {
-  title: "Concern Detail",
+  title: "Concern",
 };
 
 export const revalidate = 0;
@@ -242,7 +242,7 @@ export default async function ConcernDetailPage({
               <p className="flex items-center gap-2 text-base text-muted-foreground">
                 <Sparkles className="h-4 w-4 animate-pulse" />
                 AI is still analyzing your concern. The summary should appear
-                within a minute — refresh to check.
+                within a minute. Refresh the page to check.
               </p>
             </div>
           )}

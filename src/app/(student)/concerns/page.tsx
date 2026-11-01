@@ -23,7 +23,7 @@ import { timeAgo } from "@/lib/utils/time";
 import { concernCategoryLabel } from "@/lib/validations/concern";
 
 export const metadata: Metadata = {
-  title: "My Concerns",
+  title: "My concerns",
 };
 
 // Don't cache — students want to see new submissions instantly
@@ -64,7 +64,7 @@ export default async function ConcernsPage() {
     return (
       <div className="space-y-6">
         <PageHeader
-          title="My Concerns"
+          title="My concerns"
           description="Submit issues and questions to TUP-Manila staff."
         />
         <Card className="border-dashed">
@@ -111,7 +111,7 @@ export default async function ConcernsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="My Concerns"
+        title="My concerns"
         description="Submit issues, questions, or feedback. Our AI will help route them."
       >
         <Link
@@ -119,7 +119,7 @@ export default async function ConcernsPage() {
           className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium bg-tup-maroon-600 text-white hover:bg-tup-maroon-700 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
-          New Concern
+          New concern
         </Link>
       </PageHeader>
 

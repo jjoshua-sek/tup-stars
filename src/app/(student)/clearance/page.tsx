@@ -47,7 +47,7 @@ const STATUS_GUIDANCE: Record<string, string> = {
   cleared: "Your record is clear. Settle the certificate fee at the Cashier if one applies.",
   fee_pending: "Pay the fee at the Cashier and bring the official receipt to the OSA.",
   ready: "Ready for pickup at the OSA window. Bring your validated TUP ID.",
-  issued: "Released. Keep the certificate — reprints take another request.",
+  issued: "Released. Keep the certificate: a reprint needs a new request.",
   rejected: "This request was rejected. See the reason below.",
   cancelled: "This request was cancelled.",
 };
@@ -97,7 +97,7 @@ export default async function ClearancePage() {
     <div>
       <PageHeader
         breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Clearance" }]}
-        title="Clearance & Good Moral"
+        title="Clearance and Good Moral"
         description="Track your certificate requests and see exactly what to do if something is on hold."
       />
 
@@ -152,7 +152,7 @@ export default async function ClearancePage() {
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {request.fee_paid_at
-                              ? `Paid · OR ${request.or_number ?? "—"}`
+                              ? `Paid${request.or_number ? ` · OR ${request.or_number}` : ""}`
                               : "Unpaid"}
                           </p>
                         </div>
@@ -203,7 +203,7 @@ export default async function ClearancePage() {
                         <ul className="space-y-1 text-sm text-muted-foreground">
                           {resolvedHolds.map((hold) => (
                             <li key={hold.id}>
-                              {HOLD_LABELS[hold.hold_reason] ?? hold.hold_reason} — resolved{" "}
+                              {HOLD_LABELS[hold.hold_reason] ?? hold.hold_reason}: resolved{" "}
                               {hold.resolved_at ? formatManilaDate(hold.resolved_at) : ""}
                             </li>
                           ))}
@@ -218,7 +218,7 @@ export default async function ClearancePage() {
                     )}
 
                     <div className="flex flex-wrap gap-x-6 gap-y-1 p-4 text-sm text-muted-foreground">
-                      <span>Purpose: {request.purpose ?? "—"}</span>
+                      <span>Purpose: {request.purpose ?? "Not given"}</span>
                       {request.verified_at && (
                         <span>Verified {formatManilaDate(request.verified_at)}</span>
                       )}

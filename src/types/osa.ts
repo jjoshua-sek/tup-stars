@@ -219,7 +219,7 @@ export const ID_STATUS_META: Record<
   { label: string; tone: "neutral" | "info" | "warning" | "success" | "danger" }
 > = {
   pending:      { label: "Pending",      tone: "info" },
-  under_review: { label: "Under Review", tone: "info" },
+  under_review: { label: "Under review", tone: "info" },
   validated:    { label: "Validated",    tone: "success" },
   rejected:     { label: "Rejected",     tone: "danger" },
   expired:      { label: "Expired",      tone: "warning" },
