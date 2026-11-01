@@ -16,21 +16,21 @@ export function MarkReadButton({ notificationId }: { notificationId: string }) {
     <button
       type="button"
       disabled={isPending}
-      aria-label="Mark as read"
-      title="Mark as read"
+
       onClick={() =>
         startTransition(async () => {
           const result = await markNotificationRead(notificationId);
           if (result.error) toast.error(result.error);
         })
       }
-      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
     >
       {isPending ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Check className="h-3.5 w-3.5" />
+        <Check className="h-4 w-4" />
       )}
+      Mark as read
     </button>
   );
 }
@@ -49,12 +49,12 @@ export function MarkAllReadButton({ disabled }: { disabled?: boolean }) {
           else toast.success("All caught up.");
         })
       }
-      className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
+      className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted disabled:opacity-50"
     >
       {isPending ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <CheckCheck className="h-3.5 w-3.5" />
+        <CheckCheck className="h-4 w-4" />
       )}
       Mark all read
     </button>

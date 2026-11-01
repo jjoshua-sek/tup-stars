@@ -180,7 +180,7 @@ export default async function ConcernDetailPage({
       {/* Back link */}
       <Link
         href="/concerns"
-        className="inline-flex items-center gap-1 text-base text-muted-foreground hover:text-foreground transition-colors"
+        className="-ml-1 inline-flex min-h-10 items-center gap-1.5 rounded-md px-1 text-base font-medium text-tup-maroon-700 hover:underline"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to my concerns

@@ -22,6 +22,7 @@ import {
   MedalIcon,
   NotePencilIcon,
   PulseIcon,
+  QuestionIcon,
   ScanIcon,
   ShieldWarningIcon,
   SignOutIcon,
@@ -34,6 +35,7 @@ import {
 import type { Icon } from "@phosphor-icons/react";
 
 import { announceSignOut } from "@/components/auth/session-guard";
+import { TextSizeSwitch } from "@/components/layout/text-size-switch";
 import type { StaffNavIcon, StaffNavSection } from "@/lib/osa/staff-nav";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -160,9 +162,13 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
         {/* Mobile-only close button (the header is hidden behind the drawer on mobile) */}
         <div className="lg:hidden flex h-14 items-center justify-between px-4 border-b border-border bg-tup-maroon-600 text-white">
           <span className="text-base font-semibold">Menu</span>
-          <button onClick={onClose} aria-label="Close menu" className="rounded-md p-1.5 hover:bg-white/15">
-            <XIcon className="h-5 w-5" />
-          </button>
+          <span className="flex items-center gap-2">
+            {/* The header hides these below 640px; on a phone they live here. */}
+            <TextSizeSwitch className="sm:hidden" />
+            <button onClick={onClose} aria-label="Close menu" className="grid h-10 w-10 place-items-center rounded-md hover:bg-white/15">
+              <XIcon className="h-5 w-5" />
+            </button>
+          </span>
         </div>
 
         <nav aria-label="Main menu" className="flex-1 overflow-y-auto px-2 py-4">
@@ -218,6 +224,14 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
         </nav>
 
         <div className="border-t border-border px-3 py-3">
+          <Link
+            href="/help"
+            onClick={onClose}
+            className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-base text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground sm:hidden"
+          >
+            <QuestionIcon className="h-5 w-5" />
+            Help
+          </Link>
           <button
             onClick={handleSignOut}
             className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-base text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground"

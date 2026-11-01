@@ -141,20 +141,25 @@ export async function NotificationsView({
                     {notification.body}
                   </p>
 
-                  {notification.action_url && (
-                    <Link
-                      href={notification.action_url}
-                      className="mt-2 inline-flex items-center gap-1 text-base font-medium text-tup-maroon-600 underline-offset-2 hover:underline"
-                    >
-                      {notification.action_label ?? "Open"}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                  {/* The notice's own button and Mark as read sit together under
+                      the text, so on a phone neither squeezes the message. */}
+                  {(notification.action_url || !notification.is_read) && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {notification.action_url && (
+                        <Link
+                          href={notification.action_url}
+                          className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-tup-maroon-300 px-3 text-base font-medium text-tup-maroon-700 transition-colors hover:bg-tup-maroon-50"
+                        >
+                          {notification.action_label ?? "Open"}
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      )}
+                      {!notification.is_read && <MarkReadButton notificationId={notification.id} />}
+                    </div>
                   )}
 
                   <DeliveryNote status={notification.email_status} sentAt={notification.email_sent_at} />
                 </div>
-
-                {!notification.is_read && <MarkReadButton notificationId={notification.id} />}
               </li>
             );
           })}
