@@ -22,7 +22,7 @@ export default async function StaffNotificationsPage({
   return (
     <NotificationsView
       basePath="/staff/notifications"
-      home={{ label: "Overview", href: "/staff/dashboard" }}
+      home={{ label: "Home", href: "/staff/dashboard" }}
       description="Approvals waiting on you, assignments and system notices."
       emptyDescription="When a hearing slot needs your approval or work is assigned to you, it will appear here."
       unreadOnly={filter === "unread"}

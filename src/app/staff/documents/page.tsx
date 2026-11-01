@@ -119,7 +119,7 @@ export default async function StaffDocumentsPage() {
         <EmptyState
           icon={FileSearch}
           title="Nothing waiting to be checked"
-          description="Students upload their COR and rating slip from Academic Records. Until something is verified here, most risk scores stay low-confidence."
+          description="Students upload their COR and rating slip from Academic records. Until something is verified here, most risk scores stay low-confidence."
         />
       ) : (
         <Group title="Waiting to be checked" documents={pending} actionable />

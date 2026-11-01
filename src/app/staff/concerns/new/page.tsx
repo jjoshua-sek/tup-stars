@@ -31,9 +31,9 @@ export default async function RecordConcernPage() {
           <aside className="self-start rounded-md border border-border bg-accent p-5 text-base">
             <h2 className="mb-2 font-semibold">What happens next</h2>
             <ul className="list-disc space-y-1.5 pl-4 text-muted-foreground">
-              <li>It joins the Concern Queue with an AI summary, like one from the online form.</li>
+              <li>It joins Student concerns with an AI summary, like one from the online form.</li>
               <li>The student sees it in their portal, marked as recorded by the OSA.</li>
-              <li>For a faculty referral, the student can also be added to the At-Risk follow-up list.</li>
+              <li>For a faculty referral, a guidance referral can also be started for the student on Follow-ups.</li>
             </ul>
           </aside>
         </div>

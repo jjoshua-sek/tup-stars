@@ -76,7 +76,7 @@ export interface AgendaSources {
   /**
    * Open gate alerts: a suspended or revoked ID used at a gate. They stay
    * under Needs attention, whatever their date, until someone marks them
-   * reviewed on Gates & Access.
+   * reviewed on Campus gates.
    */
   gateAlerts?: Array<{
     id: string;

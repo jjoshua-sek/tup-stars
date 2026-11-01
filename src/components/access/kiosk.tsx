@@ -488,7 +488,7 @@ export function GateKiosk() {
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2.5 font-mono text-base text-white placeholder:text-white/30 focus:border-tup-gold-500 focus:outline-none"
           />
           <p className="mt-2 text-sm text-white/50">
-            Issued once from <span className="font-mono">Staff → Gates &amp; Access</span>. It is
+            Issued once from <span className="font-mono">Staff → Campus gates</span>. It is
             stored only in this browser.
           </p>
 

@@ -29,7 +29,7 @@ interface RecordResult {
  * through a faculty member (OSA checklist D2 and E1). It joins the same
  * queue and AI summary as one from the online form, and the student sees it
  * in their portal. A faculty referral can also put the student on the
- * At-Risk follow-up list as a recommended guidance referral.
+ * Follow-ups as a recommended (Not started) guidance referral.
  */
 export async function recordConcern(formData: FormData): Promise<RecordResult> {
   const staff = await getStaffContext();

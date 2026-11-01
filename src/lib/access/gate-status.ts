@@ -1,5 +1,5 @@
 /**
- * Gate facts shared by the Gates & Access page (a server component) and the
+ * Gate facts shared by the Campus gates page (a server component) and the
  * gate console (a client component). Kept out of the "use client" module:
  * the server cannot call a function exported from one, and doing so crashed
  * the page the moment the first gate existed.

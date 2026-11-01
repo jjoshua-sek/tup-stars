@@ -37,7 +37,7 @@ export function StaffConcernForm() {
       }
       toast.success("Concern recorded.", {
         description: result.flagged
-          ? "The student was also added to the At-Risk follow-up list as a guidance referral."
+          ? "A guidance referral was also started for the student on Follow-ups."
           : "It is in the queue, and the AI summary will appear in a few seconds.",
       });
       router.push(`/staff/concerns/${result.concernId}`);
@@ -90,9 +90,9 @@ export function StaffConcernForm() {
           <label className="flex items-start gap-2 text-base">
             <input type="checkbox" name="follow_up" defaultChecked className="mt-0.5 accent-tup-maroon-600" />
             <span>
-              Add the student to the At-Risk follow-up list
+              Start a guidance referral on Follow-ups
               <span className="block text-sm text-muted-foreground">
-                Opens a recommended guidance referral on the Interventions page.
+                It is listed under Not started yet until someone reaches the student.
               </span>
             </span>
           </label>

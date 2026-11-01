@@ -12,7 +12,7 @@ type Db = LooseClient;
  * that the office hears about it at once and steps in itself. One alert per
  * anomaly: record_access_anomaly folds repeat scans by the same student
  * within 24 hours into the open anomaly, so only its first occurrence
- * notifies; the rest show as a count on Gates & Access.
+ * notifies; the rest show as a count on Campus gates.
  *
  * In-app only. The OSA works from the portal, and a stream of gate emails
  * would teach staff to ignore STARS mail.
@@ -57,8 +57,8 @@ export async function alertOsaOfGateAnomaly(
   const when = input.offlineAt ? `While STARS was offline, on ${input.offlineAt}, ` : "";
   const body =
     input.status === "suspended"
-      ? `${when}${who} ${input.letThrough ? "was let through" : "was refused for another reason"} with a suspended ID. Follow up with the student, then mark the alert reviewed on Gates & Access.`
-      : `${when}${who}'s ID, reported lost or stolen, ${input.letThrough ? "was let through: the offline copy did not know yet" : "was refused"}. Whoever holds the card may not be its owner. Mark the alert reviewed on Gates & Access once handled.`;
+      ? `${when}${who} ${input.letThrough ? "was let through" : "was refused for another reason"} with a suspended ID. Follow up with the student, then mark the alert on Campus gates: Needs follow-up or Nothing wrong.`
+      : `${when}${who}'s ID, reported lost or stolen, ${input.letThrough ? "was let through: the offline copy did not know yet" : "was refused"}. Whoever holds the card may not be its owner. Mark the alert on Campus gates once handled.`;
 
   for (const row of (staffRows as Array<{ user_id: string }> | null) ?? []) {
     const { error: notifyError } = await db.rpc("create_notification", {
@@ -69,13 +69,13 @@ export async function alertOsaOfGateAnomaly(
       p_priority: "high",
       p_channels: ["in_app"],
       p_action_url: "/staff/gates",
-      p_action_label: "Review on Gates & Access",
+      p_action_label: "Open Campus gates",
       p_entity_type: "access_anomaly",
       p_entity_id: input.anomalyId,
     });
     if (notifyError) {
       // Before migration 00031 the type is refused. The anomaly itself is
-      // already filed and visible on Gates & Access, so this is logged once.
+      // already filed and visible on Campus gates, so this is logged once.
       console.error("[gate alert] notification not created (run migration 00031?)", notifyError);
       return;
     }

@@ -72,17 +72,17 @@ export default function AuthLayout({
             </h2>
             <p className="text-base leading-relaxed opacity-85 max-w-sm">
               Guidance, scholarships, student violations, clearance and ID
-              validation — with early warning for students who may need support.
+              validation, with early warning for students who may need support.
             </p>
 
             {/* What the system does since the OSA pivot (migration 00006);
                 registration and file management are no longer part of it. */}
             <div className="mt-6 grid gap-2">
               {[
-                "Student Violation Management",
-                "AI-Assisted Concern Triage",
-                "Early Warning for At-Risk Students",
-                "QR-Based ID Validation",
+                "Student violation management",
+                "AI-assisted concern triage",
+                "Early warning for at-risk students",
+                "QR-based ID validation",
               ].map((label) => (
                 <div
                   key={label}
@@ -102,7 +102,7 @@ export default function AuthLayout({
 
           {/* Footer note */}
           <div className="relative z-10 text-sm opacity-60 border-t border-white/15 pt-4">
-            © {manilaWallClock(new Date()).year} TUP — Manila · College of Science · Capstone Project
+            © {manilaWallClock(new Date()).year} TUP Manila · College of Science · Capstone Project
             <br />
             Protected under RA 10173 (Data Privacy Act of 2012)
           </div>
