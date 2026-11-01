@@ -16,7 +16,7 @@ import { formatManilaDateTime } from "@/lib/utils/time";
 import { STAFF_ROLE_LABELS, type StaffRole } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "Accounts",
+  title: "User accounts",
 };
 
 interface StaffMemberRow {
@@ -84,7 +84,7 @@ export default async function AccountsPage() {
   if (!staff || (!isAdmin && staff.role !== "registrar")) {
     return (
       <RestrictedNotice
-        title="Accounts"
+        title="User accounts"
         audience="Creating and importing accounts is limited to system administrators and UITC."
       />
     );
@@ -129,8 +129,8 @@ export default async function AccountsPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Accounts" }]}
-        title="Accounts"
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "User accounts" }]}
+        title="User accounts"
         description={
           isAdmin
             ? "Enroll students from a list, create a single account, and follow every sign-in link sent."
@@ -145,7 +145,7 @@ export default async function AccountsPage() {
             <h2 className="font-display text-base font-semibold tracking-tight">Import an enrollment list</h2>
           </header>
           <div className="space-y-3 px-5 py-4">
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="text-base leading-relaxed text-muted-foreground">
               One account per student. Each is emailed a one-time link, at the personal address on
               the list, to choose their own password; their profile then opens with the program and
               year already filled in from the list.
@@ -170,9 +170,9 @@ export default async function AccountsPage() {
           <h2 className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
             <MailCheck className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             Invitations
-            <span className="text-sm font-normal tabular-nums text-muted-foreground">{invitations.length}</span>
+            <span className="rounded-full bg-muted px-2 text-sm font-normal tabular-nums text-muted-foreground">{invitations.length}</span>
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             <span className="tabular-nums">{counts.activated ?? 0}</span> set up ·{" "}
             <span className="tabular-nums">{counts.sent ?? 0}</span> waiting on the student ·{" "}
             <span className="tabular-nums">{waiting}</span> still sending
@@ -210,7 +210,7 @@ export default async function AccountsPage() {
                   return (
                     <tr key={row.id} className="align-top">
                       <td className="px-4 py-2.5">
-                        <span className="font-mono text-sm">{row.student_number}</span>
+                        <span className="whitespace-nowrap font-mono text-sm">{row.student_number}</span>
                         {staffUserIds.has(row.user_id) && (
                           <span className="ml-1.5 rounded bg-muted px-1.5 py-0.5 text-sm font-semibold text-muted-foreground">
                             Staff
@@ -220,7 +220,7 @@ export default async function AccountsPage() {
                           {row.last_name}, {row.first_name}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-sm">{row.delivery_email}</td>
+                      <td className="break-all px-4 py-2.5">{row.delivery_email}</td>
                       <td className="px-4 py-2.5">
                         <ToneBadge label={status.label} tone={status.tone} />
                         {row.last_error && row.status !== "activated" && (
@@ -229,7 +229,7 @@ export default async function AccountsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 font-mono text-sm text-muted-foreground">
+                      <td className="px-4 py-2.5 text-base text-muted-foreground">
                         {row.activated_at
                           ? `Set up ${formatManilaDateTime(row.activated_at)}`
                           : row.sent_at
@@ -257,9 +257,9 @@ export default async function AccountsPage() {
           <h2 className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
             <ShieldCheck className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             Staff accounts
-            <span className="text-sm font-normal tabular-nums text-muted-foreground">{staffMembers.length}</span>
+            <span className="rounded-full bg-muted px-2 text-sm font-normal tabular-nums text-muted-foreground">{staffMembers.length}</span>
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             A reset link lets them choose a new password that no one else sees. Their current one
             works until they use it.
           </p>
@@ -294,12 +294,12 @@ export default async function AccountsPage() {
                           <span className="block text-sm text-muted-foreground">{member.position}</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-sm">{STAFF_ROLE_LABELS[member.role_type] ?? member.role_type}</td>
+                      <td className="px-4 py-2.5">{STAFF_ROLE_LABELS[member.role_type] ?? member.role_type}</td>
                       <td className="px-4 py-2.5">
                         {resetStatus ? (
                           <ToneBadge label={resetStatus.label} tone={resetStatus.tone} />
                         ) : (
-                          <span className="text-sm text-muted-foreground">Never</span>
+                          <span className="text-muted-foreground">Never</span>
                         )}
                       </td>
                       <td className="px-4 py-2.5">

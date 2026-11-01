@@ -10,9 +10,10 @@ import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { formatManila } from "@/lib/utils/time";
+import { STAFF_ROLE_LABELS, type StaffRole } from "@/types/osa";
 
 export const metadata: Metadata = {
-  title: "Audit Log",
+  title: "Activity history",
 };
 
 export const revalidate = 15;
@@ -54,8 +55,8 @@ export default async function StaffAuditPage({
   if (!staff || (!staff.isAdmin && staff.role !== "osa_head")) {
     return (
       <RestrictedNotice
-        title="Audit Log"
-        audience="The audit trail is restricted to administrators and the OSA head."
+        title="Activity history"
+        audience="The activity history is restricted to administrators and the OSA head."
       />
     );
   }
@@ -96,7 +97,7 @@ export default async function StaffAuditPage({
 
   const actors = new Map<string, string>();
   for (const row of (staffRows as Array<{ user_id: string; full_name: string; role_type: string }> | null) ?? []) {
-    actors.set(row.user_id, `${row.full_name} (${row.role_type})`);
+    actors.set(row.user_id, `${row.full_name} (${STAFF_ROLE_LABELS[row.role_type as StaffRole] ?? row.role_type})`);
   }
   for (const row of (studentRows as Array<{
     user_id: string;
@@ -112,9 +113,9 @@ export default async function StaffAuditPage({
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Audit Log" }]}
-        title="Audit Log"
-        description="Append-only record of who did what, from where, and when."
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Activity history" }]}
+        title="Activity history"
+        description="Who did what in STARS, when, and from where. Entries can be added, never changed or removed."
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-1 border-b border-border">
@@ -123,7 +124,7 @@ export default async function StaffAuditPage({
             key={option.key}
             href={`/staff/audit?filter=${option.key}`}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-base font-medium transition-colors",
+              "-mb-px flex min-h-11 items-center border-b-2 px-3 text-base font-medium transition-colors",
               activeFilter === option.key
                 ? "border-tup-maroon-600 text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
@@ -141,50 +142,73 @@ export default async function StaffAuditPage({
           description="Nothing matching this filter has been recorded yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border text-left text-sm text-muted-foreground font-medium">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">When</th>
-                <th className="px-4 py-2.5 font-medium">Who</th>
-                <th className="px-4 py-2.5 font-medium">Action</th>
-                <th className="px-4 py-2.5 font-medium">Resource</th>
-                <th className="px-4 py-2.5 font-medium">Details</th>
-                <th className="px-4 py-2.5 font-medium">IP</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {logs.map((log) => (
-                <tr key={log.id} className="align-top">
-                  <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
-                    {formatManila(log.created_at, {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}
-                  </td>
-                  <td className="px-4 py-2">{actors.get(log.user_id) ?? "—"}</td>
-                  <td className="px-4 py-2 font-mono text-sm">{log.action}</td>
-                  <td className="px-4 py-2 text-muted-foreground">{log.resource}</td>
-                  <td className="max-w-[320px] px-4 py-2 text-muted-foreground">
-                    <span className="line-clamp-2 break-words">{log.details ?? "—"}</span>
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-2 font-mono text-sm text-muted-foreground">
-                    {log.ip_address ?? "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+          {logs.map((log) => (
+            <li key={log.id} className="flex flex-wrap gap-x-6 gap-y-1 px-5 py-3">
+              <p className="w-full text-sm tabular-nums text-muted-foreground sm:w-44 sm:shrink-0 sm:text-base">
+                {formatManila(log.created_at, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </p>
+              <div className="min-w-0 flex-1 basis-72 space-y-0.5">
+                <p className="text-base">
+                  {/* The action in words; the stored code is kept for anyone checking. */}
+                  <span className="font-semibold" title={log.action}>
+                    {actionLabel(log.action)}
+                  </span>
+                  <span className="text-muted-foreground"> · {actionLabel(log.resource)}</span>
+                </p>
+                <p className="text-base">{actors.get(log.user_id) ?? "Unknown account"}</p>
+                {log.details && (
+                  <p className="line-clamp-2 break-words text-sm text-muted-foreground">{readableDetails(log.details)}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  From <span className="font-mono">{log.ip_address ?? "an address not recorded"}</span>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
 
-      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-4 max-w-prose text-base leading-relaxed text-muted-foreground">
         Showing the 150 most recent entries. Audit records are retained for the life of the
         student record and may be disclosed to the National Privacy Commission on request.
       </p>
     </div>
   );
+}
+
+/** "case_updated" as "Case updated", "violation_cases" as "Violation cases". */
+function actionLabel(code: string): string {
+  const words = code.replace(/_/g, " ").trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
+ * Details are stored as JSON ({"student_number":"TUPM-99-1001"}); shown as
+ * "Student number: TUPM-99-1001". Anything that is not a JSON object is
+ * shown exactly as stored.
+ */
+function readableDetails(details: string): string {
+  try {
+    const parsed: unknown = JSON.parse(details);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return details;
+    return Object.entries(parsed as Record<string, unknown>)
+      .map(([key, value]) => {
+        const shown = Array.isArray(value)
+          ? value.join(", ")
+          : value !== null && typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value);
+        return `${actionLabel(key)}: ${shown}`;
+      })
+      .join(" · ");
+  } catch {
+    return details;
+  }
 }

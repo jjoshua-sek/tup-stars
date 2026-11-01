@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ScalesIcon as Scale } from "@phosphor-icons/react/ssr";
 
 export const metadata: Metadata = {
-  title: "File a Case",
+  title: "File a case",
 };
 
 /**
@@ -96,7 +96,7 @@ export default async function FileCasePage({
           { label: "Discipline cases", href: "/staff/cases" },
           { label: "File a case" },
         ]}
-        title="File a Case"
+        title={staff.isOsa ? "File a case" : "File a complaint"}
         description="A complaint starts the formal process. Nothing is sent to the student until the OSA has reviewed it."
       />
 
@@ -104,7 +104,7 @@ export default async function FileCasePage({
         <EmptyState
           icon={Scale}
           title="No offense types configured"
-          description="The violation_types table is empty, so there is nothing to file against. Run migration 00007, which seeds the Student Manual offenses."
+          description="The Student Manual offenses are not loaded yet, so there is nothing to file against. Ask the administrator to load them (migration 00007)."
         />
       ) : (
         <div className="max-w-3xl">

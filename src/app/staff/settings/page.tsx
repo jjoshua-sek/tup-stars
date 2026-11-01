@@ -52,22 +52,22 @@ export default async function StaffSettingsPage() {
 
   const staff = staffRow as StaffRecord | null;
   const preferences = (preferenceRow as NotificationPreferences | null) ?? DEFAULT_PREFERENCES;
-  const loginId = user.email?.split("@")[0]?.toUpperCase() ?? "—";
+  const loginId = user.email?.split("@")[0]?.toUpperCase() ?? "Not set";
   const isAdminUser = staff?.role_type === "admin";
 
   const details: Array<[string, string]> = [
-    ["Name", staff?.full_name ?? "—"],
+    ["Name", staff?.full_name ?? "Not set"],
     ["Login ID", loginId],
     ["Role", staff ? STAFF_ROLE_LABELS[staff.role_type] : "No staff record"],
-    ["Position", staff?.position ?? "—"],
-    ["Department", staff?.department ?? "—"],
-    ["Office", staff?.office ?? "—"],
-    ["Institutional email", staff?.institutional_email ?? "—"],
+    ["Position", staff?.position ?? "Not set"],
+    ["Department", staff?.department ?? "Not set"],
+    ["Office", staff?.office ?? "Not set"],
+    ["Institutional email", staff?.institutional_email ?? "Not set"],
   ];
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your account details, password, email and recent account activity." />
+      <PageHeader title="Settings" description="Your account details, text size, password, email and recent account activity." />
 
       <div className="space-y-6">
         <Card>
@@ -87,6 +87,16 @@ export default async function StaffSettingsPage() {
               ))}
             </dl>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Text size</CardTitle>
+            <CardDescription>
+              Press <strong>A</strong>, <strong>A+</strong> or <strong>A++</strong> at the top of any page to make
+              everything larger or smaller. This computer remembers your choice.
+            </CardDescription>
+          </CardHeader>
         </Card>
 
         <Card>
