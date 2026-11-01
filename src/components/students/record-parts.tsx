@@ -94,7 +94,12 @@ const GLANCE_COLUMNS: Record<number, string> = {
  * viewer is entitled to see are passed in — a missing tile means "not
  * yours to see", never "zero".
  */
-export function GlanceStrip({ items }: { items: GlanceItem[] }) {
+export function GlanceStrip({
+  items,
+}: {
+  /** Any short figures; the student record passes its GlanceItems. */
+  items: Array<Omit<GlanceItem, "key"> & { key: string }>;
+}) {
   return (
     <dl
       className={cn(

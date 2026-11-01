@@ -9,7 +9,7 @@ import { getAccessStaff } from "@/lib/access/guards";
 import { getCurrentTerm } from "@/lib/access/term";
 
 export const metadata: Metadata = {
-  title: "QR Scanner",
+  title: "Scan an ID",
 };
 
 /**
@@ -26,8 +26,8 @@ export default async function StaffScannerPage() {
     return (
       <div>
         <PageHeader
-          breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "QR Scanner" }]}
-          title="QR Scanner"
+          breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Scan an ID" }]}
+          title="Scan an ID"
         />
         <div className="grid place-items-center gap-3 rounded-xl border border-dashed border-border p-12 text-center">
           <Lock className="h-7 w-7 text-muted-foreground/50" />
@@ -42,16 +42,16 @@ export default async function StaffScannerPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "QR Scanner" }]}
-        title="ID Verification"
-        description={`Checks the institutional QR against this term's validation — ${term.label}.`}
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Scan an ID" }]}
+        title="Scan an ID"
+        description={`Hold a student's ID QR code up to the camera to see whether it is validated for ${term.label}.`}
       >
         <Link
           href="/staff/gates"
-          className={buttonVariants({ variant: "outline", size: "sm" })}
+          className={buttonVariants({ variant: "outline" })}
         >
           <DoorOpen className="mr-1.5 h-4 w-4" />
-          Gates & Access
+          Campus gates
         </Link>
       </PageHeader>
 

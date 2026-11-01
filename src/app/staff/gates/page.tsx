@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { DoorOpenIcon as DoorOpen, LockIcon as Lock, ShieldWarningIcon as ShieldAlert, XCircleIcon as XCircle } from "@phosphor-icons/react/ssr";
+import { CaretDownIcon as ChevronDown, LockIcon as Lock } from "@phosphor-icons/react/ssr";
 
 import { AccessFeed, type AccessEventRow } from "@/components/access/access-feed";
 import { AnomalyList, type AnomalyRow } from "@/components/access/anomaly-list";
 import { GateConsole, type GateRow } from "@/components/access/gate-console";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatsCard } from "@/components/shared/stats-card";
+import { GlanceStrip } from "@/components/students/record-parts";
 import { GATE_CONSOLE_COLUMNS, isGateOnline } from "@/lib/access/gate-status";
 import { getAccessStaff } from "@/lib/access/guards";
 import { loose } from "@/lib/supabase/loose";
@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { startOfManilaDay } from "@/lib/utils/time";
 
 export const metadata: Metadata = {
-  title: "Gates & Access",
+  title: "Campus gates",
 };
 
 // The live feed keeps itself current over Realtime; this only governs the
@@ -27,8 +27,8 @@ export default async function StaffGatesPage() {
     return (
       <div>
         <PageHeader
-          breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Gates & Access" }]}
-          title="Gates & Access"
+          breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Campus gates" }]}
+          title="Campus gates"
         />
         <div className="grid place-items-center gap-3 rounded-xl border border-dashed border-border p-12 text-center">
           <Lock className="h-7 w-7 text-muted-foreground/50" />
@@ -95,51 +95,60 @@ export default async function StaffGatesPage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Gates & Access" }]}
-        title="Gates & Access"
-        description="QR turnstile terminals, live scan activity, and abuse signals for review."
+        breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Campus gates" }]}
+        title="Campus gates"
+        description="The ID turnstiles at each gate, what they let through today, and alerts to review."
       />
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
-          label="Gates online"
-          value={`${onlineGates}/${gates.length}`}
-          icon={DoorOpen}
-          trend={`${enforcingGates} enforcing`}
-        />
-        <StatsCard label="Entries today" value={allowedToday ?? 0} icon={DoorOpen} iconTone="success" />
-        <StatsCard
-          label="Denied today"
-          value={deniedToday ?? 0}
-          icon={XCircle}
-          iconTone={(deniedToday ?? 0) > 0 ? "warn" : "neutral"}
-        />
-        <StatsCard
-          label="Open anomalies"
-          value={anomalies.length}
-          icon={ShieldAlert}
-          iconTone={anomalies.length > 0 ? "danger" : "neutral"}
-        />
-      </div>
+      {/* Today at a glance, in one strip rather than four tiles. */}
+      <GlanceStrip
+        items={[
+          {
+            key: "online",
+            label: "Gates online",
+            value: `${onlineGates} of ${gates.length}, ${enforcingGates} checking IDs`,
+            tone: onlineGates < gates.length ? "warning" : "success",
+          },
+          { key: "allowed", label: "Entries today", value: String(allowedToday ?? 0), tone: "neutral" },
+          {
+            key: "denied",
+            label: "Refused today",
+            value: String(deniedToday ?? 0),
+            tone: (deniedToday ?? 0) > 0 ? "warning" : "neutral",
+          },
+          {
+            key: "alerts",
+            label: "Alerts to review",
+            value: String(anomalies.length),
+            tone: anomalies.length > 0 ? "danger" : "neutral",
+          },
+        ]}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+      {/* Two columns only on very wide screens. */}
+      <div className="mt-6 grid gap-6 2xl:grid-cols-[1.2fr_1fr]">
         <div className="space-y-6">
           <section>
-            <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">Terminals</h2>
-            <GateConsole gates={gates} canManage={staff.canManage} />
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Each lane runs <span className="font-mono">/kiosk</span> in a browser and pairs
-              once with its device key. Start a new lane in <strong>monitor</strong> mode: it
-              records every scan and opens for everyone, so a week of real traffic surfaces the
-              unvalidated IDs before anyone is held at the arm.
-            </p>
+            <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
+              Alerts to review
+            </h2>
+            <AnomalyList anomalies={anomalies} canManage={staff.canManage} />
           </section>
 
           <section>
-            <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
-              Anomalies for review
-            </h2>
-            <AnomalyList anomalies={anomalies} canManage={staff.canManage} />
+            <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">Gates</h2>
+            <GateConsole gates={gates} canManage={staff.canManage} />
+            <details className="group mt-3 rounded-lg border border-border bg-card">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 text-base font-medium [&::-webkit-details-marker]:hidden">
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+                Setting up a new gate lane
+              </summary>
+              <p className="max-w-prose border-t border-border px-4 py-3 text-base leading-relaxed text-muted-foreground">
+                Each lane runs <span className="font-mono">/kiosk</span> in a browser and pairs once with its device
+                key. Start a new lane in <strong>monitor</strong> mode: it records every scan and opens for everyone,
+                so a week of real traffic surfaces the unvalidated IDs before anyone is held at the arm.
+              </p>
+            </details>
           </section>
         </div>
 

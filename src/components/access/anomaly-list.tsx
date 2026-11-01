@@ -63,7 +63,7 @@ export function AnomalyList({ anomalies, canManage }: AnomalyListProps) {
     startTransition(async () => {
       const result = await reviewAnomaly(id, status);
       if (result.error) toast.error(result.error);
-      else toast.success(status === "dismissed" ? "Dismissed." : "Marked for follow-up.");
+      else toast.success(status === "dismissed" ? "Marked as nothing wrong." : "Marked for follow-up.");
     });
   };
 
@@ -101,14 +101,14 @@ export function AnomalyList({ anomalies, canManage }: AnomalyListProps) {
                 {anomaly.students
                   ? `${anomaly.students.first_name} ${anomaly.students.last_name} · `
                   : ""}
-                <span className="font-mono">
+                <span className="whitespace-nowrap font-mono">
                   {anomaly.students?.student_number ??
                     anomaly.normalized_student_number ??
                     "unknown"}
                 </span>
               </p>
 
-              <p className="mt-1.5 text-sm opacity-80">
+              <p className="mt-1.5 text-base opacity-80">
                 {TYPE_EXPLANATIONS[anomaly.anomaly_type]}
               </p>
 
@@ -120,26 +120,24 @@ export function AnomalyList({ anomalies, canManage }: AnomalyListProps) {
             </div>
 
             {canManage && (
-              <div className="flex shrink-0 gap-1">
+              <div className="flex shrink-0 flex-wrap gap-2">
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={() => review(anomaly.id, "confirmed")}
-                  className="rounded-md bg-white/70 p-1.5 transition-colors hover:bg-white"
-                  aria-label="Confirm — needs follow-up"
-                  title="Confirm — needs follow-up"
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-current/20 bg-white/80 px-3 text-base font-medium transition-colors hover:bg-white"
                 >
-                  <Check className="h-3.5 w-3.5" />
+                  <Check className="h-4 w-4" />
+                  Needs follow-up
                 </button>
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={() => review(anomaly.id, "dismissed")}
-                  className="rounded-md bg-white/70 p-1.5 transition-colors hover:bg-white"
-                  aria-label="Dismiss"
-                  title="Dismiss"
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-current/20 bg-white/80 px-3 text-base font-medium transition-colors hover:bg-white"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
+                  Nothing wrong
                 </button>
               </div>
             )}
