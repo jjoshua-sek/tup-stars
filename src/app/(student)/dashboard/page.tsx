@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircleIcon as CheckCircle2, ChatTextIcon as MessageSquare, WarningIcon as AlertTriangle, FolderOpenIcon as FolderOpen, PlusIcon as Plus, MedalIcon as Award, IdentificationCardIcon as IdCard, ShieldWarningIcon as ShieldAlert, MegaphoneIcon as Megaphone } from "@phosphor-icons/react/ssr";
+import { ArrowRightIcon, CheckCircleIcon, ChatTextIcon as MessageSquare, FolderOpenIcon as FolderOpen, PlusIcon as Plus, MedalIcon as Award, IdentificationCardIcon as IdCard, ShieldWarningIcon as ShieldAlert, MegaphoneIcon as Megaphone, WarningIcon } from "@phosphor-icons/react/ssr";
 
 import { getCurrentTerm } from "@/lib/access/term";
+import { studentTasks, type StudentCase, type StudentHearing } from "@/lib/students/student-today";
+import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaMonthDay, manilaWallClock } from "@/lib/utils/time";
+import { cn } from "@/lib/utils";
+import { formatManila, formatManilaLongDate, formatManilaMonthDay, manilaWallClock } from "@/lib/utils/time";
+import { CASE_STATUS_META, ID_STATUS_META, type IdValidationStatus } from "@/types/osa";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatsCard } from "@/components/shared/stats-card";
 import { ModuleCard } from "@/components/shared/module-card";
+import { GlanceStrip } from "@/components/students/record-parts";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Home",
 };
 
 export const revalidate = 30;
@@ -25,6 +30,12 @@ interface StudentRow {
   year_level: string;
   scholastic_status: string;
 }
+
+const SECONDARY_BUTTON = cn(
+  buttonVariants({ variant: "outline" }),
+  "border-tup-maroon-300 text-tup-maroon-700 hover:bg-tup-maroon-50 hover:text-tup-maroon-800",
+);
+const URGENT_BUTTON = cn(buttonVariants(), "bg-destructive text-white hover:bg-destructive/90");
 
 function getGreeting(): string {
   // The Manila hour. The server's clock is UTC, which would greet a student
@@ -54,189 +65,190 @@ export default async function DashboardPage() {
   const student = studentRaw as StudentRow | null;
   if (!student) redirect("/profile");
 
-  // Fetch dashboard stats in parallel
-  const [
-    enrollmentResult,
-    concernsActiveResult,
-    concernsPendingResult,
-    concernsReviewResult,
-    violationsActiveResult,
-    documentsResult,
-  ] = await Promise.all([
-    supabase
-      .from("enrollments")
-      .select("subjects(total_units)")
+  const db = loose(supabase);
+  const term = getCurrentTerm();
+
+  // Everything below reads the tables the rest of the portal uses. (Until
+  // November 2026 this page read leftover tables from before migration 00006,
+  // so a student with open cases was shown a clean record.)
+  const [casesResult, hearingsResult, idResult, concernsResult, documentsResult] = await Promise.all([
+    db
+      .from("violation_cases")
+      .select("case_number, status, apology_letters(review_status), case_settlements(student_signed_at), case_appeals(status, appeal_deadline)")
+      .eq("student_id", student.id),
+    db
+      .from("case_hearings")
+      .select("status, scheduled_start, violation_cases!inner(student_id)")
+      .eq("violation_cases.student_id", student.id),
+    db
+      .from("id_validations")
+      .select("status")
       .eq("student_id", student.id)
-      .eq("status", "enrolled"),
-    supabase
+      .eq("school_year", term.schoolYear)
+      .eq("semester", term.semester)
+      .maybeSingle(),
+    db
       .from("concerns")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact", head: true })
       .eq("student_id", student.id)
       .in("status", ["pending", "in_review"]),
-    supabase
-      .from("concerns")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", student.id)
-      .eq("status", "pending"),
-    supabase
-      .from("concerns")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", student.id)
-      .eq("status", "in_review"),
-    supabase
-      .from("violations")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", student.id)
-      .eq("status", "active"),
-    supabase
-      .from("student_files")
+    db
+      .from("academic_documents")
       .select("uploaded_at", { count: "exact" })
       .eq("student_id", student.id)
       .order("uploaded_at", { ascending: false })
       .limit(1),
   ]);
 
-  type EnrollmentSubject = { subjects: { total_units: number } | null };
-  const enrollments = (enrollmentResult.data as unknown as EnrollmentSubject[]) ?? [];
-  const enrolledSubjectsCount = enrollments.length;
-  const totalUnits = enrollments.reduce(
-    (sum, e) => sum + (e.subjects?.total_units || 0),
-    0
-  );
-  const isEnrolled = enrolledSubjectsCount > 0;
-
-  const activeConcerns = concernsActiveResult.count ?? 0;
-  const pendingConcerns = concernsPendingResult.count ?? 0;
-  const inReviewConcerns = concernsReviewResult.count ?? 0;
-  const activeViolations = violationsActiveResult.count ?? 0;
+  const cases = (casesResult.data as StudentCase[] | null) ?? [];
+  const hearings = (hearingsResult.data as StudentHearing[] | null) ?? [];
+  const idStatus = ((idResult.data as { status: IdValidationStatus } | null)?.status ?? null) as IdValidationStatus | null;
+  const openCases = cases.filter((c) => !CASE_STATUS_META[c.status]?.isTerminal).length;
+  const openConcerns = concernsResult.count ?? 0;
   const documentsCount = documentsResult.count ?? 0;
+  const lastUpload = (documentsResult.data as Array<{ uploaded_at: string }> | null)?.[0]?.uploaded_at;
 
-  // The term the rest of the portal files things under, in the dashboard's
-  // own order: "AY 2026–2027 · 1st Semester".
-  const term = getCurrentTerm();
-  const termLabel = `${term.schoolYearLabel} · ${term.semester}`;
-
-  const lastUploadedRow = documentsResult.data?.[0] as
-    | { uploaded_at: string }
-    | undefined;
-  const lastUpload = lastUploadedRow
-    ? formatManilaMonthDay(lastUploadedRow.uploaded_at)
-    : "No uploads yet";
+  const tasks = studentTasks({
+    cases,
+    hearings,
+    idStatus,
+    now: new Date(),
+    formatWhen: (iso) => formatManila(iso, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }),
+    formatDay: (iso) => formatManilaLongDate(iso),
+  });
 
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Dashboard" }]}
-        title={`${getGreeting()}, ${student.first_name}.`}
-        description={`Here's an overview of your student profile for ${termLabel}.`}
+        title={`${getGreeting()}, ${student.first_name}`}
+        description={`${term.schoolYearLabel}, ${term.semester}. Here is what needs your attention, and where to find everything else.`}
       >
         <Link
           href="/concerns/new"
-          className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium bg-tup-maroon-600 text-white hover:bg-tup-maroon-700 transition-colors"
+          className={cn(buttonVariants(), "gap-1.5 bg-tup-maroon-600 text-white hover:bg-tup-maroon-700")}
         >
-          <Plus className="h-3.5 w-3.5" />
-          Submit a Concern
+          <Plus className="h-4 w-4" />
+          Submit a concern
         </Link>
       </PageHeader>
 
-      {/* Stats grid — 4 cards matching mockup */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatsCard
-          label="Enrollment"
-          value={isEnrolled ? "Enrolled" : "Not enrolled"}
-          trend={
-            isEnrolled
-              ? `${totalUnits} units · ${enrolledSubjectsCount} subjects`
-              : "Pending registration"
-          }
-          trendTone={isEnrolled ? "up" : "warn"}
-          icon={CheckCircle2}
-          iconTone={isEnrolled ? "success" : "warn"}
-        />
-        <StatsCard
-          label="Active Concerns"
-          value={activeConcerns}
-          trend={
-            activeConcerns > 0
-              ? `${inReviewConcerns} in review · ${pendingConcerns} pending`
-              : "No active concerns"
-          }
-          trendTone={activeConcerns > 0 ? "warn" : "up"}
-          icon={MessageSquare}
-          iconTone={activeConcerns > 0 ? "warn" : "neutral"}
-        />
-        <StatsCard
-          label="Violations"
-          value={activeViolations}
-          trend={activeViolations === 0 ? "Clean record" : "Requires attention"}
-          trendTone={activeViolations === 0 ? "up" : "danger"}
-          icon={activeViolations === 0 ? CheckCircle2 : AlertTriangle}
-          iconTone={activeViolations === 0 ? "success" : "danger"}
-        />
-        <StatsCard
-          label="Documents"
-          value={documentsCount}
-          trend={
-            documentsCount > 0 ? `Last upload: ${lastUpload}` : "No documents yet"
-          }
-          icon={FolderOpen}
-          iconTone="neutral"
-        />
-      </div>
+      <section className="overflow-hidden rounded-xl border border-border bg-card">
+        <h2 className="border-b border-border px-6 py-4 font-display text-lg font-semibold tracking-tight">
+          Needs your attention
+        </h2>
+        {tasks.length === 0 ? (
+          <div className="flex items-center gap-4 px-6 py-8">
+            <CheckCircleIcon className="h-8 w-8 shrink-0 text-green-700" />
+            <div>
+              <p className="text-lg font-medium">Nothing needs your attention right now.</p>
+              <p className="text-base text-muted-foreground">
+                Meetings, letters the OSA asks for and other deadlines will appear here.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <ul>
+            {tasks.map((task) => (
+              <li
+                key={task.key}
+                className={cn(
+                  "flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border px-6 py-4 last:border-0",
+                  task.urgent && "bg-red-50/60",
+                )}
+              >
+                <p className="flex min-w-0 items-center gap-3 text-lg">
+                  {task.urgent ? (
+                    <WarningIcon className="h-6 w-6 shrink-0 text-destructive" aria-label="Urgent" />
+                  ) : (
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center" aria-hidden="true">
+                      <span className="h-2.5 w-2.5 rounded-full bg-tup-maroon-600" />
+                    </span>
+                  )}
+                  <span className={cn(task.urgent && "font-semibold")}>{task.text}</span>
+                </p>
+                <Link href={task.href} className={task.urgent ? URGENT_BUTTON : SECONDARY_BUTTON}>
+                  {task.action}
+                  <ArrowRightIcon className="h-5 w-5" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      {/* Quick Access section */}
-      <div className="flex items-baseline justify-between mb-3.5">
-        <h2 className="text-base font-semibold">Quick Access</h2>
-        <span className="text-sm text-muted-foreground font-mono">
-          6 modules
-        </span>
-      </div>
+      {/* The figures, in one strip. */}
+      <GlanceStrip
+        items={[
+          {
+            key: "cases",
+            label: "Open cases",
+            value: openCases === 0 ? "None" : String(openCases),
+            tone: openCases > 0 ? "warning" : "success",
+          },
+          { key: "concerns", label: "Open concerns", value: openConcerns === 0 ? "None" : String(openConcerns), tone: "neutral" },
+          {
+            key: "id",
+            label: "ID this term",
+            value: idStatus ? ID_STATUS_META[idStatus].label : "Not validated",
+            tone: idStatus === "validated" ? "success" : "warning",
+          },
+          {
+            key: "documents",
+            label: "Documents uploaded",
+            value: documentsCount === 0 ? "None yet" : `${documentsCount}, last on ${formatManilaMonthDay(lastUpload)}`,
+            tone: "neutral",
+          },
+        ]}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ModuleCard
-          title="Scholarships"
-          description="See which scholarships you qualify for and the documents each one needs."
-          icon={Award}
-          href="/scholarships"
-          linkLabel="Check eligibility"
-        />
-        <ModuleCard
-          title="Submit a Concern"
-          description="File guidance or complaint requests. Reviewed with AI-assisted triage."
-          icon={MessageSquare}
-          href="/concerns"
-          linkLabel="New concern"
-          variant="ai"
-        />
-        <ModuleCard
-          title="Violation History"
-          description="Review your disciplinary record and resolution status."
-          icon={ShieldAlert}
-          href="/violations"
-          linkLabel="View history"
-        />
-        <ModuleCard
-          title="Digital ID"
-          description="Generate a verifiable QR code for use across campus services."
-          icon={IdCard}
-          href="/id"
-          linkLabel="Show ID"
-        />
-        <ModuleCard
-          title="Academic Records"
-          description="Upload your Certificate of Registration and rating slips for OSA verification."
-          icon={FolderOpen}
-          href="/records"
-          linkLabel="Open records"
-        />
-        <ModuleCard
-          title="Notifications"
-          description="Summons, schedules, clearance updates and other notices from the OSA."
-          icon={Megaphone}
-          href="/notifications"
-          linkLabel="Read all"
-        />
-      </div>
+      <section>
+        <h2 className="mb-3.5 font-display text-lg font-semibold tracking-tight">Everything else</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ModuleCard
+            title="Scholarships"
+            description="See which scholarships you qualify for and the documents each one needs."
+            icon={Award}
+            href="/scholarships"
+            linkLabel="Check eligibility"
+          />
+          <ModuleCard
+            title="Submit a concern"
+            description="Ask the OSA for help, or file a complaint. An AI summary helps staff read it sooner."
+            icon={MessageSquare}
+            href="/concerns"
+            linkLabel="New concern"
+            variant="ai"
+          />
+          <ModuleCard
+            title="My violations"
+            description="Your disciplinary record, what each case needs from you, and how it ended."
+            icon={ShieldAlert}
+            href="/violations"
+            linkLabel="Open my violations"
+          />
+          <ModuleCard
+            title="Digital ID"
+            description="Your QR code for the campus gates, and this term's validation."
+            icon={IdCard}
+            href="/id"
+            linkLabel="Show my ID"
+          />
+          <ModuleCard
+            title="Academic records"
+            description="Upload your Certificate of Registration and rating slips for the OSA to verify."
+            icon={FolderOpen}
+            href="/records"
+            linkLabel="Open records"
+          />
+          <ModuleCard
+            title="Notifications"
+            description="Summons, schedules, clearance updates and other notices from the OSA."
+            icon={Megaphone}
+            href="/notifications"
+            linkLabel="Read all"
+          />
+        </div>
+      </section>
     </div>
   );
 }
