@@ -10,17 +10,17 @@ import { Button } from "@/components/ui/button";
 const BODIES = [
   {
     value: "PIC",
-    label: "PIC — Preliminary Investigation Committee",
+    label: "PIC: Preliminary Investigation Committee",
     note: "Fact-finding before a formal board hearing.",
   },
   {
     value: "SDB",
-    label: "SDB — Student Disciplinary Board",
+    label: "SDB: Student Disciplinary Board",
     note: "Formal hearing; can recommend suspension or worse.",
   },
   {
     value: "CODI",
-    label: "CODI — Committee on Decorum and Investigation",
+    label: "CODI: Committee on Decorum and Investigation",
     note: "Sexual harassment and gender-based violence (RA 7877, RA 11313). Makes the case confidential immediately and removes it from the general queue.",
   },
 ] as const;
@@ -32,8 +32,8 @@ export function EscalateForm({ caseId }: { caseId: string }) {
 
   if (!open) {
     return (
-      <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
-        <ArrowUpRight className="mr-1.5 h-3.5 w-3.5" />
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        <ArrowUpRight className="mr-1.5 h-4 w-4" />
         Refer to a committee
       </Button>
     );
@@ -66,12 +66,12 @@ export function EscalateForm({ caseId }: { caseId: string }) {
           aria-label="Cancel"
           className="rounded-md p-1 text-muted-foreground hover:bg-muted"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Committee</span>
+        <span className="text-base font-medium">Committee</span>
         <select
           name="escalated_to"
           value={body}
@@ -99,7 +99,7 @@ export function EscalateForm({ caseId }: { caseId: string }) {
       )}
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Why</span>
+        <span className="text-base font-medium">Why</span>
         <textarea
           name="reason"
           required
@@ -113,11 +113,10 @@ export function EscalateForm({ caseId }: { caseId: string }) {
 
       <Button
         type="submit"
-        size="sm"
         disabled={isPending}
         className="w-full bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
       >
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Refer
       </Button>
     </form>
@@ -150,7 +149,7 @@ export function EscalationOutcomeForm({ escalationId }: { escalationId: string }
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Decision</span>
+          <span className="text-base font-medium">Decision</span>
           <select
             name="outcome"
             value={outcome}
@@ -166,7 +165,7 @@ export function EscalationOutcomeForm({ escalationId }: { escalationId: string }
         </label>
 
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Committee reference</span>
+          <span className="text-base font-medium">Committee reference</span>
           <input
             name="external_reference"
             maxLength={80}
@@ -178,7 +177,7 @@ export function EscalationOutcomeForm({ escalationId }: { escalationId: string }
 
       {outcome === "sanction_recommended" && (
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Sanction</span>
+          <span className="text-base font-medium">Sanction</span>
           <input
             name="sanction_recommended"
             required
@@ -200,8 +199,8 @@ export function EscalationOutcomeForm({ escalationId }: { escalationId: string }
         className={inputClass}
       />
 
-      <Button type="submit" size="sm" variant="outline" disabled={isPending} className="w-full">
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" variant="outline" disabled={isPending} className="w-full">
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Record decision
       </Button>
     </form>
@@ -209,4 +208,4 @@ export function EscalationOutcomeForm({ escalationId }: { escalationId: string }
 }
 
 const inputClass =
-  "w-full rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-tup-maroon-600 focus:outline-none";
+  "w-full min-h-10 rounded-md border border-border bg-background px-3 py-2 text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20";

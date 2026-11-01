@@ -56,7 +56,7 @@ export function ApologyReviewControls({ letterId }: { letterId: string }) {
             aria-label="Cancel"
             className="rounded-md p-1 text-muted-foreground hover:bg-muted"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -66,7 +66,7 @@ export function ApologyReviewControls({ letterId }: { letterId: string }) {
           maxLength={1000}
           required={pending !== "accept"}
           placeholder={copy.prompt}
-          className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-sm focus:border-tup-maroon-600 focus:outline-none"
+          className="w-full min-h-10 rounded-md border border-border bg-background px-3 py-2 text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20"
         />
 
         {pending === "accept" && (
@@ -78,11 +78,10 @@ export function ApologyReviewControls({ letterId }: { letterId: string }) {
 
         <Button
           type="submit"
-          size="sm"
           disabled={isPending}
           className="w-full bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
         >
-          {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+          {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
           Confirm
         </Button>
       </form>
@@ -94,25 +93,25 @@ export function ApologyReviewControls({ letterId }: { letterId: string }) {
       <button
         type="button"
         onClick={() => setPending("accept")}
-        className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-100"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-base font-medium text-emerald-800 transition-colors hover:bg-emerald-100"
       >
-        <Check className="h-3 w-3" />
+        <Check className="h-4 w-4" />
         Accept & close
       </button>
       <button
         type="button"
         onClick={() => setPending("request_revision")}
-        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-sm font-medium transition-colors hover:bg-muted"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted"
       >
-        <RotateCcw className="h-3 w-3" />
+        <RotateCcw className="h-4 w-4" />
         Ask for changes
       </button>
       <button
         type="button"
         onClick={() => setPending("reject")}
-        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-sm font-medium transition-colors hover:bg-muted"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted"
       >
-        <X className="h-3 w-3" />
+        <X className="h-4 w-4" />
         Not accepted
       </button>
     </div>
@@ -132,7 +131,7 @@ export function ApologyFileLink({ letterId }: { letterId: string }) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 text-sm font-medium text-tup-maroon-600 underline-offset-2 hover:underline"
       >
-        <ExternalLink className="h-3 w-3" />
+        <ExternalLink className="h-4 w-4" />
         Open signed copy (5 min link)
       </a>
     );
@@ -154,7 +153,7 @@ export function ApologyFileLink({ letterId }: { letterId: string }) {
       }
       className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
     >
-      {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
+      {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
       View attached scan
     </button>
   );

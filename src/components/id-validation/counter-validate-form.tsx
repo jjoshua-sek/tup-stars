@@ -43,7 +43,7 @@ export function CounterValidateForm({ studentId, termLabel }: { studentId: strin
       <Button
         type="submit"
         disabled={isPending}
-        className="h-8 bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
+        className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
         title={`Validate for ${termLabel}`}
       >
         {isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <BadgeCheck className="mr-1.5 h-4 w-4" />}

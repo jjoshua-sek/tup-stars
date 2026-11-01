@@ -8,6 +8,7 @@ import { verifyAtDesk, type DeskScanResult } from "@/app/staff/scanner/actions";
 import { CameraScanner } from "@/components/access/camera-scanner";
 import { Button } from "@/components/ui/button";
 import { formatManilaDate, formatManilaTime } from "@/lib/utils/time";
+import { ID_STATUS_META } from "@/types/osa";
 
 interface DeskScannerProps {
   /** Guards get the verdict without the discipline context. */
@@ -74,14 +75,14 @@ export function DeskScanner({ canSeeCases }: DeskScannerProps) {
       {/* Input */}
       <div className="space-y-4">
         <div className="rounded-xl border border-border bg-card p-5">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="font-display text-base font-semibold">Scan or type a student number</p>
             <button
               type="button"
               onClick={() => setUseCamera((current) => !current)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-sm font-medium transition-colors hover:bg-muted"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted"
             >
-              {useCamera ? <Keyboard className="h-3 w-3" /> : <Camera className="h-3 w-3" />}
+              {useCamera ? <Keyboard className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
               {useCamera ? "Use scanner" : "Use camera"}
             </button>
           </div>
@@ -102,27 +103,29 @@ export function DeskScanner({ canSeeCases }: DeskScannerProps) {
                   }
                 }}
                 placeholder="TUPM-22-0148"
+                aria-label="Student number"
                 spellCheck={false}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-base focus:border-tup-maroon-600 focus:outline-none"
+                className="min-h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 py-2 font-mono text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20"
               />
               <Button
                 type="button"
                 onClick={() => runScan(value)}
                 disabled={isPending}
-                className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
+                className="shrink-0 gap-1.5 bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
               >
                 {isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <ScanLine className="h-4 w-4" />
                 )}
+                Check
               </Button>
             </div>
           )}
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            A USB scanner types the number and presses Enter on its own — just keep this field
-            focused.
+          <p className="mt-2 text-base text-muted-foreground">
+            A USB scanner types the number and presses Enter on its own. Just keep this field
+            selected.
           </p>
         </div>
 
@@ -177,21 +180,28 @@ export function DeskScanner({ canSeeCases }: DeskScannerProps) {
               ) : (
                 <ShieldAlert className="h-4 w-4" />
               )}
-              {result.headline} — {result.hint}
+              {result.headline}. {result.hint}
             </div>
 
             <dl className="space-y-1.5 text-base">
-              <Row label="Name" value={result.staffDetail?.fullName ?? "—"} />
-              <Row label="Student number" value={result.staffDetail?.studentNumber ?? "—"} mono />
-              <Row label="Validation" value={result.staffDetail?.validationStatus ?? "none"} />
+              <Row label="Name" value={result.staffDetail?.fullName ?? "Not found"} />
+              <Row label="Student number" value={result.staffDetail?.studentNumber ?? "Not found"} mono />
+              <Row
+                label="Validation"
+                value={
+                  result.staffDetail?.validationStatus
+                    ? ID_STATUS_META[result.staffDetail.validationStatus].label
+                    : "Not validated this term"
+                }
+              />
               <Row label="Term" value={result.staffDetail?.validationTerm ?? result.termLabel} />
-              <Row label="Expires" value={formatManilaDate(result.staffDetail?.expiresAt)} />
+              <Row label="Expires" value={result.staffDetail?.expiresAt ? formatManilaDate(result.staffDetail.expiresAt) : "No date"} />
               {canSeeCases && (
                 <Row
                   label="Open cases"
                   value={
                     result.openCases === null || result.openCases === undefined
-                      ? "—"
+                      ? "Not known"
                       : String(result.openCases)
                   }
                 />
@@ -199,10 +209,10 @@ export function DeskScanner({ canSeeCases }: DeskScannerProps) {
             </dl>
 
             {result.anomalyFlagged && (
-              <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                This scan raised an access anomaly. It is queued for review under Gates &amp;
-                Access — it does not block the student by itself.
+              <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-base text-amber-900">
+                <Clock className="mt-1 h-4 w-4 shrink-0" />
+                This scan raised a gate alert. It waits for review on Campus gates; it does not
+                stop the student by itself.
               </p>
             )}
 

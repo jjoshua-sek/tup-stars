@@ -38,7 +38,7 @@ export function AssignOfficerForm({
         name="officer_id"
         defaultValue={current ?? ""}
         required
-        className="h-8 rounded-md border border-border bg-background px-2 text-base focus:border-tup-maroon-600 focus:outline-none"
+        className="h-10 rounded-md border border-border bg-background px-3 text-base focus:border-tup-maroon-600 focus:outline-none"
       >
         <option value="" disabled>
           Choose an officer
@@ -49,8 +49,8 @@ export function AssignOfficerForm({
           </option>
         ))}
       </select>
-      <Button type="submit" size="sm" variant="outline" disabled={pending} className="h-8">
-        {pending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" variant="outline" disabled={pending}>
+        {pending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Assign
       </Button>
     </form>

@@ -25,7 +25,7 @@ import {
 } from "@/lib/osa/sanctions";
 
 const inputClass =
-  "w-full rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-tup-maroon-600 focus:outline-none";
+  "w-full min-h-10 rounded-md border border-border bg-background px-3 py-2 text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20";
 
 function Header({ title, onCancel }: { title: string; onCancel: () => void }) {
   return (
@@ -37,7 +37,7 @@ function Header({ title, onCancel }: { title: string; onCancel: () => void }) {
         aria-label="Cancel"
         className="rounded-md p-1 text-muted-foreground hover:bg-muted"
       >
-        <X className="h-3.5 w-3.5" />
+        <X className="h-4 w-4" />
       </button>
     </div>
   );
@@ -71,8 +71,8 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
 
   if (!open) {
     return (
-      <Button type="button" size="sm" variant="outline" onClick={openForm}>
-        <HardHat className="mr-1.5 h-3.5 w-3.5" />
+      <Button type="button" variant="outline" onClick={openForm}>
+        <HardHat className="mr-1.5 h-4 w-4" />
         Assign community service
       </Button>
     );
@@ -103,7 +103,7 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
 
       {loading ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" />
           Counting prior offenses…
         </p>
       ) : (
@@ -123,10 +123,10 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
                     name="basis_choice"
                     checked={basis === option}
                     onChange={() => setBasis(option)}
-                    className="h-3 w-3"
+                    className="h-4 w-4"
                   />
                   <span>
-                    {COUNT_BASIS_LABELS[option]} —{" "}
+                    {COUNT_BASIS_LABELS[option]}:{" "}
                     <span className="font-mono">
                       {counts ? counts[basisKey(option)] : 0} prior
                     </span>
@@ -150,7 +150,7 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
 
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="block space-y-1">
-              <span className="text-sm font-medium">
+              <span className="text-base font-medium">
                 Hours{" "}
                 {prescribed.bandMin != null && (
                   <span className="text-muted-foreground">
@@ -169,13 +169,13 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Complete by</span>
+              <span className="text-base font-medium">Complete by</span>
               <input type="date" name="deadline" className={inputClass} />
             </label>
           </div>
 
           <label className="block space-y-1">
-            <span className="text-sm font-medium">What and where</span>
+            <span className="text-base font-medium">What and where</span>
             <input
               name="service_detail"
               maxLength={500}
@@ -186,11 +186,10 @@ export function CommunityServiceForm({ caseId }: { caseId: string }) {
 
           <Button
             type="submit"
-            size="sm"
             disabled={isPending}
             className="w-full bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
           >
-            {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+            {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
             Assign and notify the student
           </Button>
         </>
@@ -237,7 +236,7 @@ export function ServiceProgressForm({
       <input type="hidden" name="assignment_id" value={assignmentId} />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Hours served of {hoursRequired}</span>
+        <span className="text-base font-medium">Hours served of {hoursRequired}</span>
         <input
           name="hours_completed"
           type="number"
@@ -250,7 +249,7 @@ export function ServiceProgressForm({
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Verified by</span>
+        <span className="text-base font-medium">Verified by</span>
         <input
           name="verifier_role"
           maxLength={120}
@@ -260,7 +259,7 @@ export function ServiceProgressForm({
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Mark as</span>
+        <span className="text-base font-medium">Mark as</span>
         <select name="mark" defaultValue="progress" className={inputClass}>
           <option value="progress">Progress only</option>
           <option value="completed">Completed</option>
@@ -276,8 +275,8 @@ export function ServiceProgressForm({
         className={`${inputClass} min-w-[140px] flex-1`}
       />
 
-      <Button type="submit" size="sm" variant="outline" disabled={isPending}>
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" variant="outline" disabled={isPending}>
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Record
       </Button>
     </form>
@@ -294,9 +293,9 @@ export function NonAppearanceForm({ hearingId }: { hearingId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-sm font-medium transition-colors hover:bg-muted"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted"
       >
-        <UserX className="h-3 w-3" />
+        <UserX className="h-4 w-4" />
         Did not appear
       </button>
     );
@@ -322,17 +321,17 @@ export function NonAppearanceForm({ hearingId }: { hearingId: string }) {
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Who did not appear</span>
+          <span className="text-base font-medium">Who did not appear</span>
           <select name="party" defaultValue="student" className={inputClass}>
             <option value="student">The student</option>
             <option value="complainant">The complainant</option>
           </select>
         </label>
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Then</span>
+          <span className="text-base font-medium">Then</span>
           <select name="proceeded" defaultValue="ex_parte" className={inputClass}>
             <option value="ex_parte">Proceeded ex-parte (Sec. 7.7)</option>
-            <option value="reset">Reset — justifiable cause shown</option>
+            <option value="reset">Reset: justifiable cause shown</option>
           </select>
         </label>
       </div>
@@ -349,8 +348,8 @@ export function NonAppearanceForm({ hearingId }: { hearingId: string }) {
         handbook has the fact noted and the proceeding continue ex-parte.
       </p>
 
-      <Button type="submit" size="sm" variant="outline" disabled={isPending} className="w-full">
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" variant="outline" disabled={isPending} className="w-full">
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Record
       </Button>
     </form>
@@ -364,8 +363,8 @@ export function ManualHearingForm({ caseId }: { caseId: string }) {
 
   if (!open) {
     return (
-      <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
-        <CalendarPlus className="mr-1.5 h-3.5 w-3.5" />
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        <CalendarPlus className="mr-1.5 h-4 w-4" />
         Book by hand
       </Button>
     );
@@ -391,11 +390,11 @@ export function ManualHearingForm({ caseId }: { caseId: string }) {
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Date and time</span>
+          <span className="text-base font-medium">Date and time</span>
           <input type="datetime-local" name="scheduled_start" required className={inputClass} />
         </label>
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Minutes</span>
+          <span className="text-base font-medium">Minutes</span>
           <input
             name="duration_minutes"
             type="number"
@@ -406,7 +405,7 @@ export function ManualHearingForm({ caseId }: { caseId: string }) {
           />
         </label>
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Type</span>
+          <span className="text-base font-medium">Type</span>
           <select name="hearing_type" defaultValue="conference" className={inputClass}>
             <option value="counselling">Counselling</option>
             <option value="conference">Conference</option>
@@ -417,7 +416,7 @@ export function ManualHearingForm({ caseId }: { caseId: string }) {
           </select>
         </label>
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Venue</span>
+          <span className="text-base font-medium">Venue</span>
           <input name="venue" defaultValue="OSA Office" maxLength={120} className={inputClass} />
         </label>
       </div>
@@ -431,12 +430,11 @@ export function ManualHearingForm({ caseId }: { caseId: string }) {
 
       <Button
         type="submit"
-        size="sm"
         disabled={isPending}
         className="w-full bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
       >
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-        Book — complainant still approves
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+        Book it; the complainant still approves
       </Button>
     </form>
   );
@@ -468,8 +466,8 @@ export function AppealWindowForm({
 
   if (!open) {
     return (
-      <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
-        <Scale className="mr-1.5 h-3.5 w-3.5" />
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        <Scale className="mr-1.5 h-4 w-4" />
         Record the appeal window
       </Button>
     );
@@ -497,7 +495,7 @@ export function AppealWindowForm({
       <Header title="Appeal window" onCancel={() => setOpen(false)} />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Penalty imposed</span>
+        <span className="text-base font-medium">Penalty imposed</span>
         <select
           name="penalty_basis"
           value={basis}
@@ -522,7 +520,7 @@ export function AppealWindowForm({
       </p>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium">Notice of Decision received on</span>
+        <span className="text-base font-medium">Notice of Decision received on</span>
         <input type="date" name="notice_received_on" required className={inputClass} />
         <span className="block text-sm text-muted-foreground">
           The clock runs from receipt, not from the date of the decision.
@@ -531,11 +529,10 @@ export function AppealWindowForm({
 
       <Button
         type="submit"
-        size="sm"
         disabled={isPending}
         className="w-full bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
       >
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         Record and tell the student
       </Button>
     </form>
@@ -561,7 +558,7 @@ export function AppealOutcomeForm({ appealId }: { appealId: string }) {
 
       <div className="grid gap-2 sm:grid-cols-3">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Status</span>
+          <span className="text-base font-medium">Status</span>
           <select
             name="status"
             value={status}
@@ -577,7 +574,7 @@ export function AppealOutcomeForm({ appealId }: { appealId: string }) {
 
         {status === "filed" && (
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Filed on</span>
+            <span className="text-base font-medium">Filed on</span>
             <input type="date" name="filed_on" className={inputClass} />
           </label>
         )}
@@ -585,7 +582,7 @@ export function AppealOutcomeForm({ appealId }: { appealId: string }) {
         {status === "decided" && (
           <>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Decision</span>
+              <span className="text-base font-medium">Decision</span>
               <select name="outcome" defaultValue="upheld" className={inputClass}>
                 <option value="upheld">Upheld</option>
                 <option value="modified">Modified</option>
@@ -595,7 +592,7 @@ export function AppealOutcomeForm({ appealId }: { appealId: string }) {
               </select>
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">Decided on</span>
+              <span className="text-base font-medium">Decided on</span>
               <input type="date" name="decided_on" className={inputClass} />
             </label>
           </>
@@ -617,9 +614,9 @@ export function AppealOutcomeForm({ appealId }: { appealId: string }) {
         />
       </div>
 
-      <Button type="submit" size="sm" variant="outline" disabled={isPending} className="w-full">
-        {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-        <Gavel className="mr-1.5 h-3.5 w-3.5" />
+      <Button type="submit" variant="outline" disabled={isPending} className="w-full">
+        {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+        <Gavel className="mr-1.5 h-4 w-4" />
         Save appeal record
       </Button>
     </form>

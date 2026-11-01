@@ -71,7 +71,7 @@ export function MinorProcessForm({ caseId, current }: { caseId: string; current:
 
       {choice === "warning_only" && (
         <label className="block space-y-1">
-          <span className="text-sm font-medium">The warning, as the student will read it</span>
+          <span className="text-base font-medium">The warning, as the student will read it</span>
           <textarea
             name="warning"
             required
@@ -79,19 +79,19 @@ export function MinorProcessForm({ caseId, current }: { caseId: string; current:
             maxLength={1000}
             rows={3}
             placeholder="e.g. You entered campus without a validated ID on Oct 20. A repeat will be treated as a second offense."
-            className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-base focus:border-tup-maroon-600 focus:outline-none"
+            className="w-full min-h-10 rounded-md border border-border bg-background px-3 py-2 text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20"
           />
         </label>
       )}
 
       {advice && choice === "warning_only" && (
         <p className="flex items-start gap-1.5 rounded-md bg-amber-50 p-2 text-sm leading-relaxed text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-          <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {advice}
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" /> {advice}
         </p>
       )}
 
-      <Button type="submit" size="sm" disabled={pending} className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700">
-        {pending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" disabled={pending} className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700">
+        {pending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         {choice === "warning_only" ? "Close with this warning" : choice === "apology_only" ? "Ask for the apology letter" : "Save"}
       </Button>
     </form>

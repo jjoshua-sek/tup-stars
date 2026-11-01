@@ -95,7 +95,7 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 Device key for {issuedKey.gate}
               </p>
               <p className="mt-1 text-base text-muted-foreground">
-                Copy it into the kiosk at <span className="font-mono">/kiosk</span> now — it is
+                Copy it into the kiosk at <span className="font-mono">/kiosk</span> now. It is
                 shown once and stored only as a hash.
               </p>
               <code className="mt-2 block overflow-x-auto rounded-md bg-background px-3 py-2 font-mono text-sm">
@@ -110,9 +110,9 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                   void navigator.clipboard
                     .writeText(issuedKey.key)
                     .then(() => toast.success("Key copied."))
-                    .catch(() => toast.error("Copy failed — select the text manually."));
+                    .catch(() => toast.error("Copy failed. Select the text and copy it by hand."));
                 }}
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background"
+                className="grid h-10 w-10 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-background"
               >
                 <Copy className="h-4 w-4" />
               </button>
@@ -120,7 +120,7 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 type="button"
                 aria-label="Dismiss"
                 onClick={() => setIssuedKey(null)}
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background"
+                className="grid h-10 w-10 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-background"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -155,29 +155,9 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                   </p>
                 </div>
 
-                {canManage && (
-                  <div className="flex shrink-0 gap-1">
-                    <button
-                      type="button"
-                      aria-label="Edit gate"
-                      onClick={() => setEditing(gate)}
-                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={gate.is_active ? "Close lane" : "Reopen lane"}
-                      onClick={() => handleToggle(gate)}
-                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted"
-                    >
-                      <Power className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )}
               </div>
 
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-base">
                 <Meta label="Mode">
                   {gate.enforcement_mode === "enforce" ? (
                     <span className="inline-flex items-center gap-1 text-emerald-700">
@@ -198,16 +178,23 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 </Meta>
               </dl>
 
+              {/* Labelled buttons in one row: icons alone (a pencil, a power sign)
+                  did not say what they do. */}
               {canManage && (
-                <button
-                  type="button"
-                  onClick={() => handleRotate(gate)}
-                  disabled={isPending}
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-                >
-                  <KeyRound className="h-3 w-3" />
-                  Issue new device key
-                </button>
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+                  <button type="button" onClick={() => setEditing(gate)} className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted disabled:opacity-50">
+                    <Pencil className="h-4 w-4" />
+                    Edit gate
+                  </button>
+                  <button type="button" onClick={() => handleToggle(gate)} className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted disabled:opacity-50">
+                    <Power className="h-4 w-4" />
+                    {gate.is_active ? "Close lane" : "Reopen lane"}
+                  </button>
+                  <button type="button" onClick={() => handleRotate(gate)} disabled={isPending} className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted disabled:opacity-50">
+                    <KeyRound className="h-4 w-4" />
+                    Issue new device key
+                  </button>
+                </div>
               )}
             </div>
           );
@@ -270,7 +257,7 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 name="name"
                 required
                 defaultValue={editing === "new" ? "" : editing.name}
-                placeholder="Main Gate — Ayala Blvd."
+                placeholder="Main Gate, Ayala Blvd."
                 className={inputClass}
               />
             </Field>
@@ -299,8 +286,8 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 defaultValue={editing === "new" ? "monitor" : editing.enforcement_mode}
                 className={inputClass}
               >
-                <option value="monitor">Monitor — log only, always open</option>
-                <option value="enforce">Enforce — deny holds the arm</option>
+                <option value="monitor">Monitor: log only, always open</option>
+                <option value="enforce">Enforce: a refusal holds the arm</option>
               </select>
             </Field>
             <Field label="Anti-passback">
@@ -310,8 +297,8 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 className={inputClass}
               >
                 <option value="off">Off</option>
-                <option value="soft">Soft — allow but flag</option>
-                <option value="hard">Hard — deny</option>
+                <option value="soft">Soft: allow but flag</option>
+                <option value="hard">Hard: refuse</option>
               </select>
             </Field>
             <Field label="Relay">
@@ -320,7 +307,7 @@ export function GateConsole({ gates, canManage }: GateConsoleProps) {
                 defaultValue={editing === "new" ? "none" : editing.relay_mode}
                 className={inputClass}
               >
-                <option value="none">None — screen only</option>
+                <option value="none">None: screen only</option>
                 <option value="local_http">Local HTTP relay board</option>
                 <option value="web_serial">USB / RS-485 (Web Serial)</option>
               </select>

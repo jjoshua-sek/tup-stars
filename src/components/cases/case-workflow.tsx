@@ -32,7 +32,6 @@ export function ProposeSlotsButton({ caseId }: { caseId: string }) {
     <Button
       type="button"
       variant="outline"
-      size="sm"
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {
@@ -101,7 +100,6 @@ export function ProposalPicker({ proposals }: { proposals: ProposalView[] }) {
                 </span>
                 <Button
                   type="button"
-                  size="sm"
                   variant={isSelected ? "secondary" : "outline"}
                   onClick={() => setSelected(isSelected ? null : proposal.id)}
                 >
@@ -149,11 +147,10 @@ export function ProposalPicker({ proposals }: { proposals: ProposalView[] }) {
 
                 <Button
                   type="submit"
-                  size="sm"
                   disabled={isPending}
                   className="bg-tup-maroon-600 text-white hover:bg-tup-maroon-700"
                 >
-                  {isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                  {isPending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                   Set this date
                 </Button>
               </form>

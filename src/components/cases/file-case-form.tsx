@@ -210,9 +210,9 @@ export function FileCaseForm({
                   setSelected(null);
                   setRecord(null);
                 }}
-                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-sm font-medium transition-colors hover:bg-muted"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium transition-colors hover:bg-muted"
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" />
                 Change
               </button>
             </div>
@@ -245,14 +245,14 @@ export function FileCaseForm({
           <div className="relative">
             <div className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 focus-within:border-tup-maroon-600">
               {searching ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               ) : (
-                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <Search className="h-4 w-4 text-muted-foreground" />
               )}
               <input
                 value={query}
                 onChange={(event) => handleQueryChange(event.target.value)}
-                placeholder="Search by student number or surname — e.g. TUPM-22-0148 or Dela Cruz"
+                placeholder="Student number or surname, for example TUPM-22-0148 or Dela Cruz"
                 className="w-full bg-transparent text-base outline-none"
               />
             </div>
@@ -275,7 +275,7 @@ export function FileCaseForm({
                           {match.program ? ` · ${match.program}` : ""}
                         </span>
                       </span>
-                      <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <Check className="h-4 w-4 shrink-0 text-muted-foreground" />
                     </button>
                   </li>
                 ))}
@@ -298,7 +298,7 @@ export function FileCaseForm({
         <SectionHeading step={2} title="What happened?" />
 
         <label className="block space-y-1">
-          <span className="text-sm font-medium">Offense</span>
+          <span className="text-base font-medium">Offense</span>
           <select
             name="violation_type_id"
             value={typeId}
@@ -310,14 +310,14 @@ export function FileCaseForm({
             <optgroup label="Minor">
               {grouped.minor.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.code} — {type.name}
+                  {type.code}: {type.name}
                 </option>
               ))}
             </optgroup>
             <optgroup label="Major">
               {grouped.major.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.code} — {type.name}
+                  {type.code}: {type.name}
                 </option>
               ))}
             </optgroup>
@@ -325,7 +325,7 @@ export function FileCaseForm({
               <optgroup label="Confidential">
                 {grouped.confidential.map((type) => (
                   <option key={type.id} value={type.id}>
-                    {type.code} — {type.name}
+                    {type.code}: {type.name}
                   </option>
                 ))}
               </optgroup>
@@ -334,7 +334,7 @@ export function FileCaseForm({
               <optgroup label="Not in the Student Manual">
                 {grouped.unlisted.map((type) => (
                   <option key={type.id} value={type.id}>
-                    {type.code} — {type.name}
+                    {type.code}: {type.name}
                   </option>
                 ))}
               </optgroup>
@@ -377,13 +377,13 @@ export function FileCaseForm({
               </p>
             ) : unlisted ? (
               <p className="flex items-start gap-2 text-sm text-muted-foreground">
-                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 The Student Manual does not list this, so the OSA classifies it as minor or major
                 after review, and decides the sanction.
               </p>
             ) : (
               <p className="flex items-start gap-2 text-sm text-muted-foreground">
-                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 Filed as a <strong className="mx-1">{selectedType.default_classification}</strong>
                 offense, as the Student Manual classifies it. The sanction is decided by the OSA.
               </p>
@@ -393,7 +393,7 @@ export function FileCaseForm({
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Date of incident</span>
+            <span className="text-base font-medium">Date of incident</span>
             <input
               type="date"
               name="incident_date"
@@ -403,11 +403,11 @@ export function FileCaseForm({
             />
           </label>
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Time (optional)</span>
+            <span className="text-base font-medium">Time (optional)</span>
             <input type="time" name="incident_time" className={inputClass} />
           </label>
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Where (optional)</span>
+            <span className="text-base font-medium">Where (optional)</span>
             <input
               name="incident_location"
               maxLength={120}
@@ -419,7 +419,7 @@ export function FileCaseForm({
         </div>
 
         <label className="mt-3 block space-y-1">
-          <span className="text-sm font-medium">
+          <span className="text-base font-medium">
             What happened, in your own words
           </span>
           <textarea
@@ -463,7 +463,7 @@ export function FileCaseForm({
         <>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block space-y-1">
-            <span className="text-sm font-medium">Filing as</span>
+            <span className="text-base font-medium">Filing as</span>
             <select
               name="complainant_type"
               value={complainantType}
@@ -481,7 +481,7 @@ export function FileCaseForm({
           </label>
 
           <label className="block space-y-1">
-            <span className="text-sm font-medium">
+            <span className="text-base font-medium">
               Complainant name {needsName ? "" : "(optional)"}
             </span>
             <input
@@ -536,4 +536,4 @@ function SectionHeading({ step, title }: { step: number; title: string }) {
 }
 
 const inputClass =
-  "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-base focus:border-tup-maroon-600 focus:outline-none";
+  "w-full min-h-10 rounded-md border border-border bg-background px-3 py-2 text-base focus:border-tup-maroon-600 focus:outline-none focus:ring-3 focus:ring-tup-maroon-600/20";

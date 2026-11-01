@@ -33,7 +33,7 @@ export function ClassifyCaseForm({ caseId, current }: { caseId: string; current:
         name="classification"
         defaultValue={current ?? ""}
         required
-        className="h-8 rounded-md border border-border bg-background px-2 text-base focus:border-tup-maroon-600 focus:outline-none"
+        className="h-10 rounded-md border border-border bg-background px-3 text-base focus:border-tup-maroon-600 focus:outline-none"
       >
         <option value="" disabled>
           Choose minor or major
@@ -41,8 +41,8 @@ export function ClassifyCaseForm({ caseId, current }: { caseId: string; current:
         <option value="minor">Minor offense</option>
         <option value="major">Major offense</option>
       </select>
-      <Button type="submit" size="sm" variant="outline" disabled={pending} className="h-8">
-        {pending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+      <Button type="submit" variant="outline" disabled={pending}>
+        {pending && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
         {current ? "Change" : "Classify"}
       </Button>
     </form>
