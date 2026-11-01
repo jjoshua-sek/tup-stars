@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { MedalIcon as Award, ClipboardTextIcon as ClipboardCheck, DoorOpenIcon as DoorOpen, DownloadSimpleIcon as Download, GavelIcon as Gavel, IdentificationCardIcon as IdCard, ScalesIcon as Scale, TrendUpIcon as TrendingUp, UsersIcon as Users } from "@phosphor-icons/react/ssr";
+import { DownloadSimpleIcon as Download } from "@phosphor-icons/react/ssr";
 
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatsCard } from "@/components/shared/stats-card";
+import { buttonVariants } from "@/components/ui/button";
 import { getCurrentTerm } from "@/lib/access/term";
 import { buildCollegeReport, totalRow } from "@/lib/osa/college-report";
 import { loadCollegeReportInput } from "@/lib/osa/college-report-data";
@@ -11,8 +11,9 @@ import { getStaffContext } from "@/lib/osa/staff-context";
 import { featuresToInputs, loadActiveRiskModel, loadRiskFeatures } from "@/lib/risk/load";
 import { scoreStudent } from "@/lib/risk/score";
 import { loose } from "@/lib/supabase/loose";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
-import { CASE_STATUS_META, type CaseStatus } from "@/types/osa";
+import { APPLICATION_OPEN, CASE_STATUS_META, type CaseStatus } from "@/types/osa";
 
 export const metadata: Metadata = {
   title: "Reports",
@@ -97,7 +98,7 @@ export default async function StaffReportsPage() {
     db
       .from("scholarship_applications")
       .select("id", { count: "exact", head: true })
-      .in("status", ["interest_declared", "documents_pending", "under_review"]),
+      .in("status", APPLICATION_OPEN),
     loadActiveRiskModel(db),
     loadRiskFeatures(db, { limit: 500 }),
   ]);
@@ -125,82 +126,69 @@ export default async function StaffReportsPage() {
     byStatus.set(row.status, (byStatus.get(row.status) ?? 0) + 1);
   }
 
+  const scans = (accessAllowed ?? 0) + (accessDenied ?? 0);
+
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
         breadcrumbs={[{ label: "Staff", href: "/staff/dashboard" }, { label: "Reports" }]}
         title="Reports"
-        description={`Totals for ${term.label}. Figures only — open the individual queues for names.`}
-      />
+        description={`Totals for ${term.label}. Figures only; open each page for names.`}
+      >
+        <a href="/staff/reports/export" className={cn(buttonVariants(), "gap-1.5 bg-tup-maroon-600 text-white hover:bg-tup-maroon-700")}>
+          <Download className="h-4 w-4" /> Download all colleges (CSV)
+        </a>
+      </PageHeader>
 
-      <Section title="Discipline">
-        <StatsCard label="Cases filed (term)" value={thisTerm} icon={Scale} />
-        <StatsCard
-          label="Open cases"
-          value={openCases.length}
-          icon={Gavel}
-          iconTone={openCases.length > 0 ? "warn" : "neutral"}
+      {/* Four short lists of figures rather than sixteen tiles. */}
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Figures
+          title="Discipline"
+          rows={[
+            ["Cases filed this term", thisTerm],
+            ["Cases still open", openCases.length, openCases.length > 0 ? "warning" : undefined],
+            ["Minor cases, all time", minor],
+            ["Major cases, all time", major],
+            ["Hearings set this term", hearingCount ?? 0],
+          ]}
         />
-        <StatsCard label="Minor / major (all time)" value={`${minor} / ${major}`} icon={Scale} />
-        <StatsCard label="Hearings scheduled" value={hearingCount ?? 0} icon={Gavel} />
-      </Section>
-
-      <Section title="Early warning">
-        <StatsCard
-          label="Critical"
-          value={tiers.critical}
-          icon={TrendingUp}
-          iconTone={tiers.critical > 0 ? "danger" : "neutral"}
+        <Figures
+          title="Early warning"
+          rows={[
+            ["Rated critical", tiers.critical, tiers.critical > 0 ? "danger" : undefined],
+            ["Rated high", tiers.high, tiers.high > 0 ? "warning" : undefined],
+            ["Rated moderate", tiers.moderate],
+            ["Students on file", studentCount ?? 0],
+          ]}
         />
-        <StatsCard label="High" value={tiers.high} icon={TrendingUp} iconTone={tiers.high > 0 ? "warn" : "neutral"} />
-        <StatsCard label="Moderate" value={tiers.moderate} icon={TrendingUp} />
-        <StatsCard label="Students on file" value={studentCount ?? 0} icon={Users} />
-      </Section>
-
-      <Section title="Services">
-        <StatsCard label="Clearance in progress" value={clearanceOpen ?? 0} icon={ClipboardCheck} />
-        <StatsCard label="Certificates issued" value={clearanceIssued ?? 0} icon={ClipboardCheck} iconTone="success" />
-        <StatsCard label="Scholarship queue" value={scholarshipQueue ?? 0} icon={Award} />
-        <StatsCard label="IDs validated this term" value={validatedIds ?? 0} icon={IdCard} iconTone="success" />
-      </Section>
-
-      <Section title="Campus access">
-        <StatsCard label="Entries allowed" value={accessAllowed ?? 0} icon={DoorOpen} iconTone="success" />
-        <StatsCard
-          label="Denied scans"
-          value={accessDenied ?? 0}
-          icon={DoorOpen}
-          iconTone={(accessDenied ?? 0) > 0 ? "warn" : "neutral"}
+        <Figures
+          title="Services"
+          rows={[
+            ["Clearance requests in progress", clearanceOpen ?? 0],
+            ["Certificates issued", clearanceIssued ?? 0],
+            ["Scholarship applications waiting", scholarshipQueue ?? 0],
+            ["IDs validated this term", validatedIds ?? 0],
+          ]}
         />
-        <StatsCard
-          label="Open anomalies"
-          value={openAnomalies ?? 0}
-          icon={DoorOpen}
-          iconTone={(openAnomalies ?? 0) > 0 ? "danger" : "neutral"}
+        <Figures
+          title="Campus gates"
+          rows={[
+            ["Entries allowed this term", accessAllowed ?? 0],
+            ["Scans refused this term", accessDenied ?? 0, (accessDenied ?? 0) > 0 ? "warning" : undefined],
+            ["Share of scans refused", scans > 0 ? `${Math.round(((accessDenied ?? 0) / scans) * 100)}%` : "No scans yet"],
+            ["Gate alerts still open", openAnomalies ?? 0, (openAnomalies ?? 0) > 0 ? "danger" : undefined],
+          ]}
         />
-        <StatsCard
-          label="Denial rate"
-          value={
-            (accessAllowed ?? 0) + (accessDenied ?? 0) > 0
-              ? `${Math.round(((accessDenied ?? 0) / ((accessAllowed ?? 0) + (accessDenied ?? 0))) * 100)}%`
-              : "—"
-          }
-          icon={DoorOpen}
-        />
-      </Section>
+      </div>
 
       {/* Per college (checklist I5) */}
-      <section className="mt-8">
-        <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 className="font-display text-lg font-semibold tracking-tight">By college</h2>
-            <p className="text-sm text-muted-foreground">
-              Counts only. A college comes from the student&apos;s verified COR; without one, from their program.
-            </p>
-          </div>
-          <a href="/staff/reports/export" className={csvLinkClass}>
-            <Download className="h-3.5 w-3.5" /> All colleges (CSV)
-          </a>
+      <section>
+        <div className="mb-3">
+          <h2 className="font-display text-lg font-semibold tracking-tight">By college</h2>
+          <p className="text-base text-muted-foreground">
+            Counts only. A college comes from the student&apos;s verified COR; without one, from their program.
+            Each row has its own download.
+          </p>
         </div>
         {collegeRows.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border p-8 text-center text-base text-muted-foreground">
@@ -244,8 +232,12 @@ export default async function StaffReportsPage() {
                       <td className="px-3 py-2 text-right">{row.highRisk}</td>
                       <td className="px-3 py-2 text-right">
                         {!isTotal && (
-                          <a href={`/staff/reports/export?college=${encodeURIComponent(row.college)}`} className={csvLinkClass}>
-                            <Download className="h-3 w-3" /> CSV
+                          <a
+                            href={`/staff/reports/export?college=${encodeURIComponent(row.college)}`}
+                            className={csvLinkClass}
+                            aria-label={`Download ${row.college} (CSV)`}
+                          >
+                            <Download className="h-4 w-4" /> Download
                           </a>
                         )}
                       </td>
@@ -259,7 +251,7 @@ export default async function StaffReportsPage() {
       </section>
 
       {/* Case pipeline */}
-      <section className="mt-8">
+      <section>
         <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
           Cases by stage
         </h2>
@@ -276,7 +268,7 @@ export default async function StaffReportsPage() {
                   const share = Math.round((count / cases.length) * 100);
                   return (
                     <li key={status} className="flex items-center gap-3 px-4 py-2.5">
-                      <span className="w-48 shrink-0 text-base">
+                      <span className="w-40 shrink-0 text-base sm:w-56">
                         {CASE_STATUS_META[status]?.label ?? status}
                       </span>
                       <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
@@ -285,7 +277,7 @@ export default async function StaffReportsPage() {
                           style={{ width: `${share}%` }}
                         />
                       </div>
-                      <span className="w-12 shrink-0 text-right font-mono text-sm tabular-nums">
+                      <span className="w-12 shrink-0 text-right text-base font-semibold tabular-nums">
                         {count}
                       </span>
                     </li>
@@ -296,7 +288,7 @@ export default async function StaffReportsPage() {
         )}
       </section>
 
-      <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+      <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
         Risk tiers are computed live from the active model and reflect only students with
         data on file. Report them as a workload measure, not as a prediction of outcomes.
       </p>
@@ -305,13 +297,28 @@ export default async function StaffReportsPage() {
 }
 
 const csvLinkClass =
-  "inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-sm font-medium text-tup-maroon-600 transition-colors hover:bg-muted";
+  "inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium text-tup-maroon-700 transition-colors hover:bg-muted";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+type FigureTone = "warning" | "danger";
+
+const FIGURE_TONE: Record<FigureTone, string> = {
+  warning: "text-amber-800",
+  danger: "text-red-700",
+};
+
+/** A titled list of figures: the label on the left, the number on the right. */
+function Figures({ title, rows }: { title: string; rows: Array<[string, number | string, FigureTone?]> }) {
   return (
-    <section className="mb-6">
-      <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">{title}</h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{children}</div>
+    <section className="rounded-xl border border-border bg-card">
+      <h2 className="border-b border-border px-5 py-3 font-display text-lg font-semibold tracking-tight">{title}</h2>
+      <dl className="divide-y divide-border">
+        {rows.map(([label, value, tone]) => (
+          <div key={label} className="flex items-baseline justify-between gap-4 px-5 py-3">
+            <dt className="text-base text-muted-foreground">{label}</dt>
+            <dd className={cn("text-xl font-semibold tabular-nums", tone && FIGURE_TONE[tone])}>{value}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
