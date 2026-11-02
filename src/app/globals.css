@@ -276,6 +276,13 @@ html[data-text-size="larger"] .text-size-option[data-size="larger"] {
   color: var(--color-tup-maroon-700);
 }
 
+/* The header's light/dark button (ThemeToggle) names the screen it switches
+   to, read from the class the theme sets, so the label is right at once. */
+.dark .theme-to-dark,
+html:not(.dark) .theme-to-light {
+  display: none;
+}
+
 /*
  * The header (components/layout/tup-header.tsx), after tup.edu.ph: the
  * campus under a crimson veil on the left, cut on a slant, over TUP's slate.
@@ -296,9 +303,13 @@ html[data-text-size="larger"] .text-size-option[data-size="larger"] {
     url("/tup-campus.webp") center 40% / cover no-repeat;
   clip-path: polygon(0 0, 100% 0, calc(100% - 2.5rem) 100%, 0 100%);
 }
-/* At A++ between 1024 and 1279px the full name would need three lines;
-   the header says TUP Manila instead. */
+/* Where the full name would need three lines (A+ or A++ below 1280px, A++
+   below 1536px), the header says TUP Manila instead. */
 @media (min-width: 64rem) and (max-width: 79.99rem) {
+  html[data-text-size] .tup-name-full { display: none; }
+  html[data-text-size] .tup-name-short { display: inline; }
+}
+@media (min-width: 80rem) and (max-width: 95.99rem) {
   html[data-text-size="larger"] .tup-name-full { display: none; }
   html[data-text-size="larger"] .tup-name-short { display: inline; }
 }

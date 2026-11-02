@@ -36,6 +36,7 @@ import type { Icon } from "@phosphor-icons/react";
 
 import { announceSignOut } from "@/components/auth/session-guard";
 import { TextSizeSwitch } from "@/components/layout/text-size-switch";
+import { ThemeToggle } from "@/components/layout/theme-switch";
 import type { StaffNavIcon, StaffNavSection } from "@/lib/osa/staff-nav";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -160,15 +161,18 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
         )}
       >
         {/* Mobile-only close button (the header is hidden behind the drawer on mobile) */}
-        <div className="lg:hidden flex h-14 items-center justify-between px-4 border-b border-border bg-tup-maroon-600 text-white">
-          <span className="text-base font-semibold">Menu</span>
-          <span className="flex items-center gap-2">
-            {/* The header hides these below 640px; on a phone they live here. */}
-            <TextSizeSwitch className="sm:hidden" />
+        <div className="lg:hidden border-b border-border bg-tup-maroon-600 text-white">
+          <div className="flex h-14 items-center justify-between px-4">
+            <span className="text-base font-semibold">Menu</span>
             <button onClick={onClose} aria-label="Close menu" className="grid h-10 w-10 place-items-center rounded-md hover:bg-white/15">
               <XIcon className="h-5 w-5" />
             </button>
-          </span>
+          </div>
+          {/* The header hides the text size and light/dark switches below 640px; on a phone they live here, on their own row. */}
+          <div className="flex flex-wrap items-center gap-2 px-4 pb-3 sm:hidden">
+            <TextSizeSwitch />
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* On desktop the header's seal hangs 2rem into this column; the menu starts below it. */}

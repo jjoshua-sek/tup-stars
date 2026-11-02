@@ -59,6 +59,36 @@ function applyTheme(next: Theme) {
   listeners.forEach((listener) => listener());
 }
 
+/**
+ * The header's one-press switch, beside the text size switch. It names the
+ * screen it switches to: Dark while the screen is light, Light while it is
+ * dark. Which label shows comes from CSS (globals.css, .theme-to-dark and
+ * .theme-to-light) reading the same class on <html> the theme sets, so it
+ * is right from the first frame. "Match this computer" stays in Settings.
+ */
+export function ThemeToggle({ className }: { className?: string }) {
+  const toggle = () => applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
+
+  return (
+    <div className={cn("flex items-center rounded-lg bg-white/10 p-0.5", className)}>
+      <button
+        type="button"
+        onClick={toggle}
+        className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-semibold leading-none text-white/85 transition-colors duration-150 hover:bg-white/15 hover:text-white active:scale-[0.97]"
+      >
+        <span className="theme-to-dark inline-flex items-center gap-1.5">
+          <MoonIcon className="h-4 w-4" />
+          <span className="sr-only">Switch to a </span>Dark<span className="sr-only"> screen</span>
+        </span>
+        <span className="theme-to-light inline-flex items-center gap-1.5">
+          <SunIcon className="h-4 w-4" />
+          <span className="sr-only">Switch to a </span>Light<span className="sr-only"> screen</span>
+        </span>
+      </button>
+    </div>
+  );
+}
+
 export function ThemeSwitch({ className }: { className?: string }) {
   // The server cannot know the stored choice, so it renders "system".
   const theme = useSyncExternalStore(subscribe, readTheme, () => "system" as const);

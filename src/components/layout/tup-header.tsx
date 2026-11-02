@@ -14,6 +14,7 @@ import { APP_NAME } from "@/lib/brand";
 import { announceSignOut } from "@/components/auth/session-guard";
 import { useRouter } from "next/navigation";
 import { TextSizeSwitch } from "@/components/layout/text-size-switch";
+import { ThemeToggle } from "@/components/layout/theme-switch";
 import { TupSeal } from "@/components/layout/tup-seal";
 
 interface TupHeaderProps {
@@ -121,6 +122,7 @@ export function TupHeader({
           )}
         </div>
         <TextSizeSwitch className="hidden sm:flex" />
+        <ThemeToggle className="hidden sm:flex" />
 
         <Link
           href="/help"
