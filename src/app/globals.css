@@ -276,6 +276,38 @@ html[data-text-size="larger"] .text-size-option[data-size="larger"] {
   color: var(--color-tup-maroon-700);
 }
 
+/*
+ * The header (components/layout/tup-header.tsx), after tup.edu.ph: the
+ * campus under a crimson veil on the left, cut on a slant, over TUP's slate.
+ * The veil is 85% or more, so white text keeps 5.1:1 even over the sky. The
+ * sidebar sits below the header, so both read its height from --header-h.
+ */
+:root {
+  --header-h: 4rem;
+}
+@media (min-width: 64rem) {
+  :root {
+    --header-h: 5.5rem;
+  }
+}
+.tup-header-photo {
+  background:
+    linear-gradient(90deg, rgb(184 26 53 / 0.92), rgb(184 26 53 / 0.85)),
+    url("/tup-campus.webp") center 40% / cover no-repeat;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 2.5rem) 100%, 0 100%);
+}
+/* At A++ between 1024 and 1279px the full name would need three lines;
+   the header says TUP Manila instead. */
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  html[data-text-size="larger"] .tup-name-full { display: none; }
+  html[data-text-size="larger"] .tup-name-short { display: inline; }
+}
+/* On a phone at A+ or A++ no name fits beside the menu button, seal, bell
+   and account; the seal stands alone. */
+@media (max-width: 39.99rem) {
+  html[data-text-size] .tup-header-name { display: none; }
+}
+
 /* Movement becomes a short fade for anyone who asks the system for less motion. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

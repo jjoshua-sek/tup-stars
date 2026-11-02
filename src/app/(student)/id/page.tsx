@@ -173,7 +173,7 @@ export default async function DigitalIdPage() {
               <br />
               of the Philippines
             </div>
-            <TupSeal size={44} />
+            <TupSeal className="size-11" />
           </div>
 
           {/* MIDDLE: photo + identity */}

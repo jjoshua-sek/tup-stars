@@ -47,7 +47,7 @@ export default function AuthLayout({
 
           {/* Brand header */}
           <div className="relative z-10 flex items-center gap-3.5">
-            <TupSeal size={56} />
+            <TupSeal className="size-14" />
             <div>
               <div className="text-sm opacity-80 mb-0.5 font-medium">
                 Technological University of the Philippines · Manila

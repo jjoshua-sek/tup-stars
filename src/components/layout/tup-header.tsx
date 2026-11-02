@@ -31,15 +31,19 @@ interface TupHeaderProps {
 }
 
 /**
- * Full-width TUP institutional header.
+ * Full-width TUP header, after the university's own site (tup.edu.ph).
  *
- * Visual language (matches the mockup precisely):
- * - Background: TUP maroon (#7A1F2B)
- * - Bottom border: 3px solid TUP gold (#d4a017) — the signature institutional touch
- * - Left: 36px TUP seal + brand text (university name + system name)
- * - Right: Help link, notification bell with count, user block (avatar + name + role)
+ * - Left: the campus under a crimson veil, cut on a slant (.tup-header-photo
+ *   in globals.css), with the seal and the university's name. On desktop
+ *   the seal is large and hangs below the bar, over the top of the sidebar.
+ * - Right, on TUP's slate: "Hello" and the person's first name with their
+ *   role or course below (wide screens), the text size switch, Help, the
+ *   notification bell and the account menu. Below 1280px the greeting moves
+ *   into the account menu.
+ * - A 3px gold rule along the bottom.
  *
- * This component sits ABOVE the sidebar+main grid, full-width, sticky to the top.
+ * It sits above the sidebar and page, sticky to the top. Its height is
+ * --header-h, which the sidebar uses for its own offset.
  */
 export function TupHeader({
   onMenuClick,
@@ -65,38 +69,57 @@ export function TupHeader({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  const firstName = userName.split(" ")[0];
+  const area = isStaffConsole ? "OSA Console" : "Student Portal";
 
   return (
-    <header
-      className="sticky top-0 z-40 flex min-h-[3.75rem] items-center justify-between bg-tup-maroon-600 px-4 sm:px-6 py-2.5 text-white border-b-[3px] border-tup-gold-500"
-    >
-      {/* LEFT: mobile menu + brand */}
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 flex h-[var(--header-h)] items-stretch border-b-[3px] border-tup-gold-500 bg-[#46434e] text-white">
+      {/* LEFT: the campus photo, the seal and the university's name */}
+      <div className="relative flex min-w-0 items-center gap-2 pl-2 pr-12 sm:gap-3 sm:pl-4 lg:pl-6 lg:pr-16 2xl:min-w-[50%]">
+        <div className="tup-header-photo absolute inset-0" aria-hidden="true" />
+
         <button
           type="button"
           onClick={onMenuClick}
-          className="lg:hidden p-1 -ml-1 text-white/90 hover:text-white"
+          className="relative grid h-10 w-10 shrink-0 place-items-center rounded-md text-white hover:bg-white/15 lg:hidden"
           aria-label="Open menu"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </button>
 
-        <Link href={role === "student" ? "/dashboard" : "/staff/dashboard"} className="flex items-center gap-3">
-          <TupSeal size={36} />
+        <Link
+          href={role === "student" ? "/dashboard" : "/staff/dashboard"}
+          className="relative flex min-w-0 items-center gap-3 self-stretch lg:gap-4"
+        >
+          {/* Desktop: 7rem, starting 0.5rem from the top, so it hangs 2rem below the bar. */}
+          <TupSeal className="size-11 lg:size-28 lg:self-start lg:mt-2 lg:shadow-lg" />
 
-          {/* Brand text */}
-          <div className="hidden sm:block leading-tight">
-            <div className="text-sm tracking-wide opacity-85">
-              TUP Manila{isStaffConsole && " · OSA Console"}
+          <div className="tup-header-name min-w-0 leading-tight">
+            {/* Wraps to a second line rather than being cut off when space is short (A++). */}
+            <div className="line-clamp-2 text-base font-bold uppercase tracking-wide text-balance sm:text-lg">
+              <span className="tup-name-short lg:hidden">TUP Manila</span>
+              <span className="tup-name-full hidden lg:inline">Technological University of the Philippines</span>
             </div>
-            {/* The line above already says "OSA Console" on the staff side. */}
-            <div className="text-base font-semibold tracking-tight">{APP_NAME}</div>
+            <div className="mt-0.5 truncate text-sm font-semibold uppercase italic tracking-wide">
+              <span className="hidden lg:inline">Manila · </span>
+              {/* A phone has room for the area only. */}
+              <span className="hidden sm:inline">{APP_NAME} · </span>
+              {area}
+            </div>
           </div>
         </Link>
       </div>
 
-      {/* RIGHT: text size, Help, notifications, user */}
-      <div className="flex items-center gap-3 sm:gap-5">
+      {/* RIGHT, on the slate: greeting, text size, Help, notifications, account */}
+      <div className="ml-auto flex shrink-0 items-center gap-3 pr-3 sm:gap-5 sm:pr-6">
+        <div className="hidden max-w-[15rem] leading-tight xl:block">
+          <div className="truncate text-lg font-bold uppercase tracking-wide">Hello, {firstName}</div>
+          {userSubtitle && (
+            <div className="mt-0.5 truncate text-sm font-semibold uppercase italic tracking-wide text-white/80">
+              {userSubtitle}
+            </div>
+          )}
+        </div>
         <TextSizeSwitch className="hidden sm:flex" />
 
         <Link
@@ -115,7 +138,7 @@ export function TupHeader({
           <Bell className="h-5 w-5" />
           {notificationCount > 0 && (
             <span
-              className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-tup-gold-500 text-tup-maroon-600 text-sm font-bold flex items-center justify-center font-mono"
+              className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-tup-gold-500 text-tup-maroon-700 text-sm font-bold flex items-center justify-center font-mono"
               aria-hidden="true"
             >
               {notificationCount > 99 ? "99+" : notificationCount}
@@ -125,31 +148,30 @@ export function TupHeader({
 
         {/* User block with separator on its left */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2.5 pl-3 sm:pl-5 sm:border-l border-white/20 rounded-sm transition-colors">
+          <DropdownMenuTrigger
+            className="flex items-center rounded-full sm:border-l sm:border-white/20 sm:pl-5"
+            aria-label={`Account menu for ${userName}`}
+          >
             <div className="relative">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 border border-white/30 text-sm font-medium text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/15 text-sm font-semibold text-white">
                 {initials}
               </div>
               {photoIsProvisional && (
                 <span
                   aria-label="Provisional photo"
-                  className="absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-tup-gold-500 border border-tup-maroon-600"
+                  className="absolute -bottom-0.5 -right-0.5 block h-3 w-3 rounded-full border border-[#46434e] bg-tup-gold-500"
                 />
-              )}
-            </div>
-            <div className="hidden md:block text-left leading-tight">
-              <div className="text-sm font-medium text-white truncate max-w-[140px]">
-                {userName}
-              </div>
-              {userSubtitle && (
-                <div className="text-sm text-white/70 truncate max-w-[140px]">
-                  {userSubtitle}
-                </div>
               )}
             </div>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent align="end" className="w-60">
+            {/* Who is signed in: the greeting's place below 1280px, and a check for everyone. */}
+            <div className="px-2 py-2 leading-tight">
+              <div className="truncate text-base font-semibold">{userName}</div>
+              {userSubtitle && <div className="truncate text-sm text-muted-foreground">{userSubtitle}</div>}
+            </div>
+            <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Link
                 href={role === "student" ? "/profile" : "/staff/settings"}

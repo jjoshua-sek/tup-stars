@@ -180,7 +180,9 @@ export default async function StaffHomePage() {
   const firstName = staff?.fullName?.split(" ")[0] || "there";
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    // Beside the menu, not centred. Up to 1535px one 64rem column keeps each
+    // task's sentence close to its button; wider screens put the two lists side by side.
+    <div className="max-w-5xl space-y-8 2xl:max-w-none">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-balance">
@@ -206,67 +208,69 @@ export default async function StaffHomePage() {
         </div>
       </header>
 
-      <section aria-labelledby="waiting-heading" className="rounded-2xl border border-border bg-card">
-        <h2 id="waiting-heading" className="border-b border-border px-6 py-4 text-xl font-semibold tracking-tight">
-          Waiting for you
-        </h2>
-        {tasks.length === 0 ? (
-          <div className="flex items-center gap-4 px-6 py-8">
-            <CheckCircleIcon className="h-8 w-8 shrink-0 text-green-700" />
-            <div>
-              <p className="text-lg font-medium">Nothing is waiting for you right now.</p>
-              <p className="text-base text-muted-foreground">New concerns, cases and requests will appear here as they arrive.</p>
+      <div className="space-y-8 2xl:grid 2xl:grid-cols-[3fr_2fr] 2xl:items-start 2xl:gap-8 2xl:space-y-0">
+        <section aria-labelledby="waiting-heading" className="rounded-2xl border border-border bg-card">
+          <h2 id="waiting-heading" className="border-b border-border px-6 py-4 text-xl font-semibold tracking-tight">
+            Waiting for you
+          </h2>
+          {tasks.length === 0 ? (
+            <div className="flex items-center gap-4 px-6 py-8">
+              <CheckCircleIcon className="h-8 w-8 shrink-0 text-green-700" />
+              <div>
+                <p className="text-lg font-medium">Nothing is waiting for you right now.</p>
+                <p className="text-base text-muted-foreground">New concerns, cases and requests will appear here as they arrive.</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <ul>
-            {tasks.map((task) => (
-              <li
-                key={task.key}
-                className={cn(
-                  "flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border px-6 py-4 last:border-0",
-                  task.urgent && "bg-red-50/60",
-                )}
-              >
-                <p className="flex min-w-0 items-center gap-3 text-lg">
-                  {task.urgent ? (
-                    <WarningIcon className="h-6 w-6 shrink-0 text-destructive" aria-label="Urgent" />
-                  ) : (
-                    // The sentence already starts with the number; a dot keeps the rows aligned.
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center" aria-hidden="true">
-                      <span className="h-2.5 w-2.5 rounded-full bg-tup-maroon-600" />
-                    </span>
+          ) : (
+            <ul>
+              {tasks.map((task) => (
+                <li
+                  key={task.key}
+                  className={cn(
+                    "flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border px-6 py-4 last:border-0",
+                    task.urgent && "bg-red-50/60",
                   )}
-                  <span className={cn(task.urgent && "font-semibold")}>{task.text}</span>
-                </p>
-                <Link href={task.href} className={task.urgent ? URGENT_BUTTON : SECONDARY_BUTTON}>
-                  {task.action}
-                  <ArrowRightIcon className="h-5 w-5" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                >
+                  <p className="flex min-w-0 items-center gap-3 text-lg">
+                    {task.urgent ? (
+                      <WarningIcon className="h-6 w-6 shrink-0 text-destructive" aria-label="Urgent" />
+                    ) : (
+                      // The sentence already starts with the number; a dot keeps the rows aligned.
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center" aria-hidden="true">
+                        <span className="h-2.5 w-2.5 rounded-full bg-tup-maroon-600" />
+                      </span>
+                    )}
+                    <span className={cn(task.urgent && "font-semibold")}>{task.text}</span>
+                  </p>
+                  <Link href={task.href} className={task.urgent ? URGENT_BUTTON : SECONDARY_BUTTON}>
+                    {task.action}
+                    <ArrowRightIcon className="h-5 w-5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      <section aria-labelledby="recent-heading" className="rounded-2xl border border-border bg-card">
-        <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
-          <h2 id="recent-heading" className="text-xl font-semibold tracking-tight">Recent concerns</h2>
-          <Link href="/staff/concerns" className="inline-flex items-center gap-1.5 text-base font-medium text-tup-maroon-600 hover:underline">
-            See all concerns
-            <ArrowRightIcon className="h-5 w-5" />
-          </Link>
-        </div>
-        {recentConcerns.length === 0 ? (
-          <p className="px-6 py-8 text-base text-muted-foreground">No concerns yet. New ones will appear here.</p>
-        ) : (
-          <ul>
-            {recentConcerns.map((concern) => (
-              <RecentConcern key={concern.id} concern={concern} />
-            ))}
-          </ul>
-        )}
-      </section>
+        <section aria-labelledby="recent-heading" className="rounded-2xl border border-border bg-card">
+          <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+            <h2 id="recent-heading" className="text-xl font-semibold tracking-tight">Recent concerns</h2>
+            <Link href="/staff/concerns" className="inline-flex items-center gap-1.5 text-base font-medium text-tup-maroon-600 hover:underline">
+              See all concerns
+              <ArrowRightIcon className="h-5 w-5" />
+            </Link>
+          </div>
+          {recentConcerns.length === 0 ? (
+            <p className="px-6 py-8 text-base text-muted-foreground">No concerns yet. New ones will appear here.</p>
+          ) : (
+            <ul>
+              {recentConcerns.map((concern) => (
+                <RecentConcern key={concern.id} concern={concern} />
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
 
       <details className="group rounded-2xl border border-border bg-card">
         <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">

@@ -155,7 +155,7 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
           "fixed lg:sticky inset-y-0 lg:inset-auto left-0 z-40 lg:z-auto",
           "w-64 flex flex-col bg-card border-r border-border",
           "transition-transform duration-300 ease-[var(--ease-drawer)] lg:translate-x-0",
-          "lg:top-[3.75rem] lg:h-[calc(100dvh-3.75rem)]",
+          "lg:top-[var(--header-h)] lg:h-[calc(100dvh-var(--header-h))]",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -171,7 +171,8 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
           </span>
         </div>
 
-        <nav aria-label="Main menu" className="flex-1 overflow-y-auto px-2 py-4">
+        {/* On desktop the header's seal hangs 2rem into this column; the menu starts below it. */}
+        <nav aria-label="Main menu" className="flex-1 overflow-y-auto px-2 py-4 lg:pt-11">
           {sections.map((section, idx) => (
             <div key={section.label ?? "top"} className={cn(idx > 0 && "mt-6")}>
               {section.label && (
