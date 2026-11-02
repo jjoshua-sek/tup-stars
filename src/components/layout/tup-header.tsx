@@ -14,6 +14,7 @@ import { APP_NAME } from "@/lib/brand";
 import { announceSignOut } from "@/components/auth/session-guard";
 import { useRouter } from "next/navigation";
 import { TextSizeSwitch } from "@/components/layout/text-size-switch";
+import { TupSeal } from "@/components/layout/tup-seal";
 
 interface TupHeaderProps {
   onMenuClick: () => void;
@@ -35,7 +36,7 @@ interface TupHeaderProps {
  * Visual language (matches the mockup precisely):
  * - Background: TUP maroon (#7A1F2B)
  * - Bottom border: 3px solid TUP gold (#d4a017) — the signature institutional touch
- * - Left: 36px gold seal with "TUP" + brand text (university name + system name)
+ * - Left: 36px TUP seal + brand text (university name + system name)
  * - Right: Help link, notification bell with count, user block (avatar + name + role)
  *
  * This component sits ABOVE the sidebar+main grid, full-width, sticky to the top.
@@ -81,13 +82,7 @@ export function TupHeader({
         </button>
 
         <Link href={role === "student" ? "/dashboard" : "/staff/dashboard"} className="flex items-center gap-3">
-          {/* Gold TUP seal */}
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-tup-gold-500 text-tup-maroon-600 font-bold text-base tracking-tight border-2 border-white shrink-0"
-            aria-label="TUP seal"
-          >
-            TUP
-          </div>
+          <TupSeal size={36} />
 
           {/* Brand text */}
           <div className="hidden sm:block leading-tight">

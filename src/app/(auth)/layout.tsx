@@ -1,5 +1,6 @@
 import { APP_FULL_NAME, APP_NAME } from "@/lib/brand";
 import { manilaWallClock } from "@/lib/utils/time";
+import { TupSeal } from "@/components/layout/tup-seal";
 
 /**
  * Auth Layout — Two-column institutional gateway matching Screen 01 of
@@ -46,12 +47,7 @@ export default function AuthLayout({
 
           {/* Brand header */}
           <div className="relative z-10 flex items-center gap-3.5">
-            <div
-              className="w-14 h-14 rounded-full bg-tup-gold-500 text-tup-maroon-600 flex items-center justify-center font-bold text-xl border-[3px] border-white shrink-0"
-              aria-label="TUP seal"
-            >
-              TUP
-            </div>
+            <TupSeal size={56} />
             <div>
               <div className="text-sm opacity-80 mb-0.5 font-medium">
                 Technological University of the Philippines · Manila

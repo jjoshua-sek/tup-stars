@@ -4,6 +4,7 @@ import { ArrowsLeftRightIcon as ArrowRightLeft, CheckCircleIcon as CheckCircle2,
 
 import { IdCardQr, IdQrPanel } from "@/components/id/id-qr-panel";
 import { RequestValidationButton } from "@/components/id/request-validation-button";
+import { TupSeal } from "@/components/layout/tup-seal";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatInstitutionalQrPayload } from "@/lib/access/payload";
 import { getCurrentTerm, hasExpired } from "@/lib/access/term";
@@ -172,12 +173,7 @@ export default async function DigitalIdPage() {
               <br />
               of the Philippines
             </div>
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-tup-gold-500 text-base font-bold text-tup-maroon-700"
-              aria-label="TUP seal"
-            >
-              TUP
-            </div>
+            <TupSeal size={44} />
           </div>
 
           {/* MIDDLE: photo + identity */}
