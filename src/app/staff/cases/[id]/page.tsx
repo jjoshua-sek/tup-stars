@@ -38,9 +38,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { caseNextStep, type CaseSection } from "@/lib/osa/case-next-step";
 import { cn } from "@/lib/utils";
 import {
+  COUNT_BASIS_LABELS,
   appealWindow,
   inferPenaltyBasis,
   resolveAppealRoute,
+  type CountBasis,
   type PenaltyBasis,
 } from "@/lib/osa/sanctions";
 import { getStaffContext } from "@/lib/osa/staff-context";
@@ -424,7 +426,7 @@ export default async function StaffCaseDetailPage({
                   {assignment.band_min != null
                     ? `band ${assignment.band_min}–${assignment.band_max} hours`
                     : "no band"}{" "}
-                  &middot; counted as {assignment.count_basis.replace(/_/g, " ")}
+                  &middot; counted as {(COUNT_BASIS_LABELS[assignment.count_basis as CountBasis] ?? assignment.count_basis.replace(/_/g, " ")).toLowerCase()}
                   {assignment.handbook_reference
                     ? ` · ${assignment.handbook_reference}`
                     : ""}

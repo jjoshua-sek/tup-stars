@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { formatManila, formatManilaTime, isUpcoming } from "@/lib/utils/time";
+import { SESSION_TYPE_LABELS } from "@/lib/osa/guidance-labels";
 import { HEARING_STATUS_LABELS, HEARING_TYPE_LABELS, type HearingStatus } from "@/types/osa";
 
 export const metadata: Metadata = {
@@ -189,8 +190,8 @@ export default async function AppointmentsPage() {
                   >
                     <UserRound className="h-4 w-4 shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-base font-medium capitalize">
-                        {session.session_type.replace(/_/g, " ")}
+                      <p className="text-base font-medium">
+                        Guidance session: {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type.replace(/_/g, " ")}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {session.scheduled_at
