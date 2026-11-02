@@ -164,8 +164,8 @@ export default async function DigitalIdPage() {
 
           {/* TOP: brand */}
           <div className="relative z-10 flex items-start justify-between">
-            <div className="text-sm leading-snug tracking-wider opacity-85">
-              <strong className="mb-1 block text-base font-semibold tracking-wide text-tup-gold-500">
+            <div className="text-sm leading-snug tracking-wider text-white/85">
+              <strong className="mb-1 block text-base font-semibold tracking-wide text-tup-gold-300">
                 TUP MANILA
               </strong>
               Technological University
@@ -173,7 +173,7 @@ export default async function DigitalIdPage() {
               of the Philippines
             </div>
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-tup-gold-500 text-base font-bold text-tup-maroon-600"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-tup-gold-500 text-base font-bold text-tup-maroon-700"
               aria-label="TUP seal"
             >
               TUP
@@ -204,7 +204,7 @@ export default async function DigitalIdPage() {
                 <br />
                 {student.last_name}
               </div>
-              <div className="space-y-0.5 text-sm leading-[1.6] opacity-85">
+              <div className="space-y-0.5 text-sm leading-[1.6] text-white/85">
                 <IdMetaRow label="ID" value={student.student_number} />
                 <IdMetaRow label="Course" value={student.program} />
                 <IdMetaRow label="Year" value={student.year_level} />
@@ -215,13 +215,13 @@ export default async function DigitalIdPage() {
 
           {/* BOTTOM: validity + QR */}
           <div className="relative z-10 flex items-end justify-between border-t border-white/20 pt-3.5">
-            <div className="text-sm opacity-70 font-medium">
+            <div className="text-sm font-medium text-white/80">
               Valid
               <br />
-              <strong className="mt-0.5 block tracking-wide text-tup-gold-500">
+              <strong className="mt-0.5 block tracking-wide text-tup-gold-300">
                 {term.schoolYearLabel}
               </strong>
-              <span className="mt-1 block normal-case tracking-normal opacity-80">
+              <span className="mt-1 block normal-case tracking-normal">
                 {statusMeta.label}
               </span>
             </div>
@@ -380,7 +380,7 @@ export default async function DigitalIdPage() {
 function IdMetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-1">
-      <strong className="min-w-[56px] text-sm font-semibold text-tup-gold-500">
+      <strong className="min-w-[56px] text-sm font-semibold text-tup-gold-300">
         {label}
       </strong>
       <span>{value}</span>

@@ -309,6 +309,9 @@ html[data-text-size="larger"] .text-size-option[data-size="larger"] {
 .dark .bg-ai-accent-soft { background: color-mix(in oklab, #8b5cf6 18%, var(--card)); }
 .dark .border-ai-accent  { border-color: color-mix(in oklab, #8b5cf6 40%, var(--card)); }
 .dark .text-ai-accent    { color: #c4b5fd; }
+/* --primary stays deep enough for white text on filled buttons; maroon
+   text and links on a dark card need the lighter rose (7.2:1). */
+.dark .text-primary { color: #e58a99; }
 /* Half-white chips and buttons on tinted boxes turn into a darker layer. */
 .dark .bg-white\/60,
 .dark .bg-white\/70,
