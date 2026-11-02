@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BellIcon as Bell, QuestionIcon as HelpCircle, ListIcon as Menu } from "@phosphor-icons/react/ssr";
+import { QuestionIcon as HelpCircle, ListIcon as Menu } from "@phosphor-icons/react/ssr";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,7 @@ import { announceSignOut } from "@/components/auth/session-guard";
 import { useRouter } from "next/navigation";
 import { TextSizeSwitch } from "@/components/layout/text-size-switch";
 import { ThemeToggle } from "@/components/layout/theme-switch";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { TupSeal } from "@/components/layout/tup-seal";
 
 interface TupHeaderProps {
@@ -38,8 +39,9 @@ interface TupHeaderProps {
  *   in globals.css), with the seal and the university's name. On desktop
  *   the seal is large and hangs below the bar, over the top of the sidebar.
  * - Right, on TUP's slate: "Hello" and the person's first name with their
- *   role or course below (wide screens), the text size switch, Help, the
- *   notification bell and the account menu. Below 1280px the greeting moves
+ *   role or course below (wide screens), the text size and light/dark
+ *   switches, Help, the notification bell (a panel of the latest notices,
+ *   NotificationBell) and the account menu. Below 1280px the greeting moves
  *   into the account menu.
  * - A 3px gold rule along the bottom.
  *
@@ -132,21 +134,10 @@ export function TupHeader({
           Help
         </Link>
 
-        <Link
-          href={role === "student" ? "/notifications" : "/staff/notifications"}
-          className="relative text-white/85 hover:text-white transition-colors"
-          aria-label={`Notifications (${notificationCount})`}
-        >
-          <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <span
-              className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-tup-gold-500 text-tup-maroon-700 text-sm font-bold flex items-center justify-center font-mono"
-              aria-hidden="true"
-            >
-              {notificationCount > 99 ? "99+" : notificationCount}
-            </span>
-          )}
-        </Link>
+        <NotificationBell
+          inboxHref={role === "student" ? "/notifications" : "/staff/notifications"}
+          unreadCount={notificationCount}
+        />
 
         {/* User block with separator on its left */}
         <DropdownMenu>
