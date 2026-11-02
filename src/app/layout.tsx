@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TEXT_SIZE_SCRIPT } from "@/components/layout/text-size-switch";
+import { THEME_SCRIPT } from "@/components/layout/theme-switch";
 import { OfflineBanner } from "@/components/offline/offline-banner";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,6 +62,10 @@ export default function RootLayout({
             invalid and breaks hydration, hence the <head>. */}
         <Script id="text-size" strategy="beforeInteractive">
           {TEXT_SIZE_SCRIPT}
+        </Script>
+        {/* Light or dark, from the computer's setting or the choice in Settings. */}
+        <Script id="theme" strategy="beforeInteractive">
+          {THEME_SCRIPT}
         </Script>
       </head>
       {/* data-offline-mode greys out every saving form on the LAN copy (globals.css). */}

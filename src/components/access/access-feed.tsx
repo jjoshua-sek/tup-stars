@@ -65,7 +65,7 @@ export function AccessFeed({ initialEvents }: AccessFeedProps) {
         <p className="font-display text-base font-semibold">Live gate activity</p>
         <span
           className={`inline-flex items-center gap-1.5 text-sm ${
-            live ? "text-emerald-600" : "text-muted-foreground"
+            live ? "text-emerald-700" : "text-muted-foreground"
           }`}
         >
           <Radio className={`h-3 w-3 ${live ? "animate-pulse" : ""}`} />

@@ -34,15 +34,15 @@ interface StatsCardProps {
 
 const iconToneStyles: Record<NonNullable<StatsCardProps["iconTone"]>, string> = {
   neutral: "bg-muted text-muted-foreground",
-  success: "bg-[#dcfce7] text-[#166534]",
-  warn:    "bg-[#fef3c7] text-[#92400e]",
-  danger:  "bg-[#fef2f2] text-[#b91c1c]",
+  success: "bg-emerald-100 text-emerald-800",
+  warn:    "bg-amber-100 text-amber-800",
+  danger:  "bg-red-50 text-red-700",
   ai:      "bg-ai-accent-soft text-ai-accent",
 };
 
 const trendToneStyles: Record<NonNullable<StatsCardProps["trendTone"]>, string> = {
-  up:      "text-[#16a34a]",
-  warn:    "text-[#f59e0b]",
+  up:      "text-emerald-700",
+  warn:    "text-amber-700",
   danger:  "text-destructive",
   neutral: "text-muted-foreground",
 };

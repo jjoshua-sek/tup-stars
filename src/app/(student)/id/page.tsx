@@ -391,7 +391,7 @@ function IdMetaRow({ label, value }: { label: string; value: string }) {
 function UseTag({ label, variant }: { label: string; variant?: "danger" }) {
   if (variant === "danger") {
     return (
-      <span className="rounded-full border border-[#fecaca] bg-[#fef2f2] px-2.5 py-1 text-sm text-[#991b1b]">
+      <span className="rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-sm text-red-800">
         {label}
       </span>
     );

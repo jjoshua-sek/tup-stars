@@ -284,3 +284,83 @@ html[data-text-size="larger"] .text-size-option[data-size="larger"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== Dark mode (generated) ===== */
+/*
+ * Dark mode. The .dark class is set on <html> before first paint by
+ * THEME_SCRIPT (components/layout/theme-switch.tsx): the computer's setting,
+ * or the choice in Settings. The tokens above switch on their own; the rules
+ * below give dark versions of the fixed light tints and light versions of the
+ * dark text shades the pages use, generated from the classes in src. They are
+ * unlayered so they win over the utilities. The gate kiosk is never dark here:
+ * it has its own dark design. ID QR panels stay white for the scanners.
+ */
+.dark {
+  color-scheme: dark;
+}
+.dark body {
+  /* Cards sit lighter than the page in dark, as they sit whiter in light. */
+  background: var(--background);
+}
+/* Red text on dark needs the bright red (--destructive); white text on a
+   filled red button needs a deeper one to stay readable (5.6:1). */
+.dark .bg-destructive,
+.dark .hover\:bg-destructive\/90:hover { background-color: #c42b2b; }
+.dark .bg-ai-accent-soft { background: color-mix(in oklab, #8b5cf6 18%, var(--card)); }
+.dark .border-ai-accent  { border-color: color-mix(in oklab, #8b5cf6 40%, var(--card)); }
+.dark .text-ai-accent    { color: #c4b5fd; }
+/* Half-white chips and buttons on tinted boxes turn into a darker layer. */
+.dark .bg-white\/60,
+.dark .bg-white\/70,
+.dark .bg-white\/80 { background-color: color-mix(in oklab, var(--card) 70%, transparent); }
+.dark .hover\:bg-white:hover { background-color: var(--card); }
+.dark .bg-amber-100 { background-color: color-mix(in oklab, #f59e0b 20%, var(--card)); }
+.dark .bg-amber-50 { background-color: color-mix(in oklab, #f59e0b 14%, var(--card)); }
+.dark .bg-amber-50\/60 { background-color: color-mix(in oklab, #f59e0b 11%, var(--card)); }
+.dark .bg-emerald-100 { background-color: color-mix(in oklab, #10b981 20%, var(--card)); }
+.dark .bg-emerald-50 { background-color: color-mix(in oklab, #10b981 14%, var(--card)); }
+.dark .bg-red-100 { background-color: color-mix(in oklab, #ef4444 20%, var(--card)); }
+.dark .bg-red-200 { background-color: color-mix(in oklab, #ef4444 28%, var(--card)); }
+.dark .bg-red-50 { background-color: color-mix(in oklab, #ef4444 14%, var(--card)); }
+.dark .bg-red-50\/50 { background-color: color-mix(in oklab, #ef4444 10%, var(--card)); }
+.dark .bg-red-50\/60 { background-color: color-mix(in oklab, #ef4444 11%, var(--card)); }
+.dark .bg-sky-50 { background-color: color-mix(in oklab, #0ea5e9 14%, var(--card)); }
+.dark .bg-tup-maroon-50\/30 { background-color: color-mix(in oklab, #c14e62 8%, var(--card)); }
+.dark .bg-tup-maroon-50\/40 { background-color: color-mix(in oklab, #c14e62 9%, var(--card)); }
+.dark .border-amber-200 { border-color: color-mix(in oklab, #f59e0b 35%, var(--card)); }
+.dark .border-amber-300 { border-color: color-mix(in oklab, #f59e0b 45%, var(--card)); }
+.dark .border-emerald-200 { border-color: color-mix(in oklab, #10b981 35%, var(--card)); }
+.dark .border-emerald-300 { border-color: color-mix(in oklab, #10b981 45%, var(--card)); }
+.dark .border-red-200 { border-color: color-mix(in oklab, #ef4444 35%, var(--card)); }
+.dark .border-sky-200 { border-color: color-mix(in oklab, #0ea5e9 35%, var(--card)); }
+.dark .border-tup-maroon-200 { border-color: color-mix(in oklab, #c14e62 35%, var(--card)); }
+.dark .border-tup-maroon-300 { border-color: color-mix(in oklab, #c14e62 45%, var(--card)); }
+.dark .hover\:bg-emerald-100:hover { background-color: color-mix(in oklab, #10b981 20%, var(--card)); }
+.dark .hover\:bg-tup-maroon-50:hover { background-color: color-mix(in oklab, #c14e62 14%, var(--card)); }
+.dark .hover\:text-tup-maroon-800:hover:not([class*="bg-tup-gold"]) { color: #f6c3cc; }
+.dark .text-amber-600 { color: #fbbf24; }
+.dark .text-amber-700 { color: #fcd34d; }
+.dark .text-amber-700\/80 { color: #fcd34d; }
+.dark .text-amber-800 { color: #fde68a; }
+.dark .text-amber-900 { color: #fde68a; }
+.dark .text-amber-950 { color: #fde68a; }
+.dark .text-blue-700 { color: #93c5fd; }
+.dark .text-emerald-600 { color: #34d399; }
+.dark .text-emerald-600\/60 { color: #34d399; }
+.dark .text-emerald-700 { color: #6ee7b7; }
+.dark .text-emerald-800 { color: #a7f3d0; }
+.dark .text-emerald-900 { color: #a7f3d0; }
+.dark .text-green-700 { color: #86efac; }
+.dark .text-orange-700 { color: #fdba74; }
+.dark .text-red-600 { color: #f87171; }
+.dark .text-red-700 { color: #fca5a5; }
+.dark .text-red-800 { color: #fecaca; }
+.dark .text-red-900 { color: #fecaca; }
+.dark .text-red-900\/80 { color: #fecaca; }
+.dark .text-sky-800 { color: #bae6fd; }
+.dark .text-sky-900 { color: #bae6fd; }
+.dark .text-tup-maroon-600:not([class*="bg-tup-gold"]) { color: #e58a99; }
+.dark .text-tup-maroon-700:not([class*="bg-tup-gold"]) { color: #f0a3b0; }
+.dark .text-tup-maroon-900:not([class*="bg-tup-gold"]) { color: #f6c3cc; }
+.dark .text-violet-600 { color: #a78bfa; }
+.dark .text-violet-700 { color: #c4b5fd; }

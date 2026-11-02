@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AccountActivity } from "@/components/settings/account-activity";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { EmailPreferencesForm } from "@/components/settings/email-preferences-form";
+import { ThemeSwitch } from "@/components/layout/theme-switch";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_PREFERENCES, type NotificationPreferences } from "@/lib/notifications/policy";
@@ -40,7 +41,7 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your password, the emails you receive, and recent account activity." />
+      <PageHeader title="Settings" description="Your password, screen colors, the emails you receive, and recent account activity." />
 
       <div className="space-y-6">
         <Card>
@@ -50,6 +51,19 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <ChangePasswordForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Screen colors</CardTitle>
+            <CardDescription>
+              Dark screens are easier on the eyes at night. STARS follows this computer&apos;s setting unless you
+              choose here; the choice is kept on this computer.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemeSwitch />
           </CardContent>
         </Card>
 

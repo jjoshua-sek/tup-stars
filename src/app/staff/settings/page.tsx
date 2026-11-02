@@ -5,6 +5,7 @@ import { AccountActivity } from "@/components/settings/account-activity";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { EmailPreferencesForm } from "@/components/settings/email-preferences-form";
 import { RetentionForm } from "@/components/settings/retention-form";
+import { ThemeSwitch } from "@/components/layout/theme-switch";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_PREFERENCES, type NotificationPreferences } from "@/lib/notifications/policy";
@@ -67,7 +68,7 @@ export default async function StaffSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your account details, text size, password, email and recent account activity." />
+      <PageHeader title="Settings" description="Your account details, text size, screen colors, password, email and recent account activity." />
 
       <div className="space-y-6">
         <Card>
@@ -97,6 +98,19 @@ export default async function StaffSettingsPage() {
               everything larger or smaller. This computer remembers your choice.
             </CardDescription>
           </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Screen colors</CardTitle>
+            <CardDescription>
+              Dark screens are easier on the eyes at night. STARS follows this computer&apos;s setting unless you
+              choose here; the choice is kept on this computer.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemeSwitch />
+          </CardContent>
         </Card>
 
         <Card>

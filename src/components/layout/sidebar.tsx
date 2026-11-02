@@ -153,7 +153,7 @@ export function Sidebar({ role, staffNav, badges, open, onClose }: SidebarProps)
       <aside
         className={cn(
           "fixed lg:sticky inset-y-0 lg:inset-auto left-0 z-40 lg:z-auto",
-          "w-64 flex flex-col bg-white border-r border-border",
+          "w-64 flex flex-col bg-card border-r border-border",
           "transition-transform duration-300 ease-[var(--ease-drawer)] lg:translate-x-0",
           "lg:top-[3.75rem] lg:h-[calc(100dvh-3.75rem)]",
           open ? "translate-x-0" : "-translate-x-full",
