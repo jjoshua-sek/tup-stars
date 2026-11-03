@@ -479,3 +479,68 @@ export async function sendStaffPasswordReset(formData: FormData): Promise<Result
 
   return { ok: true, message: `A password reset link for ${loginId} goes to ${parsed.data.email} within a minute.` };
 }
+
+// ============================================================
+// TWO-STEP SIGN-IN: TURN OFF FOR SOMEONE
+// ============================================================
+
+/**
+ * For someone who lost their phone (or their authenticator app): removes
+ * their two-step sign-in, so they can sign in with their password and set it
+ * up again in Settings. Administrators only. The person is not told by
+ * email; Settings shows it as off when they next sign in.
+ */
+export async function turnOffTwoStepFor(formData: FormData): Promise<Result> {
+  const admin = await requireAdmin();
+  if (!admin) return { error: "Only an administrator can turn off two-step sign-in for an account." };
+
+  const loginId = String(formData.get("login_id") ?? "").trim().toUpperCase();
+  if (!STUDENT_NUMBER.test(loginId)) return { error: "Type the login ID as TUPM-XX-XXXX." };
+
+  const service = createAdminClient();
+  const userId = await findUserIdByLoginId(service, loginId);
+  if (!userId) return { error: `No account signs in as ${loginId}.` };
+
+  const { data, error } = await service.auth.admin.mfa.listFactors({ userId });
+  if (error) {
+    console.error("[accounts] could not list MFA factors", error);
+    return { error: "Could not read that account's two-step sign-in. Try again." };
+  }
+  const factors = data?.factors ?? [];
+  if (factors.length === 0) return { ok: true, message: `${loginId} does not use two-step sign-in.` };
+
+  for (const factor of factors) {
+    const { error: deleteError } = await service.auth.admin.mfa.deleteFactor({ id: factor.id, userId });
+    if (deleteError) {
+      console.error("[accounts] could not delete an MFA factor", deleteError);
+      return { error: "Could not turn it off completely. Try again." };
+    }
+  }
+
+  await logAuditEvent(admin.userId, "two_step_reset_by_admin", "auth.mfa", { login_id: loginId });
+  return {
+    ok: true,
+    message: `Two-step sign-in is off for ${loginId}. They can sign in with their password and set it up again in Settings.`,
+  };
+}
+
+/** The account that signs in as <login id>@tup.edu.ph. */
+async function findUserIdByLoginId(service: ReturnType<typeof createAdminClient>, loginId: string): Promise<string | null> {
+  const db = loose(service);
+  // Students, and staff who were ever sent a reset link, are on record by login ID.
+  for (const table of ["students", "account_invitations"]) {
+    const { data } = await db.from(table).select("user_id").eq("student_number", loginId).not("user_id", "is", null).limit(1);
+    const row = (data as Array<{ user_id: string }> | null)?.[0];
+    if (row?.user_id) return row.user_id;
+  }
+  // Anyone else: look the email up among the accounts, a page at a time.
+  const email = `${loginId.toLowerCase()}@tup.edu.ph`;
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error || !data) return null;
+    const match = data.users.find((user) => user.email?.toLowerCase() === email);
+    if (match) return match.id;
+    if (data.users.length < 1000) return null;
+  }
+  return null;
+}

@@ -3,11 +3,13 @@ import { redirect } from "next/navigation";
 
 import { AccountActivity } from "@/components/settings/account-activity";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
+import { TwoStepSettings } from "@/components/settings/two-step-settings";
 import { EmailPreferencesForm } from "@/components/settings/email-preferences-form";
 import { ThemeSwitch } from "@/components/layout/theme-switch";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_PREFERENCES, type NotificationPreferences } from "@/lib/notifications/policy";
+import { isOfflineMode } from "@/lib/offline/mode";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,7 +43,7 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your password, screen colors, the emails you receive, and recent account activity." />
+      <PageHeader title="Settings" description="Your password, two-step sign-in, screen colors, the emails you receive, and recent account activity." />
 
       <div className="space-y-6">
         <Card>
@@ -51,6 +53,19 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <ChangePasswordForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Two-step sign-in</CardTitle>
+            <CardDescription>
+              Optional. When it is on, signing in also asks for a 6-digit code from an app on your phone, so a
+              stolen password alone cannot open your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TwoStepSettings offline={isOfflineMode()} />
           </CardContent>
         </Card>
 

@@ -273,7 +273,7 @@ export async function scanStampedCopy(formData: FormData): Promise<ScanResult> {
   if (!SCAN_TYPES.has(photo.type)) return { error: "The photo must be a JPG, PNG or WebP image." };
   if (photo.size > MAX_SCAN_BYTES) return { error: "The photo is too large. Retake it; it is shrunk automatically." };
 
-  const limit = checkRateLimit({ identifier: `stamped-scan:${staff.staffId}`, maxRequests: 30, windowSeconds: 600 });
+  const limit = await checkRateLimit({ identifier: `stamped-scan:${staff.staffId}`, maxRequests: 30, windowSeconds: 600 });
   if (!limit.success) return { error: "Too many scans in a few minutes. Wait a moment, then try again." };
 
   const admin = createAdminClient();

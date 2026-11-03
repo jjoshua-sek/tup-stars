@@ -44,7 +44,7 @@ export async function requestClearance(formData: FormData): Promise<Result> {
   } = await supabase.auth.getUser();
   if (!user) return { error: "You are signed out." };
 
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `clearance-request:${user.id}`,
     maxRequests: 5,
     windowSeconds: 3600,

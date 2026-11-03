@@ -34,7 +34,7 @@ export async function requestIdValidation(): Promise<ActionResult> {
 
   // Requests are cheap for us and rare for them; this only stops accidental
   // double-taps and scripted spam.
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `id-validation:${user.id}`,
     maxRequests: 5,
     windowSeconds: 3600,

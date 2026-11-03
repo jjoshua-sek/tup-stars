@@ -72,12 +72,14 @@ export async function updateSession(request: NextRequest) {
     carry,
     /**
      * Continue to the page. The forwarded headers are built now, not at the
-     * top of the request, so they include anything refreshed since.
+     * top of the request, so they include anything refreshed since. `extra`
+     * adds request headers the page reads (the CSP and its nonce).
      */
-    next() {
+    next(extra: Record<string, string> = {}) {
       const headers = new Headers(request.headers);
       // Read by the student layout's profile-completion gate.
       headers.set("x-pathname", request.nextUrl.pathname);
+      for (const [name, value] of Object.entries(extra)) headers.set(name, value);
       return carry(NextResponse.next({ request: { headers } }));
     },
     redirect(url: URL | string) {

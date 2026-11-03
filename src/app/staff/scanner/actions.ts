@@ -32,7 +32,7 @@ export async function verifyAtDesk(payload: string): Promise<DeskScanResult> {
     } as DeskScanResult;
   }
 
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `desk-scan:${staff.userId}`,
     maxRequests: 120,
     windowSeconds: 60,

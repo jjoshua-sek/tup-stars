@@ -58,7 +58,7 @@ export async function changePassword(formData: FormData): Promise<Result> {
 
   // Guessing the current password through this form is still guessing a
   // password; slow it down the way the sign-in form does.
-  const attempts = checkRateLimit({ identifier: `password-change:${user.id}`, maxRequests: 5, windowSeconds: 15 * 60 });
+  const attempts = await checkRateLimit({ identifier: `password-change:${user.id}`, maxRequests: 5, windowSeconds: 15 * 60 });
   if (!attempts.success) return { error: "Too many attempts. Wait a few minutes, then try again." };
 
   const verifier = createStatelessClient(
@@ -166,4 +166,27 @@ export async function recordSignIn(): Promise<void> {
   if (!user) return;
 
   await logAuditEvent(user.id, "login", "auth.session", { method: "password" });
+}
+
+// ============================================================
+// TWO-STEP SIGN-IN
+// ============================================================
+
+/**
+ * Records in the Activity history that two-step sign-in was turned on or
+ * off. The browser turns it on and off itself (Supabase Auth MFA); this
+ * only writes down what the account now has, read here on the server, so a
+ * record never claims a change that did not happen.
+ */
+export async function recordTwoStepChange(): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { data } = await supabase.auth.mfa.listFactors();
+  const on = (data?.totp ?? []).some((factor) => factor.status === "verified");
+  await logAuditEvent(user.id, on ? "two_step_turned_on" : "two_step_turned_off", "auth.mfa");
+  revalidateSettings();
 }

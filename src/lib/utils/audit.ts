@@ -43,6 +43,11 @@ type AuditAction =
   | "student_record_viewed"
   // A report downloaded as a file leaves STARS, so who took it is logged.
   | "report_exported"
+  // Two-step sign-in (migration 00056): turned on or off by the account
+  // itself, or turned off by the administrator for someone who lost their phone.
+  | "two_step_turned_on"
+  | "two_step_turned_off"
+  | "two_step_reset_by_admin"
   // Attendance sheets from the colleges or the Registrar (migration 00043).
   | "attendance_imported"
   // Retention periods recorded on the DPO's instruction (migration 00047).

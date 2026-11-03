@@ -33,7 +33,7 @@ export async function declareScholarshipInterest(
   } = await supabase.auth.getUser();
   if (!user) return { error: "You are signed out." };
 
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `scholarship-interest:${user.id}`,
     maxRequests: 20,
     windowSeconds: 3600,

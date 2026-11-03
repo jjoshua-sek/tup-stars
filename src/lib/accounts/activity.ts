@@ -12,6 +12,9 @@ export const ACCOUNT_ACTIVITY_ACTIONS = [
   "password_change",
   "account_activated",
   "password_reset_requested",
+  // Two-step sign-in, turned on or off in Settings (migration 00056).
+  "two_step_turned_on",
+  "two_step_turned_off",
 ] as const;
 
 export type AccountActivityAction = (typeof ACCOUNT_ACTIVITY_ACTIONS)[number];
@@ -60,6 +63,10 @@ export function describeActivity(row: AccountActivityRow): { label: string; note
         label: "Password reset requested",
         note: RESET_OUTCOME[String(details.outcome)] ?? "No link sent",
       };
+    case "two_step_turned_on":
+      return { label: "Two-step sign-in turned on", note: "Signing in now also asks for the code from your app" };
+    case "two_step_turned_off":
+      return { label: "Two-step sign-in turned off", note: null };
     default:
       return { label: row.action, note: null };
   }

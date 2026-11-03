@@ -173,7 +173,7 @@ export async function fileCase(formData: FormData): Promise<Result & { caseId?: 
 
   // A complaint is cheap to file and expensive to receive; this is the brake
   // on a bad afternoon turning into forty cases.
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `file-case:${staff.userId}`,
     maxRequests: 20,
     windowSeconds: 3600,

@@ -131,13 +131,22 @@ export function countsAsActivity(request: RequestLike): boolean {
  * same token with Supabase.
  */
 export function sessionIdFromAccessToken(token: string | null | undefined): string | null {
+  const claims = accessTokenClaims(token);
+  return typeof claims?.session_id === "string" && claims.session_id ? claims.session_id : null;
+}
+
+/**
+ * The claims inside a Supabase access token, decoded but NOT verified. Only
+ * for reading what a token already checked by Supabase (getUser) says.
+ */
+export function accessTokenClaims(token: string | null | undefined): Record<string, unknown> | null {
   const payload = token?.split(".")[1];
   if (!payload) return null;
   try {
     const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
     const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-    const claims = JSON.parse(atob(padded)) as { session_id?: unknown };
-    return typeof claims.session_id === "string" && claims.session_id ? claims.session_id : null;
+    const claims: unknown = JSON.parse(atob(padded));
+    return claims && typeof claims === "object" ? (claims as Record<string, unknown>) : null;
   } catch {
     return null;
   }

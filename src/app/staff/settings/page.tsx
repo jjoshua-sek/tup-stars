@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AccountActivity } from "@/components/settings/account-activity";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
+import { TwoStepSettings } from "@/components/settings/two-step-settings";
 import { EmailPreferencesForm } from "@/components/settings/email-preferences-form";
 import { RetentionForm } from "@/components/settings/retention-form";
 import { ThemeSwitch } from "@/components/layout/theme-switch";
@@ -10,6 +11,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_PREFERENCES, type NotificationPreferences } from "@/lib/notifications/policy";
 import { describeAccessLogRetention, describeRecordRetention, readRetention } from "@/lib/settings/retention";
+import { isOfflineMode } from "@/lib/offline/mode";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { STAFF_ROLE_LABELS, type StaffRole } from "@/types/osa";
@@ -68,7 +70,7 @@ export default async function StaffSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your account details, text size, screen colors, password, email and recent account activity." />
+      <PageHeader title="Settings" description="Your account details, text size, screen colors, password, two-step sign-in, email and recent account activity." />
 
       <div className="space-y-6">
         <Card>
@@ -120,6 +122,19 @@ export default async function StaffSettingsPage() {
           </CardHeader>
           <CardContent>
             <ChangePasswordForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Two-step sign-in</CardTitle>
+            <CardDescription>
+              Optional. When it is on, signing in also asks for a 6-digit code from an app on your phone, so a
+              stolen password alone cannot open your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TwoStepSettings offline={isOfflineMode()} />
           </CardContent>
         </Card>
 

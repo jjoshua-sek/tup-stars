@@ -10,7 +10,9 @@ import {
   sessionIdFromAccessToken,
   sessionKindForRole,
 } from "@/lib/auth/session-policy";
+import { SECOND_STEP_REFUSAL, needsSecondStep } from "@/lib/auth/two-step";
 import { OFFLINE_REFUSAL, isOfflineMode, offlineAllowsActionOn, offlineAllowsApi } from "@/lib/offline/mode";
+import { contentSecurityPolicy, createNonce } from "@/lib/security/csp";
 import { updateSession } from "@/lib/supabase/middleware";
 
 // Routes that don't require authentication. /auth/confirm is where a
@@ -108,12 +110,28 @@ export async function middleware(request: NextRequest) {
   const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
   const isAction = request.method === "POST" && request.headers.has("next-action");
 
+  // ---- Content-Security-Policy (lib/security/csp.ts) ------------------
+  // A fresh nonce per request. The page reads it from the request headers
+  // (Next.js for its own scripts, app/layout.tsx for the start-up scripts);
+  // the browser enforces the policy from the response header.
+  const nonce = createNonce();
+  const csp = contentSecurityPolicy({
+    nonce,
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    dev: process.env.NODE_ENV !== "production",
+  });
+  const withCsp = (response: NextResponse) => {
+    response.headers.set("Content-Security-Policy", csp);
+    return response;
+  };
+  const next = () => withCsp(session.next({ "x-nonce": nonce, "content-security-policy": csp }));
+
   // ---- Supabase unreachable ------------------------------------------
   // "Couldn't check" is not "not signed in". Treating it as signed out
   // bounced people between /login and their dashboard whenever the
   // connection to Supabase dropped for a moment.
   if (!user && session.error && isAuthRetryableFetchError(session.error) && hasSessionCookie(request)) {
-    if (isPublic) return session.next();
+    if (isPublic) return next();
     if (isAction) {
       return session.carry(
         refuseAction(503, "Couldn't reach the sign-in service, so this wasn't saved. Check your connection and try again."),
@@ -130,11 +148,13 @@ export async function middleware(request: NextRequest) {
   // tab is suspended. Whatever the browser missed, the next request is
   // checked before it is served.
   let activityStamp: string | null = null;
+  let accessToken: string | undefined;
   if (user) {
     const {
       data: { session: current },
     } = await session.supabase.auth.getSession();
-    const sessionId = sessionIdFromAccessToken(current?.access_token);
+    accessToken = current?.access_token;
+    const sessionId = sessionIdFromAccessToken(accessToken);
 
     if (sessionId) {
       const now = Date.now();
@@ -175,6 +195,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const respond = (response: NextResponse) => {
+    withCsp(response);
     if (activityStamp) {
       response.cookies.set(ACTIVITY_COOKIE, activityStamp, {
         httpOnly: true,
@@ -204,7 +225,7 @@ export async function middleware(request: NextRequest) {
   // their dashboard, which made switching accounts impossible without
   // finding the sign-out button first — and fed the /login ⇄ /staff/dashboard
   // loop. The login page now offers to continue or sign out instead.
-  if (isPublic) return respond(session.next());
+  if (isPublic) return respond(next());
 
   // ---- Not signed in -------------------------------------------------
   if (!user) {
@@ -216,6 +237,18 @@ export async function middleware(request: NextRequest) {
     // A fetch() to an API gets a status it can act on, not a login page.
     if (isApi) return session.json({ error: "Sign in required." }, { status: 401 });
     return session.redirect(loginUrl(request, { redirect: pathname }));
+  }
+
+  // ---- Two-step sign-in (lib/auth/two-step.ts) ------------------------
+  // An account that turned it on and has given only its password so far
+  // goes to the code step, wherever it was headed. The database refuses
+  // such a session too (migration 00056); this says so in words.
+  if (needsSecondStep({ accessToken, factors: user.factors })) {
+    if (isAction) return respond(session.carry(refuseAction(401, SECOND_STEP_REFUSAL)));
+    if (isApi) {
+      return respond(session.json({ error: "Enter the 6-digit code from your authenticator app first." }, { status: 401 }));
+    }
+    return respond(session.redirect(loginUrl(request, { redirect: pathname, step: "code" })));
   }
 
   // app_metadata is server-only. user_metadata is writable by the user via
@@ -264,7 +297,7 @@ export async function middleware(request: NextRequest) {
     return respond(session.redirect(new URL(isStaff ? "/staff/dashboard" : "/dashboard", request.url)));
   }
 
-  return respond(session.next());
+  return respond(next());
 }
 
 export const config = {

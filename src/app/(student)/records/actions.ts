@@ -57,7 +57,7 @@ export async function registerAcademicDocument(
   } = await supabase.auth.getUser();
   if (!user) return { error: "You are signed out." };
 
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `academic-upload:${user.id}`,
     maxRequests: 10,
     windowSeconds: 3600,
@@ -128,7 +128,7 @@ export async function extractMyDocument(documentId: string): Promise<Result> {
   if (!user) return { error: "You are signed out." };
 
   // Each run costs real money, so it's capped per student per hour.
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `academic-extract:${user.id}`,
     maxRequests: 12,
     windowSeconds: 3600,

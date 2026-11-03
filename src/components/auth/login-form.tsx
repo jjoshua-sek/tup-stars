@@ -10,6 +10,7 @@ import { recordSignIn } from "@/lib/accounts/account-actions";
 import { OFFLINE_SIGN_IN_FAILED } from "@/lib/offline/mode";
 import { safeLocalPath } from "@/lib/utils/safe-path";
 import { announceSignIn, markTabOpen } from "@/components/auth/session-guard";
+import { TwoStepCode } from "@/components/auth/two-step-code";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,9 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
   // rendering left the button disabled after the 30 seconds were up, since
   // nothing renders the form again on its own.
   const [isInCooldown, setIsInCooldown] = useState(false);
+  // Set after a correct password on an account with two-step sign-in on:
+  // the form gives way to the code step, then finishes the sign-in.
+  const [secondStep, setSecondStep] = useState<{ role: string; userId: string; form: LoginInput } | null>(null);
 
   const {
     register,
@@ -126,6 +130,28 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
       // Never read role from user_metadata — users can self-modify that.
       const role = authData.user.app_metadata?.role || "student";
 
+      // Two-step sign-in comes before anything is read: until the code is
+      // given, the database refuses this session's reads (migration 00056),
+      // so the birth-date check below would find no record.
+      const { data: level } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (level?.currentLevel === "aal1" && level.nextLevel === "aal2") {
+        setSecondStep({ role, userId: authData.user.id, form: data });
+        return;
+      }
+
+      await finishSignIn(role, authData.user.id, data);
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** Everything after the password (and the code, when two-step is on). */
+  const finishSignIn = async (role: string, userId: string, data: LoginInput) => {
+    const supabase = createClient();
+    try {
       // For students: do birthday verification AND check profile completion in
       // one query, so we can route them directly to /profile or /dashboard
       // and avoid the redirect chain that causes the "white screen" issue.
@@ -134,7 +160,7 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
         const { data: studentRecord } = await supabase
           .from("students")
           .select("birth_date, profile_completed_at")
-          .eq("user_id", authData.user.id)
+          .eq("user_id", userId)
           .maybeSingle();
 
         const studentData = studentRecord as
@@ -153,6 +179,7 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
             // every device, so anyone who knew a student's password but not
             // their birth date could sign them out everywhere at will.
             await supabase.auth.signOut({ scope: "local" });
+            setSecondStep(null);
             handleFailedAttempt("Birth date does not match our records.");
             return;
           }
@@ -207,6 +234,15 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
       setIsLoading(false);
     }
   };
+
+  if (secondStep) {
+    return (
+      <TwoStepCode
+        loginId={secondStep.form.student_number.toUpperCase()}
+        onVerified={() => finishSignIn(secondStep.role, secondStep.userId, secondStep.form)}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-sm mx-auto">

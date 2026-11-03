@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   // A busy lane peaks around one scan per second. 240/min leaves headroom for
   // double-taps while still stopping a stolen key from being used to enumerate
   // student numbers.
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `access-verify:${gate.id}`,
     maxRequests: 240,
     windowSeconds: 60,

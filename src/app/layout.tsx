@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TEXT_SIZE_SCRIPT } from "@/components/layout/text-size-switch";
@@ -45,11 +46,15 @@ export const metadata: Metadata = {
   keywords: ["TUP", "Manila", "Office of Student Affairs", "Student Portal", "Early Warning"],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The Content-Security-Policy nonce the proxy made for this request
+  // (lib/security/csp.ts). Absent on the kiosk, which the proxy skips.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="en"
@@ -60,11 +65,11 @@ export default function RootLayout({
         {/* The text size chosen in the header (A, A+, A++), applied before first
             paint so the page never jumps. A script directly inside <html> is
             invalid and breaks hydration, hence the <head>. */}
-        <Script id="text-size" strategy="beforeInteractive">
+        <Script id="text-size" strategy="beforeInteractive" nonce={nonce}>
           {TEXT_SIZE_SCRIPT}
         </Script>
         {/* Light or dark, from the computer's setting or the choice in Settings. */}
-        <Script id="theme" strategy="beforeInteractive">
+        <Script id="theme" strategy="beforeInteractive" nonce={nonce}>
           {THEME_SCRIPT}
         </Script>
       </head>

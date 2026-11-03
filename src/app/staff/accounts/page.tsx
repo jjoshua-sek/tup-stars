@@ -6,6 +6,7 @@ import { EnrollmentImport } from "@/components/accounts/enrollment-import";
 import { ResendInvitationButton } from "@/components/accounts/resend-invitation-button";
 import { ResetPasswordButton } from "@/components/accounts/reset-password-button";
 import { StaffResetForm } from "@/components/accounts/staff-reset-form";
+import { TwoStepResetForm } from "@/components/accounts/two-step-reset-form";
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
 import { ToneBadge, type Tone } from "@/components/osa/tone-badge";
 import { PageHeader } from "@/components/shared/page-header";
@@ -319,6 +320,21 @@ export default async function AccountsPage() {
           </div>
         )}
       </section>
+      )}
+
+      {isAdmin && (
+        <section className="mt-6 rounded-xl border border-border bg-card">
+          <header className="border-b border-border px-5 py-3">
+            <h2 className="font-display text-base font-semibold tracking-tight">Lost phone: turn off two-step sign-in</h2>
+            <p className="mt-0.5 text-base text-muted-foreground">
+              For a student or staff member who can&apos;t get their 6-digit code. They then sign in with their
+              password alone and can set two-step sign-in up again in Settings.
+            </p>
+          </header>
+          <div className="px-5 py-4">
+            <TwoStepResetForm />
+          </div>
+        </section>
       )}
     </div>
   );

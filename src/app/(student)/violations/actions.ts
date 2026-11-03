@@ -55,7 +55,7 @@ export async function submitApologyLetter(formData: FormData): Promise<Result> {
   } = await supabase.auth.getUser();
   if (!user) return { error: "You are signed out." };
 
-  const limit = checkRateLimit({
+  const limit = await checkRateLimit({
     identifier: `apology:${user.id}`,
     maxRequests: 10,
     windowSeconds: 3600,
@@ -265,7 +265,7 @@ export async function fileAppeal(formData: FormData): Promise<Result> {
   } = await supabase.auth.getUser();
   if (!user) return { error: "You are signed out." };
 
-  const limit = checkRateLimit({ identifier: `appeal-file:${user.id}`, maxRequests: 5, windowSeconds: 3600 });
+  const limit = await checkRateLimit({ identifier: `appeal-file:${user.id}`, maxRequests: 5, windowSeconds: 3600 });
   if (!limit.success) return { error: "Too many attempts. Please try again later." };
 
   const parsed = appealSchema.safeParse({ appeal_id: formData.get("appeal_id"), grounds: formData.get("grounds") ?? "" });

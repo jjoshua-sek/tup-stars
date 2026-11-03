@@ -46,8 +46,8 @@ export async function requestPasswordReset(formData: FormData): Promise<Result> 
   // within ten minutes however many times the form is submitted.
   const headerList = await headers();
   const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() || headerList.get("x-real-ip") || "unknown";
-  const byIp = checkRateLimit({ identifier: `reset:ip:${ip}`, maxRequests: 5, windowSeconds: 15 * 60 });
-  const byAccount = checkRateLimit({ identifier: `reset:id:${loginId}`, maxRequests: 3, windowSeconds: 60 * 60 });
+  const byIp = await checkRateLimit({ identifier: `reset:ip:${ip}`, maxRequests: 5, windowSeconds: 15 * 60 });
+  const byAccount = await checkRateLimit({ identifier: `reset:id:${loginId}`, maxRequests: 3, windowSeconds: 60 * 60 });
   if (!byIp.success || !byAccount.success) {
     return { error: "Too many requests. Wait a few minutes, then try again." };
   }
