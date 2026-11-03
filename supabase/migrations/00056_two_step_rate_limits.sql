@@ -31,7 +31,7 @@
 --    WHERE n.nspname = 'public' AND c.relkind = 'r' AND c.relrowsecurity
 --      AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname = 'public'
 --                      AND p.tablename = c.relname AND p.policyname = 'two-step sign-in when turned on');
---   -- expect no rows
+--   -- expect no rows (on the offline copy: offline_sync_state and offline_outbox, skipped)
 --   SELECT * FROM public.hit_rate_limit('check:00056', 2, 60);    -- allowed true, hits 1
 
 -- The rate-limit table (section 2) is created first, so the loop in
@@ -81,11 +81,18 @@ BEGIN
       JOIN pg_namespace n ON n.oid = c.relnamespace
      WHERE n.nspname = 'public' AND c.relkind = 'r' AND c.relrowsecurity
   LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', 'two-step sign-in when turned on', t.relname);
-    EXECUTE format(
-      'CREATE POLICY %I ON public.%I AS RESTRICTIVE FOR ALL TO authenticated '
-      'USING ((SELECT public.session_meets_two_step())) WITH CHECK ((SELECT public.session_meets_two_step()))',
-      'two-step sign-in when turned on', t.relname);
+    BEGIN
+      EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', 'two-step sign-in when turned on', t.relname);
+      EXECUTE format(
+        'CREATE POLICY %I ON public.%I AS RESTRICTIVE FOR ALL TO authenticated '
+        'USING ((SELECT public.session_meets_two_step())) WITH CHECK ((SELECT public.session_meets_two_step()))',
+        'two-step sign-in when turned on', t.relname);
+    EXCEPTION WHEN insufficient_privilege THEN
+      -- The offline copy's own tables (offline_sync_state, offline_outbox) belong to
+      -- its sync role and are never read by a browser. Every cloud table
+      -- belongs to the role running this.
+      RAISE NOTICE 'two-step policy skipped on %: owned by another role', t.relname;
+    END;
   END LOOP;
 END;
 $$;
