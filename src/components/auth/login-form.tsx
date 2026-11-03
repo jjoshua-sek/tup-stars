@@ -8,6 +8,7 @@ import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { createClient } from "@/lib/supabase/client";
 import { recordSignIn } from "@/lib/accounts/account-actions";
 import { OFFLINE_SIGN_IN_FAILED } from "@/lib/offline/mode";
+import { safeLocalPath } from "@/lib/utils/safe-path";
 import { announceSignIn, markTabOpen } from "@/components/auth/session-guard";
 import { toast } from "sonner";
 
@@ -49,7 +50,10 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
-  const [cooldownUntil, setCooldownUntil] = useState(0);
+  // A timer ends the cooldown. Comparing a stored time with Date.now() while
+  // rendering left the button disabled after the 30 seconds were up, since
+  // nothing renders the form again on its own.
+  const [isInCooldown, setIsInCooldown] = useState(false);
 
   const {
     register,
@@ -62,8 +66,6 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
       password: "",
     },
   });
-
-  const isInCooldown = cooldownUntil > Date.now();
 
   /**
    * Compare two dates as YYYY-MM-DD strings, ignoring time/timezone.
@@ -82,7 +84,8 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
 
     if (newAttempts >= 5) {
       // 30-second cooldown after 5 failed attempts
-      setCooldownUntil(Date.now() + 30000);
+      setIsInCooldown(true);
+      window.setTimeout(() => setIsInCooldown(false), 30_000);
       setFailedAttempts(0);
       toast.error(
         "Too many failed attempts. Please wait 30 seconds before trying again."
@@ -178,11 +181,9 @@ export function LoginForm({ offline = false }: { offline?: boolean }) {
 
       // Only ever a path on this site. Following ?redirect= as given made
       // /login?redirect=https://… an open redirect, sending someone to
-      // another site straight after they typed their password here.
-      const safeRedirect =
-        redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-          ? redirectTo
-          : null;
+      // another site straight after they typed their password here
+      // (safeLocalPath also refuses "/\evil.com", which browsers read as "//").
+      const safeRedirect = safeLocalPath(redirectTo);
 
       let destination: string;
       if (safeRedirect) {

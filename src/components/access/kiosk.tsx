@@ -104,6 +104,9 @@ export function GateKiosk() {
       // Blocked storage: the copy's address is asked for again each session.
     }
     lanUrlRef.current = saved;
+    // Browser storage is only readable after mount; reading it while
+    // rendering would differ from the server's render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one read of saved choices on mount
     setLanUrl(saved);
     setLanInput(saved ?? "");
 
@@ -191,6 +194,7 @@ export function GateKiosk() {
     }
 
     if (!stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- no saved pairing, read on mount
       setPhase("pairing");
       return;
     }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeLocalPath } from "@/lib/utils/safe-path";
 
 /**
  * Auth callback handler for Supabase.
@@ -9,7 +10,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  // A path on this site only: glued onto the origin as given, "next=.evil.com"
+  // made the address tup-usms.vercel.app.evil.com, another site.
+  const next = safeLocalPath(searchParams.get("next")) ?? "/dashboard";
 
   if (code) {
     const supabase = await createClient();
