@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRightIcon, CheckCircleIcon, ChatTextIcon as MessageSquare, FolderOpenIcon as FolderOpen, PlusIcon as Plus, MedalIcon as Award, IdentificationCardIcon as IdCard, ShieldWarningIcon as ShieldAlert, MegaphoneIcon as Megaphone, WarningIcon } from "@phosphor-icons/react/ssr";
 
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { studentTasks, type StudentCase, type StudentHearing } from "@/lib/students/student-today";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ModuleCard } from "@/components/shared/module-card";
 import { GlanceStrip } from "@/components/students/record-parts";
 import { buttonVariants } from "@/components/ui/button";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -66,7 +67,7 @@ export default async function DashboardPage() {
   if (!student) redirect("/profile");
 
   const db = loose(supabase);
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   // Everything below reads the tables the rest of the portal uses. (Until
   // November 2026 this page read leftover tables from before migration 00006,

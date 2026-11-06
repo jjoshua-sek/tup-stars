@@ -6,11 +6,13 @@ import { EmptyState } from "@/components/osa/empty-state";
 import { ToneBadge, type Tone } from "@/components/osa/tone-badge";
 import { DocumentUpload } from "@/components/records/document-upload";
 import { PageHeader } from "@/components/shared/page-header";
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { formatManilaDate } from "@/lib/utils/time";
 import type { AcademicDocument, AcademicSnapshot } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
+import { recentTerms } from "@/lib/settings/term";
 
 export const metadata: Metadata = {
   title: "Academic records",
@@ -70,7 +72,7 @@ export default async function RecordsPage() {
   if (!user) redirect("/login");
 
   const db = loose(supabase);
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const { data: studentRow } = await db
     .from("students")
@@ -106,8 +108,7 @@ export default async function RecordsPage() {
 
       <div className="mb-6">
         <DocumentUpload
-          defaultSchoolYear={term.schoolYear}
-          defaultSemester={term.semester}
+          terms={recentTerms(term)}
         />
       </div>
 

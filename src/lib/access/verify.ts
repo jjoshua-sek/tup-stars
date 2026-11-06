@@ -37,7 +37,7 @@ import {
 } from "./decide";
 import { alertOsaOfGateAnomaly } from "./alerts";
 import { maskStudentNumber, parseInstitutionalQr, shortDisplayName } from "./payload";
-import { getCurrentTerm } from "./term";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export interface AccessGate {
   id: string;
@@ -127,7 +127,7 @@ interface ValidationRow {
 export async function verifyScan(input: VerifyScanInput): Promise<VerifyScanResult> {
   const startedAt = input.startedAt ?? Date.now();
   const now = new Date();
-  const term = getCurrentTerm(now);
+  const term = await getActiveTerm();
   // New tables aren't in the hand-maintained Database generic yet, so the
   // typed query builder would collapse them to `never`.
   const db = loose(createAdminClient());

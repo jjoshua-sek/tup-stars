@@ -28,6 +28,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { formatManilaLongDate, manilaWallClock, startOfManilaDay } from "@/lib/utils/time";
 import { concernCategoryLabel } from "@/lib/validations/concern";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -188,7 +189,9 @@ export default async function StaffHomePage() {
           <h1 className="text-3xl font-semibold tracking-tight text-balance">
             {greetingFor(manilaWallClock(now).minutes)}, {firstName}
           </h1>
-          <p className="mt-1 text-lg text-muted-foreground">{formatManilaLongDate(now)}</p>
+          <p className="mt-1 text-lg text-muted-foreground">
+            {formatManilaLongDate(now)} · {(await getActiveTerm()).label}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/staff/cases/new" className={buttonVariants({ className: "bg-tup-maroon-600 text-white hover:bg-tup-maroon-700" })}>

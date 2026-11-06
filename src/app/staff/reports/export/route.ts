@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { buildCollegeReport, normalizeCollege, reportCsv, UNKNOWN_COLLEGE } from "@/lib/osa/college-report";
 import { loadCollegeReportInput, reportTermStart } from "@/lib/osa/college-report-data";
 import { getStaffContext } from "@/lib/osa/staff-context";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/utils/audit";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 /**
  * GET /staff/reports/export — the per-college report as CSV (checklist I5).
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
   const college = param === UNKNOWN_COLLEGE ? UNKNOWN_COLLEGE : normalizeCollege(param);
   if (param && !college) return NextResponse.json({ error: "Unknown college." }, { status: 400 });
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
   const input = await loadCollegeReportInput(loose(await createClient()), term, reportTermStart());
   const rows = buildCollegeReport(input, college ?? undefined);
   const csv = reportCsv(rows, { byProgram: Boolean(college), termLabel: term.label });

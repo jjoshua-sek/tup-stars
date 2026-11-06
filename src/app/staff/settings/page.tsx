@@ -6,6 +6,9 @@ import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { TwoStepSettings } from "@/components/settings/two-step-settings";
 import { EmailPreferencesForm } from "@/components/settings/email-preferences-form";
 import { RetentionForm } from "@/components/settings/retention-form";
+import { TermForm } from "@/components/settings/term-form";
+import { getActiveTermInfo } from "@/lib/settings/active-term";
+import { schoolYearStart } from "@/lib/settings/term";
 import { ThemeSwitch } from "@/components/layout/theme-switch";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,6 +60,10 @@ export default async function StaffSettingsPage() {
   const preferences = (preferenceRow as NotificationPreferences | null) ?? DEFAULT_PREFERENCES;
   const loginId = user.email?.split("@")[0]?.toUpperCase() ?? "Not set";
   const isAdminUser = staff?.role_type === "admin";
+  const termInfo = await getActiveTermInfo();
+  // Last school year, this one and the next: chosen, never typed.
+  const termStart = schoolYearStart(termInfo.term.schoolYear) ?? new Date().getFullYear();
+  const schoolYearChoices = [termStart - 1, termStart, termStart + 1].map((year) => `${year}-${year + 1}`);
 
   const details: Array<[string, string]> = [
     ["Name", staff?.full_name ?? "Not set"],
@@ -147,6 +154,26 @@ export default async function StaffSettingsPage() {
           </CardHeader>
           <CardContent>
             <EmailPreferencesForm initial={preferences} categories={false} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Current term</CardTitle>
+            <CardDescription>
+              {termInfo.setByAdmin
+                ? "Set by the administrator."
+                : "Not set yet, so STARS follows the calendar (August starts the 1st Semester, January the 2nd, June the Summer)."}{" "}
+              Every page uses it: ID validation and the gate, academic records forms and checks, reports, and the
+              header.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isAdminUser ? (
+              <TermForm current={termInfo.term} schoolYears={schoolYearChoices} />
+            ) : (
+              <p className="text-base font-medium">{termInfo.term.label}</p>
+            )}
           </CardContent>
         </Card>
 

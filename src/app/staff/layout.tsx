@@ -5,6 +5,7 @@ import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { STAFF_ROLE_LABELS, type StaffRole } from "@/types/osa";
 import { StaffShell } from "./staff-shell";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 /**
  * Staff Layout — Server Component that fetches staff user data
@@ -79,6 +80,7 @@ export default async function StaffLayout({
     <StaffShell
       userName={userName}
       userSubtitle={userSubtitle}
+      termLabel={(await getActiveTerm()).label}
       // The shell's idea of "admin" comes from the staff record, the same
       // place every page's permission check reads — not from the login
       // role, which only decides entry to /staff.

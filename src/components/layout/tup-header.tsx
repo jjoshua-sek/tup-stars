@@ -24,6 +24,8 @@ interface TupHeaderProps {
   userName?: string;
   /** Short role descriptor below the name (e.g. "BSIT · 4th Year" or "OSA Officer") */
   userSubtitle?: string;
+  /** The current term, e.g. "1st Semester, AY 2026–2027" (set by the administrator). */
+  termLabel?: string;
   /** Mark provisional photo via amber dot in the corner of the avatar */
   photoIsProvisional?: boolean;
   /** Whether this is the admin/staff console (changes branding line) */
@@ -39,7 +41,7 @@ interface TupHeaderProps {
  *   in globals.css), with the seal and the university's name. On desktop
  *   the seal is large and hangs below the bar, over the top of the sidebar.
  * - Right, on TUP's slate: "Hello" and the person's first name with their
- *   role or course below (wide screens), the text size and light/dark
+ *   role or course and the current term below (wide screens), the text size and light/dark
  *   switches, Help, the notification bell (a panel of the latest notices,
  *   NotificationBell) and the account menu. Below 1280px the greeting moves
  *   into the account menu.
@@ -52,6 +54,7 @@ export function TupHeader({
   onMenuClick,
   userName = "User",
   userSubtitle,
+  termLabel,
   photoIsProvisional,
   isStaffConsole,
   notificationCount = 0,
@@ -115,13 +118,14 @@ export function TupHeader({
 
       {/* RIGHT, on the slate: greeting, text size, Help, notifications, account */}
       <div className="ml-auto flex shrink-0 items-center gap-3 pr-3 sm:gap-5 sm:pr-6">
-        <div className="hidden max-w-[15rem] leading-tight xl:block">
+        <div className="hidden max-w-[16rem] leading-tight xl:block">
           <div className="truncate text-lg font-bold uppercase tracking-wide">Hello, {firstName}</div>
           {userSubtitle && (
             <div className="mt-0.5 truncate text-sm font-semibold uppercase italic tracking-wide text-white/80">
               {userSubtitle}
             </div>
           )}
+          {termLabel && <div className="mt-0.5 truncate text-sm text-white/80">{termLabel}</div>}
         </div>
         <TextSizeSwitch className="hidden sm:flex" />
         <ThemeToggle className="hidden sm:flex" />
@@ -163,6 +167,7 @@ export function TupHeader({
             <div className="px-2 py-2 leading-tight">
               <div className="truncate text-base font-semibold">{userName}</div>
               {userSubtitle && <div className="truncate text-sm text-muted-foreground">{userSubtitle}</div>}
+              {termLabel && <div className="mt-1 truncate text-sm text-muted-foreground">{termLabel}</div>}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

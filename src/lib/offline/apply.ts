@@ -3,7 +3,7 @@ import "server-only";
 import type { PriorEvent } from "@/lib/access/decide";
 import { alertOsaOfGateAnomaly } from "@/lib/access/alerts";
 import { MISSING_COLUMN } from "@/lib/access/verify";
-import { defaultTermExpiry, getCurrentTerm } from "@/lib/access/term";
+import { defaultTermExpiry } from "@/lib/access/term";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loose, type LooseClient } from "@/lib/supabase/loose";
 import { logSystemAuditEvent } from "@/lib/utils/audit";
@@ -19,6 +19,7 @@ import {
   type UploadOutcome,
   type UploadRecord,
 } from "./upload-rules";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 /**
  * Applies records uploaded from the offline LAN copy, each checked with the
@@ -89,8 +90,8 @@ async function findStudent(db: LooseClient, by: { id?: string; number?: string |
   return data as { id: string; user_id: string; student_number: string; first_name: string; last_name: string } | null;
 }
 
-async function termValidation(db: LooseClient, studentId: string, at: Date) {
-  const term = getCurrentTerm(at);
+async function termValidation(db: LooseClient, studentId: string) {
+  const term = await getActiveTerm();
   const { data } = await db
     .from("id_validations")
     .select("id, status")
@@ -141,7 +142,7 @@ async function applyGateScan(db: LooseClient, record: GateScanUpload) {
     );
   }
 
-  const validation = student ? await termValidation(db, student.id, at) : null;
+  const validation = student ? await termValidation(db, student.id) : null;
   const { data: gateRow } = scan.gate_id ? await db.from("access_gates").select("id").eq("id", scan.gate_id).maybeSingle() : { data: null };
 
   const { data: inserted, error } = await db
@@ -219,12 +220,11 @@ async function applyGateScan(db: LooseClient, record: GateScanUpload) {
 
 async function applyIdValidation(db: LooseClient, record: IdValidationUpload) {
   const p = record.payload;
-  const at = new Date(record.occurred_at);
   const when = offlineMoment(record.occurred_at);
   const student = await findStudent(db, { id: p.student_id });
   if (!student) return { outcome: "rejected" as const, detail: `No student ${p.student_number} in the cloud.`, studentId: null, review: false };
 
-  const { term, row } = await termValidation(db, student.id, at);
+  const { term, row } = await termValidation(db, student.id);
   const plan = planUploadedValidation(row?.status ?? null);
 
   if (plan === "already_validated") {

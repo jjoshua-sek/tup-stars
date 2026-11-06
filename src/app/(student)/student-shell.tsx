@@ -7,6 +7,8 @@ interface StudentShellProps {
   userName: string;
   userAvatar?: string;
   userSubtitle?: string;
+  /** The current term, shown in the header (lib/settings/active-term). */
+  termLabel?: string;
   photoIsProvisional?: boolean;
   notificationCount: number;
   sidebarBadges?: Record<string, number>;
@@ -18,6 +20,7 @@ export function StudentShell({
   userName,
   userAvatar,
   userSubtitle,
+  termLabel,
   photoIsProvisional,
   notificationCount,
   sidebarBadges,
@@ -30,6 +33,7 @@ export function StudentShell({
       userName={userName}
       userAvatar={userAvatar}
       userSubtitle={userSubtitle}
+      termLabel={termLabel}
       photoIsProvisional={photoIsProvisional}
       notificationCount={notificationCount}
       sidebarBadges={sidebarBadges}

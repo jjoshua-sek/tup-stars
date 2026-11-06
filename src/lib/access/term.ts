@@ -55,11 +55,14 @@ export function getCurrentTerm(now: Date = new Date()): AcademicTerm {
     semester = "2nd Semester";
   }
 
-  const schoolYear = `${startYear}-${startYear + 1}`;
-  const schoolYearLabel = `AY ${startYear}–${startYear + 1}`;
+  return termOf(semester, startYear);
+}
 
+/** The term for a semester and the school year starting in `startYear`. */
+export function termOf(semester: Semester, startYear: number): AcademicTerm {
+  const schoolYearLabel = `AY ${startYear}–${startYear + 1}`;
   return {
-    schoolYear,
+    schoolYear: `${startYear}-${startYear + 1}`,
     semester,
     schoolYearLabel,
     label: `${semester}, ${schoolYearLabel}`,

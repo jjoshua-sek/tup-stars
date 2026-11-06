@@ -7,12 +7,13 @@ import { RequestValidationButton } from "@/components/id/request-validation-butt
 import { TupSeal } from "@/components/layout/tup-seal";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatInstitutionalQrPayload } from "@/lib/access/payload";
-import { getCurrentTerm, hasExpired } from "@/lib/access/term";
+import { hasExpired } from "@/lib/access/term";
 import { describeAccessLogRetention, readRetention } from "@/lib/settings/retention";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { formatManilaMonthDayTime } from "@/lib/utils/time";
 import { ID_STATUS_META, type IdValidationStatus } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "Digital ID",
@@ -105,7 +106,7 @@ export default async function DigitalIdPage() {
 
   // New OSA tables aren't in the hand-maintained Database generic yet.
   const db = loose(supabase);
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const [{ data: validationRaw }, { data: eventsRaw }, { data: settingRows }] = await Promise.all([
     db

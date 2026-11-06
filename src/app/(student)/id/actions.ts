@@ -2,13 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/utils/audit";
 import { checkRateLimit } from "@/lib/utils/rate-limit";
 import type { IdValidationStatus } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 interface ActionResult {
   ok?: boolean;
@@ -62,7 +63,7 @@ export async function requestIdValidation(): Promise<ActionResult> {
     return { error: "Add a profile photo before requesting ID validation." };
   }
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const { data: existingRow } = await db
     .from("id_validations")

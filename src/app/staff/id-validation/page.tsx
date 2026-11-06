@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/osa/empty-state";
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
 import { ToneBadge } from "@/components/osa/tone-badge";
 import { PageHeader } from "@/components/shared/page-header";
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { isOfflineMode } from "@/lib/offline/mode";
 import { OFFLINE_UPLOAD_COLUMNS, offlineMoment } from "@/lib/offline/upload-rules";
 import { getStaffContext } from "@/lib/osa/staff-context";
@@ -18,6 +18,7 @@ import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { formatManilaMonthDayTime } from "@/lib/utils/time";
 import { ID_STATUS_META, type AcademicDocument, type IdValidationStatus } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "ID validation",
@@ -114,7 +115,7 @@ export default async function StaffIdValidationPage({
   const tokens = searchTokens(q);
 
   const db = loose(await createClient());
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const offline = isOfflineMode();
   const [queueResult, flaggedResult, validatedResult, reviewResult] = await Promise.all([

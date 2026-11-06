@@ -52,6 +52,8 @@ type AuditAction =
   | "attendance_imported"
   // Retention periods recorded on the DPO's instruction (migration 00047).
   | "retention_changed"
+  // The current semester and school year, set by the administrator (00057).
+  | "term_changed"
   // Account provisioning (migration 00021)
   | "account_created"
   | "enrollment_imported"

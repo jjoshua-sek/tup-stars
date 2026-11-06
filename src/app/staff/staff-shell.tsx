@@ -7,6 +7,8 @@ interface StaffShellProps {
   children: React.ReactNode;
   userName: string;
   userSubtitle?: string;
+  /** The current term, shown in the header (lib/settings/active-term). */
+  termLabel?: string;
   role: "staff" | "admin";
   /** This person's menu, built in the staff layout. */
   staffNav: StaffNavSection[];
@@ -19,6 +21,7 @@ export function StaffShell({
   children,
   userName,
   userSubtitle,
+  termLabel,
   role,
   staffNav,
   notificationCount,
@@ -32,6 +35,7 @@ export function StaffShell({
       idleMinutes={idleMinutes}
       userName={userName}
       userSubtitle={userSubtitle}
+      termLabel={termLabel}
       notificationCount={notificationCount}
       sidebarBadges={sidebarBadges}
     >

@@ -17,9 +17,16 @@ const BUCKET = "academic-documents";
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf"] as const;
 
 interface DocumentUploadProps {
-  /** Defaults for the term pickers, from the server's current term. */
-  defaultSchoolYear: string;
-  defaultSemester: string;
+  /**
+   * The terms a document can be filed under: the current one (set by the
+   * administrator) first, then the two before it. Chosen, never typed.
+   */
+  terms: Array<{ schoolYear: string; semester: string; label: string }>;
+}
+
+/** A COR is for the term under way; a rating slip, for the one that ended. */
+function defaultTermIndex(documentType: string, termCount: number): number {
+  return documentType === "rating_slip" && termCount > 1 ? 1 : 0;
 }
 
 /**
@@ -29,14 +36,16 @@ interface DocumentUploadProps {
  * through the Next.js server — Supabase Storage enforces the same RLS on the
  * upload that the database enforces on the row.
  */
-export function DocumentUpload({
-  defaultSchoolYear,
-  defaultSemester,
-}: DocumentUploadProps) {
+export function DocumentUpload({ terms }: DocumentUploadProps) {
   const [isPending, startTransition] = useTransition();
   const [busy, setBusy] = useState(false);
   const [reading, setReading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const [documentType, setDocumentType] = useState("rating_slip");
+  // Follows the document type until the student picks a term themselves.
+  const [pickedTerm, setPickedTerm] = useState<number | null>(null);
+  const termIndex = pickedTerm ?? defaultTermIndex(documentType, terms.length);
+  const term = terms[termIndex] ?? terms[0];
 
   const handleSubmit = async (formData: FormData) => {
     const chosen = formData.get("file");
@@ -134,31 +143,34 @@ export function DocumentUpload({
     >
       <label className="block space-y-1">
         <span className="text-sm font-medium">Document</span>
-        <select name="document_type" defaultValue="rating_slip" className={inputClass}>
+        <select
+          name="document_type"
+          value={documentType}
+          onChange={(event) => setDocumentType(event.target.value)}
+          className={inputClass}
+        >
           <option value="rating_slip">Rating slip (grades)</option>
           <option value="certificate_of_registration">Certificate of Registration</option>
           <option value="transcript">Transcript of records</option>
         </select>
       </label>
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium">School year</span>
-        <input
-          name="school_year"
-          defaultValue={defaultSchoolYear}
-          pattern="\d{4}-\d{4}"
-          required
+      <label className="block space-y-1 sm:col-span-2 lg:col-span-1">
+        <span className="text-sm font-medium">Term on the document</span>
+        <select
+          value={termIndex}
+          onChange={(event) => setPickedTerm(Number(event.target.value))}
           className={inputClass}
-        />
-      </label>
-
-      <label className="block space-y-1">
-        <span className="text-sm font-medium">Semester</span>
-        <select name="semester" defaultValue={defaultSemester} className={inputClass}>
-          <option>1st Semester</option>
-          <option>2nd Semester</option>
-          <option>Summer</option>
+        >
+          {terms.map((option, index) => (
+            <option key={option.label} value={index}>
+              {option.label}
+              {index === 0 ? " (this term)" : ""}
+            </option>
+          ))}
         </select>
+        <input type="hidden" name="school_year" value={term.schoolYear} />
+        <input type="hidden" name="semester" value={term.semester} />
       </label>
 
       <label className="block space-y-1">

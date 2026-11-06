@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 interface Result {
   ok?: boolean;
@@ -64,7 +65,7 @@ export async function addAvailabilityBlock(formData: FormData): Promise<Result> 
     return { error: parsed.error.issues[0]?.message ?? "Check the times you entered." };
   }
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const { error } = await loose(supabase)
     .from("availability_blocks")

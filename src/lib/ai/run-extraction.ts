@@ -1,7 +1,9 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { checkDocumentIntegrity, printedTerm, type IntegrityCheck } from "@/lib/documents/integrity";
+import { checkCurrentTerm, checkDocumentIntegrity, printedTerm, type IntegrityCheck } from "@/lib/documents/integrity";
+import { getActiveTerm } from "@/lib/settings/active-term";
+import { recentTerms } from "@/lib/settings/term";
 import type { ExtractedAcademicData } from "@/types/osa";
 import { readPdfFacts } from "@/lib/documents/pdf-facts";
 import { loose } from "@/lib/supabase/loose";
@@ -136,6 +138,13 @@ export async function runAcademicExtraction(
         pdf: await readPdfFacts(bytes),
       });
       const termCheck = await fileUnderPrintedTerm(db, document, outcome.data);
+      // Recent enough for the term the administrator set?
+      const currentCheck = checkCurrentTerm(
+        document.document_type,
+        printedTerm(outcome.data.school_year, outcome.data.semester),
+        recentTerms(await getActiveTerm()),
+      );
+      if (currentCheck) checks.unshift(currentCheck);
       if (termCheck) checks.unshift(termCheck);
       const { error } = await db.from("academic_documents").update({ integrity_checks: checks }).eq("id", document.id);
       // Before migration 00037 the column does not exist; nothing is lost.

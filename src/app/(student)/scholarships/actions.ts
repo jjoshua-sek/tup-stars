@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/utils/rate-limit";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 interface Result {
   ok?: boolean;
@@ -50,7 +51,7 @@ export async function declareScholarshipInterest(
   const student = studentRow as { id: string } | null;
   if (!student) return { error: "Complete your profile first." };
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const { data: existingRow } = await db
     .from("scholarship_applications")

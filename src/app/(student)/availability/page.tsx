@@ -9,10 +9,11 @@ import {
 import { EmptyState } from "@/components/osa/empty-state";
 import { ToneBadge } from "@/components/osa/tone-badge";
 import { PageHeader } from "@/components/shared/page-header";
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import type { AvailabilityBlockRow } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "My schedule",
@@ -50,7 +51,7 @@ export default async function AvailabilityPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const { data: rows } = await loose(supabase)
     .from("availability_blocks")

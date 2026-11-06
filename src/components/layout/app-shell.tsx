@@ -17,6 +17,8 @@ interface AppShellProps {
   userAvatar?: string;
   /** Short role line shown under the name in the header (e.g. "BSIT · 4th Year") */
   userSubtitle?: string;
+  /** The current term, shown in the header. */
+  termLabel?: string;
   photoIsProvisional?: boolean;
   notificationCount?: number;
   /** Per-route badge counts for the sidebar (e.g. { "/concerns": 3 }) */
@@ -50,6 +52,7 @@ export function AppShell({
   staffNav,
   userName,
   userSubtitle,
+  termLabel,
   photoIsProvisional,
   notificationCount,
   sidebarBadges,
@@ -67,6 +70,7 @@ export function AppShell({
         onMenuClick={() => setSidebarOpen(true)}
         userName={userName}
         userSubtitle={userSubtitle}
+        termLabel={termLabel}
         photoIsProvisional={photoIsProvisional}
         isStaffConsole={role === "staff" || role === "admin"}
         notificationCount={notificationCount}

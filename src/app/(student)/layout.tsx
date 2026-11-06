@@ -5,6 +5,7 @@ import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { StudentShell } from "./student-shell";
 import { isProfileComplete } from "@/lib/utils/profile-completeness";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 /**
  * Student Layout — fetches user + student profile, enforces the
@@ -115,6 +116,7 @@ export default async function StudentLayout({
     <StudentShell
       userName={userName}
       userSubtitle={userSubtitle}
+      termLabel={(await getActiveTerm()).label}
       userAvatar={studentData?.photo_url || undefined}
       photoIsProvisional={studentData?.photo_is_provisional ?? false}
       notificationCount={unreadCount || 0}

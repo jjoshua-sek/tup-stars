@@ -6,7 +6,8 @@ import { DeskScanner } from "@/components/access/desk-scanner";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { getAccessStaff } from "@/lib/access/guards";
-import { getCurrentTerm } from "@/lib/access/term";
+import { getActiveTerm } from "@/lib/settings/active-term";
+
 
 export const metadata: Metadata = {
   title: "Scan an ID",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
  */
 export default async function StaffScannerPage() {
   const staff = await getAccessStaff();
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   if (!staff?.canView) {
     return (

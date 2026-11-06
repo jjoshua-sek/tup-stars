@@ -16,7 +16,16 @@ import type { ExtractedAcademicData } from "@/types/osa";
 export type CheckStatus = "pass" | "warn" | "skip";
 
 export interface IntegrityCheck {
-  code: "student_number" | "student_name" | "term" | "gwa" | "units" | "grade_scale" | "pdf_source" | "pdf_revisions";
+  code:
+    | "student_number"
+    | "student_name"
+    | "term"
+    | "current_term"
+    | "gwa"
+    | "units"
+    | "grade_scale"
+    | "pdf_source"
+    | "pdf_revisions";
   status: CheckStatus;
   detail: string;
 }
@@ -196,6 +205,32 @@ export function printedTerm(schoolYear: string | null | undefined, semester: str
   const text = semester?.trim().toLowerCase() ?? "";
   const term = /sum/.test(text) ? "Summer" : /^(1st|first)\b/.test(text) ? "1st Semester" : /^(2nd|second)\b/.test(text) ? "2nd Semester" : null;
   return term ? { schoolYear: `${year[1]}-${year[2]}`, semester: term } : null;
+}
+
+/**
+ * Is the document recent enough for the term in force (set by the
+ * administrator)? A COR proves enrollment only for its own term, so it must
+ * be the current one. A rating slip may be from this term or the two before
+ * it (`recent`, newest first). A flag for the officer, never a rejection.
+ */
+export function checkCurrentTerm(
+  documentType: "certificate_of_registration" | "rating_slip" | "transcript",
+  printed: { schoolYear: string; semester: string } | null,
+  recent: ReadonlyArray<{ schoolYear: string; semester: string; label: string }>,
+): IntegrityCheck | null {
+  if (documentType === "transcript" || recent.length === 0) return null;
+  const current = recent[0];
+  if (!printed) return { code: "current_term", status: "skip", detail: "No term could be read to compare with the current term." };
+  const printedAs = `${printed.semester}, ${printed.schoolYear}`;
+  const isCurrent = printed.schoolYear === current.schoolYear && printed.semester === current.semester;
+  if (documentType === "certificate_of_registration") {
+    return isCurrent
+      ? { code: "current_term", status: "pass", detail: `A COR for the current term, ${current.label}.` }
+      : { code: "current_term", status: "warn", detail: `This COR is for ${printedAs}, not the current term (${current.label}). It does not show enrollment now.` };
+  }
+  return recent.some((term) => term.schoolYear === printed.schoolYear && term.semester === printed.semester)
+    ? { code: "current_term", status: "pass", detail: `Grades from ${printedAs}, a recent term.` }
+    : { code: "current_term", status: "warn", detail: `These grades are from ${printedAs}, more than two terms before the current one (${current.label}).` };
 }
 
 /** True when the file's first bytes say PDF, whatever its name (ERS saves rating slips as .php). */

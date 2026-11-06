@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { checkDocumentIntegrity, computeGwa, countPdfRevisions, isPdfBytes, normalizeGrade, normalizeSubjectCode, printedTerm, unitsFromGrades, type PdfFacts } from "./integrity";
+import { checkCurrentTerm, checkDocumentIntegrity, computeGwa, countPdfRevisions, isPdfBytes, normalizeGrade, normalizeSubjectCode, printedTerm, unitsFromGrades, type PdfFacts } from "./integrity";
 
 // The real 2nd Sem 2025-2026 rating slip from ERS, as read.
 const slip = {
@@ -111,5 +111,32 @@ describe("printedTerm", () => {
     expect(printedTerm("2627", "First")).toBeNull();
     expect(printedTerm("2025-2027", "First")).toBeNull();
     expect(printedTerm("2025-2026", null)).toBeNull();
+  });
+});
+
+describe("checkCurrentTerm", () => {
+  // The term in force is 1st Semester 2026-2027; the two before it follow.
+  const recent = [
+    { schoolYear: "2026-2027", semester: "1st Semester", label: "1st Semester, AY 2026–2027" },
+    { schoolYear: "2025-2026", semester: "Summer", label: "Summer, AY 2025–2026" },
+    { schoolYear: "2025-2026", semester: "2nd Semester", label: "2nd Semester, AY 2025–2026" },
+  ];
+  const term = (semester: string, schoolYear: string) => ({ semester, schoolYear });
+
+  it("passes a COR only for the current term", () => {
+    expect(checkCurrentTerm("certificate_of_registration", term("1st Semester", "2026-2027"), recent)?.status).toBe("pass");
+    const old = checkCurrentTerm("certificate_of_registration", term("2nd Semester", "2025-2026"), recent);
+    expect(old?.status).toBe("warn");
+    expect(old?.detail).toMatch(/not the current term/);
+  });
+
+  it("passes a rating slip from this term or the two before it", () => {
+    expect(checkCurrentTerm("rating_slip", term("2nd Semester", "2025-2026"), recent)?.status).toBe("pass");
+    expect(checkCurrentTerm("rating_slip", term("1st Semester", "2025-2026"), recent)?.status).toBe("warn");
+  });
+
+  it("skips when no term was read, and leaves transcripts alone", () => {
+    expect(checkCurrentTerm("rating_slip", null, recent)?.status).toBe("skip");
+    expect(checkCurrentTerm("transcript", term("1st Semester", "2020-2021"), recent)).toBeNull();
   });
 });

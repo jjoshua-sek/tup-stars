@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { defaultTermExpiry, getCurrentTerm } from "@/lib/access/term";
+import { defaultTermExpiry } from "@/lib/access/term";
 import { OFFLINE_REFUSAL, isOfflineMode } from "@/lib/offline/mode";
 import { getStaffContext } from "@/lib/osa/staff-context";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loose } from "@/lib/supabase/loose";
 import { logAuditEvent } from "@/lib/utils/audit";
 import type { IdValidationStatus } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 interface Result {
   ok?: boolean;
@@ -101,7 +102,7 @@ export async function reviewIdValidation(formData: FormData): Promise<Result> {
   }
 
   const db = loose(createAdminClient());
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
   const now = new Date();
 
   const { data: rowData } = await db
@@ -182,7 +183,7 @@ export async function validateAtCounter(formData: FormData): Promise<Result> {
   if (!parsed.success) return { error: "Choose a student first." };
 
   const db = loose(createAdminClient());
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
   const now = new Date();
 
   const { data: studentData } = await db

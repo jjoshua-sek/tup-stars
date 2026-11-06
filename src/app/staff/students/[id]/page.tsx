@@ -15,7 +15,7 @@ import {
   RowList,
   type NoticeRow,
 } from "@/components/students/record-parts";
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { getStaffContext } from "@/lib/osa/staff-context";
 import { featuresToInputs, loadActiveRiskModel, loadRiskFeatures } from "@/lib/risk/load";
 import { RISK_TIER_META, scoreStudent } from "@/lib/risk/score";
@@ -40,6 +40,7 @@ import { concernCategoryLabel } from "@/lib/validations/concern";
 import { CONCERN_STATUSES as CONCERN_STATUS_STYLES } from "@/components/concerns/status-badge";
 import { SESSION_STATUS_LABELS, SESSION_TYPE_LABELS } from "@/lib/osa/guidance-labels";
 import { followUpStatusLabel, followUpTypeLabel } from "@/lib/risk/follow-up-labels";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "Student record",
@@ -297,7 +298,7 @@ export default async function StaffStudentRecordPage({
       .map(([section]) => section),
   });
 
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
   const none = Promise.resolve(null);
 
   const [
