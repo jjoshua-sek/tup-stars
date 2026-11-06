@@ -4,7 +4,7 @@ import { DownloadSimpleIcon as Download } from "@phosphor-icons/react/ssr";
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonVariants } from "@/components/ui/button";
-import { getCurrentTerm } from "@/lib/access/term";
+
 import { buildCollegeReport, totalRow } from "@/lib/osa/college-report";
 import { loadCollegeReportInput } from "@/lib/osa/college-report-data";
 import { getStaffContext } from "@/lib/osa/staff-context";
@@ -14,6 +14,7 @@ import { loose } from "@/lib/supabase/loose";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { APPLICATION_OPEN, CASE_STATUS_META, type CaseStatus } from "@/types/osa";
+import { getActiveTerm } from "@/lib/settings/active-term";
 
 export const metadata: Metadata = {
   title: "Reports",
@@ -41,7 +42,7 @@ export default async function StaffReportsPage() {
 
   const supabase = await createClient();
   const db = loose(supabase);
-  const term = getCurrentTerm();
+  const term = await getActiveTerm();
 
   const termStart = new Date();
   termStart.setMonth(termStart.getMonth() - 5);
@@ -136,7 +137,7 @@ export default async function StaffReportsPage() {
         description={`Totals for ${term.label}. Figures only; open each page for names.`}
       >
         <a href="/staff/reports/export" className={cn(buttonVariants(), "gap-1.5 bg-tup-maroon-600 text-white hover:bg-tup-maroon-700")}>
-          <Download className="h-4 w-4" /> Download all colleges (CSV)
+          <Download className="h-4 w-4" /> Download all colleges (opens in Excel)
         </a>
       </PageHeader>
 

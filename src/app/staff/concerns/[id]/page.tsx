@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CONCERN_STUDENT_COLUMNS } from "@/lib/students/columns";
 import { ConcernAttachments } from "@/components/concerns/concern-attachments";
 import { ResponseForm } from "@/components/concerns/response-form";
-import { MarkResolvedButton, StatusUpdater } from "@/components/concerns/status-updater";
+import { CategoryChanger, MarkResolvedButton, StatusUpdater } from "@/components/concerns/status-updater";
 import { ConcernRealtime } from "@/components/concerns/concern-realtime";
 import { UrgencyBadge } from "@/components/concerns/urgency-badge";
 import { PageHeader } from "@/components/shared/page-header";
@@ -221,6 +221,7 @@ export default async function StaffConcernDetailPage({
           currentStatus={concern.status}
           hasAiSummary={!!concern.ai_summary}
         />
+        <CategoryChanger key={concern.category} concernId={id} currentCategory={concern.category} />
         <div className="flex flex-wrap gap-2 sm:ml-auto">
           {/* A plain in-page link: the reply form is the whole of
               responding, this only saves the scroll on a long concern. */}

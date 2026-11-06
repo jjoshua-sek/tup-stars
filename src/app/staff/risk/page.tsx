@@ -34,7 +34,11 @@ const TIER_TONE: Record<RiskTier, Tone> = {
   critical: "danger",
 };
 
-const TIERS: Array<RiskTier | "all"> = ["critical", "high", "moderate", "low", "all"];
+// Low-risk students are scored but not listed: a page of "at-risk students"
+// that shows students doing well reads as an accusation. One line says how
+// many there are.
+type ListedTier = Exclude<RiskTier, "low">;
+const TIERS: Array<ListedTier | "all"> = ["critical", "high", "moderate", "all"];
 
 const COUNT = new Intl.NumberFormat("en-PH");
 const formatFigure = (value: number | null) => (value == null ? "Not recorded" : value.toFixed(3));
@@ -70,9 +74,7 @@ export default async function StaffRiskPage({
   }
 
   const { tier } = await searchParams;
-  const activeTier = (TIERS.includes((tier ?? "") as RiskTier) ? tier : "all") as
-    | RiskTier
-    | "all";
+  const activeTier = (TIERS.includes((tier ?? "") as ListedTier) ? tier : "all") as ListedTier | "all";
 
   const supabase = await createClient();
   const db = loose(supabase);
@@ -180,18 +182,19 @@ export default async function StaffRiskPage({
     })
     .sort((a, b) => b.assessment.risk_score - a.assessment.risk_score);
 
+  const atRisk = scored.filter((s) => s.assessment.risk_tier !== "low");
   const counts = {
-    critical: scored.filter((s) => s.assessment.risk_tier === "critical").length,
-    high: scored.filter((s) => s.assessment.risk_tier === "high").length,
-    moderate: scored.filter((s) => s.assessment.risk_tier === "moderate").length,
-    low: scored.filter((s) => s.assessment.risk_tier === "low").length,
+    critical: atRisk.filter((s) => s.assessment.risk_tier === "critical").length,
+    high: atRisk.filter((s) => s.assessment.risk_tier === "high").length,
+    moderate: atRisk.filter((s) => s.assessment.risk_tier === "moderate").length,
   };
-  const lowConfidence = scored.filter((s) => s.assessment.lowConfidence).length;
+  const lowCount = scored.length - atRisk.length;
+  const lowConfidence = atRisk.filter((s) => s.assessment.lowConfidence).length;
 
   const visible =
     activeTier === "all"
-      ? scored
-      : scored.filter((s) => s.assessment.risk_tier === activeTier);
+      ? atRisk
+      : atRisk.filter((s) => s.assessment.risk_tier === activeTier);
 
   return (
     <div>
@@ -212,7 +215,7 @@ export default async function StaffRiskPage({
       <nav aria-label="Which students" className="mb-4 flex flex-wrap items-center gap-1 border-b border-border">
         {TIERS.map((option) => {
           const active = activeTier === option;
-          const count = option === "all" ? scored.length : counts[option];
+          const count = option === "all" ? atRisk.length : counts[option];
           return (
             <Link
               key={option}
@@ -225,7 +228,7 @@ export default async function StaffRiskPage({
                   : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {option === "all" ? "All" : RISK_TIER_META[option].label}
+              {option === "all" ? "All at risk" : RISK_TIER_META[option].label}
               <span
                 className={cn(
                   "rounded-full px-2 text-sm tabular-nums",
@@ -242,6 +245,13 @@ export default async function StaffRiskPage({
           );
         })}
       </nav>
+
+      {lowCount > 0 && (
+        <p className="mb-4 text-base text-muted-foreground">
+          {lowCount} {lowCount === 1 ? "student scores" : "students score"} low risk and {lowCount === 1 ? "is" : "are"} not
+          listed here.
+        </p>
+      )}
 
       {visible.length === 0 ? (
         <EmptyState

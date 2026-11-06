@@ -9,7 +9,7 @@ import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/utils/audit";
 import { sanitizeText } from "@/lib/utils/sanitize";
-import { CONCERN_STATUSES } from "@/lib/validations/concern";
+import { CONCERN_STATUSES, STAFF_CONCERN_CATEGORIES } from "@/lib/validations/concern";
 
 interface ActionResult {
   success?: boolean;
@@ -184,6 +184,46 @@ export async function updateConcernStatus(
   revalidatePath(`/concerns/${concernId}`);
   revalidatePath("/concerns");
 
+  return { success: true };
+}
+
+/**
+ * Moves a concern to another category, when the officer sees it belongs
+ * elsewhere: filed under Other, or under Harassment when it is not. OSA
+ * staff and counselors only. A concern cannot be moved into "Complaint":
+ * that category needs the details of the student complained about, which
+ * only the student's own form collects.
+ */
+export async function updateConcernCategory(concernId: string, category: string): Promise<ActionResult> {
+  const staff = await getStaffContext();
+  if (!staff || !(staff.isOsa || staff.isCounselor)) {
+    return { error: "Only OSA staff can change a concern's category." };
+  }
+  if (!(STAFF_CONCERN_CATEGORIES as readonly string[]).includes(category)) {
+    return { error: "Choose one of the listed categories." };
+  }
+
+  const supabase = await createClient();
+  const db = loose(supabase);
+  const { data: current } = await db.from("concerns").select("category").eq("id", concernId).maybeSingle();
+  const from = (current as { category: string } | null)?.category;
+  if (!from) return { error: "That concern could not be found." };
+  if (from === category) return { success: true };
+
+  const { error } = await db.from("concerns").update({ category }).eq("id", concernId);
+  if (error) {
+    console.error("Category change failed:", error);
+    return { error: "The category could not be changed." };
+  }
+
+  await logAuditEvent(staff.userId, "concern_respond", `concerns/${concernId}`, {
+    category_from: from,
+    category_to: category,
+  });
+  revalidatePath(`/staff/concerns/${concernId}`);
+  revalidatePath("/staff/concerns");
+  revalidatePath(`/concerns/${concernId}`);
+  revalidatePath("/concerns");
   return { success: true };
 }
 

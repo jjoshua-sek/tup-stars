@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import { CheckCircleIcon as CheckCircle2, CircleNotchIcon as Loader2, ArrowsClockwiseIcon as RefreshCw } from "@phosphor-icons/react/ssr";
 
 import {
+  updateConcernCategory,
   updateConcernStatus,
   resummarizeConcern,
 } from "@/app/staff/concerns/actions";
-import { CONCERN_STATUSES } from "@/lib/validations/concern";
+import { CONCERN_STATUSES, STAFF_CONCERN_CATEGORIES, concernCategoryLabel } from "@/lib/validations/concern";
 import { CONCERN_STATUSES as STATUS_STYLES } from "@/components/concerns/status-badge";
 
 type ConcernStatusValue = (typeof CONCERN_STATUSES)[number];
@@ -163,5 +164,54 @@ export function MarkResolvedButton({
       )}
       {done ? STATUS_LABELS[currentStatus] : "Mark as resolved"}
     </button>
+  );
+}
+
+/**
+ * Moves the concern to another category, beside Status. A student's
+ * complaint about another student keeps its own label until it is moved;
+ * nothing can be moved into it (updateConcernCategory says why).
+ */
+export function CategoryChanger({ concernId, currentCategory }: { concernId: string; currentCategory: string }) {
+  const router = useRouter();
+  const [category, setCategory] = useState(currentCategory);
+  const [isPending, startTransition] = useTransition();
+  const options: string[] = (STAFF_CONCERN_CATEGORIES as readonly string[]).includes(currentCategory)
+    ? [...STAFF_CONCERN_CATEGORIES]
+    : [currentCategory, ...STAFF_CONCERN_CATEGORIES];
+
+  const handleChange = (next: string | null) => {
+    if (!next || next === category) return;
+    const previous = category;
+    setCategory(next);
+    startTransition(async () => {
+      const result = await updateConcernCategory(concernId, next);
+      if (result.error) {
+        toast.error(result.error);
+        setCategory(previous);
+        return;
+      }
+      toast.success(`Category changed to ${concernCategoryLabel(next)}`);
+      router.refresh();
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="whitespace-nowrap text-base font-medium text-muted-foreground">Category</span>
+      <Select value={category} onValueChange={handleChange} disabled={isPending}>
+        <SelectTrigger className="h-10 w-56 text-base" aria-label="Category">
+          <SelectValue>{(value: string) => concernCategoryLabel(value)}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option} disabled={option === "Complaint"}>
+              {concernCategoryLabel(option)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {isPending && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+    </div>
   );
 }

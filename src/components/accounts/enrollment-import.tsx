@@ -93,6 +93,25 @@ export function EnrollmentImport() {
   return (
     <div className="space-y-4">
       {!preview && (
+        <ol className="list-decimal space-y-1.5 rounded-lg border border-border bg-muted/30 py-3 pr-4 pl-9 text-base">
+          <li>
+            Press <strong>Template</strong> below and open the file in Excel or Google Sheets.
+          </li>
+          <li>
+            Type one student per row. For <strong>year_level</strong>, type just the number: <strong>1</strong> to{" "}
+            <strong>5</strong>.
+          </li>
+          <li>
+            Save it as CSV. In Excel: <strong>File → Save As → CSV (Comma delimited)</strong>. In Google Sheets:{" "}
+            <strong>File → Download → Comma-separated values (.csv)</strong>.
+          </li>
+          <li>
+            Choose that file here and press <strong>Check the list</strong>. Nothing is created until you confirm.
+          </li>
+        </ol>
+      )}
+
+      {!preview && (
         <form action={check} className="space-y-3">
           {pasting ? (
             <label className="block space-y-1">
@@ -101,7 +120,7 @@ export function EnrollmentImport() {
                 name="csv"
                 rows={6}
                 spellCheck={false}
-                placeholder={"student_number,first_name,last_name,email,program,year_level,section\nTUPM-99-0001,Juan,Dela Cruz,you+juan@gmail.com,BSIT,1st Year,A"}
+                placeholder={"student_number,first_name,last_name,email,program,year_level,section\nTUPM-99-0001,Juan,Dela Cruz,you+juan@gmail.com,BSIT,1,A"}
                 className="w-full rounded-md border border-border bg-background px-2.5 py-2 font-mono text-sm focus:border-tup-maroon-600 focus:outline-none"
               />
             </label>
@@ -110,7 +129,7 @@ export function EnrollmentImport() {
               <UploadCloud className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
               <span className="text-base font-medium">Choose the enrollment list (.csv)</span>
               <span className="text-sm text-muted-foreground">
-                Export it from a spreadsheet as CSV. Up to 1,000 students per file.
+                Up to 1,000 students per file.
               </span>
               <input name="file" type="file" accept=".csv,text/csv" className="text-sm" />
             </label>
