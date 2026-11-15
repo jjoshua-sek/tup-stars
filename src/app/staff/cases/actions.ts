@@ -29,7 +29,9 @@ import { loose } from "@/lib/supabase/loose";
 import { logAuditEvent } from "@/lib/utils/audit";
 import { checkRateLimit } from "@/lib/utils/rate-limit";
 import { sanitizeText } from "@/lib/utils/sanitize";
-import { parseManilaDateTime } from "@/lib/utils/time";
+import { formatManilaDateTime, parseManilaDateTime } from "@/lib/utils/time";
+import { HANDOVER_KIND, handoverTimeProblem } from "@/lib/osa/codi-handover";
+import { codiHandoverAccess } from "@/lib/osa/codi-handover-access";
 import { CASE_STATUSES, CASE_STATUS_META, type CaseStatus } from "@/types/osa";
 
 interface Result {
@@ -167,7 +169,7 @@ const STUDENT_COMPLAINANT = "A student (complaint received through Concerns)";
  *   - the student is NOT notified on filing. Notice comes with the summons,
  *     after the OSA has triaged and a date is approved.
  */
-export async function fileCase(formData: FormData): Promise<Result & { caseId?: string }> {
+export async function fileCase(formData: FormData): Promise<Result & { caseId?: string; nextHref?: string }> {
   const staff = await getStaffContext();
   if (!staff) return { error: "Only staff can file a case." };
 
@@ -364,8 +366,10 @@ export async function fileCase(formData: FormData): Promise<Result & { caseId?: 
   return {
     ok: true,
     caseId: created.id,
+    // The filer cannot open a CODI case; the handover sheet is where they go next.
+    ...(isConfidential ? { nextHref: `/staff/cases/${created.id}/handover` } : {}),
     message: isConfidential
-      ? `Filed as ${created.case_number} and routed to CODI. It will not appear in the general case queue.`
+      ? `Filed as ${created.case_number} and routed to CODI. Print the handover sheet and take it to CODI.`
       : isRestricted
         ? `Filed as ${created.case_number}, restricted: only the OSA head, the administrator and ${staff.isOsa ? "you, as its officer," : "the officer the OSA head assigns"} can see it.`
         : needsClassification
@@ -1257,7 +1261,7 @@ const ESCALATION_STATUS: Record<"PIC" | "SDB" | "CODI", CaseStatus> = {
  * committee through its own channel rather than by a portal notification
  * pointing at a page they can no longer open.
  */
-export async function escalateCase(formData: FormData): Promise<Result> {
+export async function escalateCase(formData: FormData): Promise<Result & { nextHref?: string }> {
   const staff = await getStaffContext();
   if (!staff?.isOsa) return { error: "Only OSA staff can escalate a case." };
 
@@ -1343,8 +1347,9 @@ export async function escalateCase(formData: FormData): Promise<Result> {
   revalidatePath("/staff/cases");
   return {
     ok: true,
+    ...(toCodi ? { nextHref: `/staff/cases/${parsed.data.case_id}/handover` } : {}),
     message: toCodi
-      ? "Referred to CODI. The case is now confidential and has left the general queue."
+      ? "Referred to CODI. The case is now confidential; print the handover sheet and take it to CODI."
       : `Referred to the ${parsed.data.escalated_to}.`,
   };
 }
@@ -1918,4 +1923,82 @@ export async function updateCaseStatus(formData: FormData): Promise<Result> {
     ok: true,
     message: `Case updated.${meetingNote}`,
   };
+}
+
+// ============================================================
+// CODI HANDOVER — the case turned over to the committee, on record
+// ============================================================
+
+const handoverSchema = z.object({
+  case_id: z.string().uuid(),
+  received_by: z.string().trim().min(3, { message: "Write who at CODI received the case." }).max(120),
+  received_at: z.string().trim().min(1, { message: "Give the date and time of the handover." }),
+  codi_reference: z.string().trim().max(80).optional().or(z.literal("")),
+});
+
+/**
+ * Records that a confidential case was handed to CODI: who received it, when,
+ * and CODI's own reference if it gave one. Written into the case's
+ * append-only history, so a correction is a second entry, never an edit.
+ *
+ * Open to cleared staff and to the officer who filed or referred the case
+ * (lib/osa/codi-handover-access.ts); the write uses the server's key because
+ * that officer can no longer see the case through RLS.
+ */
+export async function recordCodiHandover(formData: FormData): Promise<Result> {
+  const staff = await getStaffContext();
+  if (!staff) return { error: "Sign in again." };
+
+  const parsed = handoverSchema.safeParse({
+    case_id: formData.get("case_id"),
+    received_by: formData.get("received_by") ?? "",
+    received_at: formData.get("received_at") ?? "",
+    codi_reference: formData.get("codi_reference") ?? "",
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the handover details." };
+
+  const access = await codiHandoverAccess(staff, parsed.data.case_id);
+  if (!access) return { error: "Only cleared staff, or the officer who sent this case to CODI, can record its handover." };
+
+  const receivedAt = parseManilaDateTime(parsed.data.received_at);
+  if (!receivedAt) return { error: "Give a real date and time for the handover." };
+
+  const db = loose(createAdminClient());
+  const { data: caseRow } = await db
+    .from("violation_cases")
+    .select("id, case_number, status, created_at")
+    .eq("id", parsed.data.case_id)
+    .maybeSingle();
+  const violationCase = caseRow as { id: string; case_number: string; status: string; created_at: string } | null;
+  if (!violationCase) return { error: "Case not found." };
+
+  const problem = handoverTimeProblem(receivedAt, new Date(violationCase.created_at), new Date());
+  if (problem) return { error: problem };
+
+  const receivedBy = sanitizeText(parsed.data.received_by, 120);
+  const reference = parsed.data.codi_reference ? sanitizeText(parsed.data.codi_reference, 80) : "";
+
+  await addTimelineEntry(db, {
+    caseId: violationCase.id,
+    actorId: staff.userId,
+    actorLabel: staff.fullName,
+    eventType: "note_added",
+    summary: `Handed over to CODI: received by ${receivedBy} on ${formatManilaDateTime(receivedAt)}${reference ? `, CODI reference ${reference}` : ""}.`,
+    details: {
+      kind: HANDOVER_KIND,
+      received_by: receivedBy,
+      received_at: receivedAt.toISOString(),
+      codi_reference: reference,
+    },
+  });
+
+  await logAuditEvent(staff.userId, "codi_handover_recorded", "violation_cases", {
+    case_id: violationCase.id,
+    case_number: violationCase.case_number,
+  });
+
+  revalidatePath(`/staff/cases/${violationCase.id}`);
+  revalidatePath(`/staff/cases/${violationCase.id}/handover`);
+  revalidatePath("/staff/cases");
+  return { ok: true, message: `Handover of ${violationCase.case_number} recorded.` };
 }

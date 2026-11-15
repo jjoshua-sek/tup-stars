@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowUpRightIcon as ArrowUpRight, CircleNotchIcon as Loader2, XIcon as X } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 
@@ -26,6 +27,7 @@ const BODIES = [
 ] as const;
 
 export function EscalateForm({ caseId }: { caseId: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState<string>("PIC");
   const [isPending, startTransition] = useTransition();
@@ -52,6 +54,8 @@ export function EscalateForm({ caseId }: { caseId: string }) {
           }
           toast.success(result.message ?? "Referred.");
           setOpen(false);
+          // A CODI referral hides the case from the OSA; the handover sheet is next.
+          if (result.nextHref) router.push(result.nextHref);
         })
       }
       className="space-y-2 rounded-lg border border-border p-3"

@@ -14,7 +14,8 @@ import { WAITING } from "@/lib/osa/today";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { formatManilaDate } from "@/lib/utils/time";
+import { listMyCodiHandovers } from "@/lib/osa/codi-handover-access";
+import { formatIncidentWhen, formatManilaDateTime } from "@/lib/utils/time";
 import { CASE_STATUS_META, type ViolationCaseWithRelations } from "@/types/osa";
 
 export const metadata: Metadata = {
@@ -103,6 +104,11 @@ export default async function StaffCasesPage({
     .limit(300);
 
   const cases = (rows as CaseRow[] | null) ?? [];
+  // CODI cases leave this queue; the ones this officer sent stay listed below
+  // by number, so the handover can be printed and recorded.
+  const handovers = (await listMyCodiHandovers(staff)).filter(
+    (item) => !cases.some((c) => c.id === item.id),
+  );
 
   const open = cases.filter((c) => !CASE_STATUS_META[c.status]?.isTerminal);
   const needsScheduling = open.filter((c) => SCHEDULING_STATUSES.includes(c.status));
@@ -208,7 +214,10 @@ export default async function StaffCasesPage({
                       ) : (
                         classification && <ToneBadge label={classification.label} tone={classification.tone} />
                       )}
-                      <span className="whitespace-nowrap">Incident {formatManilaDate(violationCase.incident_date)}</span>
+                      <span className="whitespace-nowrap">Filed {formatManilaDateTime(violationCase.created_at)}</span>
+                      <span className="whitespace-nowrap">
+                        Incident {formatIncidentWhen(violationCase.incident_date, violationCase.incident_time)}
+                      </span>
                       {hasPendingLetter(violationCase) && <ToneBadge label="Letter to review" tone="warning" />}
                     </div>
                   </div>
@@ -218,6 +227,38 @@ export default async function StaffCasesPage({
             );
           })}
         </ul>
+      )}
+
+      {handovers.length > 0 && (
+        <section className="mt-8">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Cases you sent to CODI</h2>
+          <p className="mb-3 mt-0.5 text-base text-muted-foreground">
+            Confidential: only cleared staff can open these cases. You can print each one&apos;s handover sheet and record
+            when CODI received it.
+          </p>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            {handovers.map((item) => (
+              <li key={item.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-base font-semibold">{item.caseNumber}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Sent to CODI {formatManilaDateTime(item.referredAt)} ·{" "}
+                    {item.handover
+                      ? `received by ${item.handover.receivedBy} on ${formatManilaDateTime(item.handover.receivedAt)}`
+                      : "handover not recorded yet"}
+                  </p>
+                </div>
+                <ToneBadge label={item.handover ? "Handed over" : "To hand over"} tone={item.handover ? "success" : "warning"} />
+                <Link
+                  href={`/staff/cases/${item.id}/handover`}
+                  className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-base font-medium text-tup-maroon-700 hover:bg-muted"
+                >
+                  Handover sheet
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   );

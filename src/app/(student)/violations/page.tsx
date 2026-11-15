@@ -17,7 +17,7 @@ import {
 } from "@/lib/osa/sanctions";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaLongDate } from "@/lib/utils/time";
+import { formatIncidentWhen, formatManilaDateTime, formatManilaLongDate } from "@/lib/utils/time";
 import { CASE_STATUS_META, type ViolationCaseWithRelations } from "@/types/osa";
 
 export const metadata: Metadata = {
@@ -158,7 +158,7 @@ export default async function ViolationsPage() {
   const { data: caseRows } = await db
     .from("violation_cases")
     .select(
-      "id, case_number, classification, status, incident_date, incident_location, description, sanction_applied, resolution_notes, created_at, closed_at, violation_types(code, name, handbook_reference, typical_sanction), apology_letters(id, review_status, submitted_at, reviewer_notes, file_path), case_settlements(id, terms, student_obligations, compliance_deadline, student_signed_at, complainant_signed_at, osa_witnessed_at, is_complied), community_service_assignments(id, offense_sequence, hours_required, hours_completed, deadline, service_detail, status), case_appeals(*)",
+      "id, case_number, classification, status, incident_date, incident_time, incident_location, description, sanction_applied, resolution_notes, created_at, closed_at, violation_types(code, name, handbook_reference, typical_sanction), apology_letters(id, review_status, submitted_at, reviewer_notes, file_path), case_settlements(id, terms, student_obligations, compliance_deadline, student_signed_at, complainant_signed_at, osa_witnessed_at, is_complied), community_service_assignments(id, offense_sequence, hours_required, hours_completed, deadline, service_detail, status), case_appeals(*)",
     )
     .eq("student_id", student.id)
     .order("incident_date", { ascending: false });
@@ -236,8 +236,10 @@ export default async function ViolationsPage() {
                 <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
                     <CalendarDays className="h-3 w-3" />
-                    {formatManilaLongDate(violationCase.incident_date)}
+                    Incident {formatIncidentWhen(violationCase.incident_date, violationCase.incident_time, true)}
                   </span>
+                  <span>Filed {formatManilaDateTime(violationCase.created_at)}</span>
+                  {violationCase.closed_at && <span>Closed {formatManilaDateTime(violationCase.closed_at)}</span>}
                   {violationCase.incident_location && (
                     <span className="inline-flex items-center gap-1">
                       <MapPin className="h-3 w-3" />
@@ -418,7 +420,7 @@ export default async function ViolationsPage() {
                             Appeal filed with the OSA
                             {appeal.filed_on ? ` on ${formatManilaLongDate(appeal.filed_on)}` : ""}.{" "}
                             {appeal.forwarded_at
-                              ? `It was forwarded to the ${route.bodyLabel} on ${formatManilaLongDate(appeal.forwarded_at)}.`
+                              ? `It was forwarded to the ${route.bodyLabel} on ${formatManilaDateTime(appeal.forwarded_at)}.`
                               : `The OSA forwards it to the ${route.bodyLabel}.`}{" "}
                             You will be told the outcome.
                           </>

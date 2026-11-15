@@ -11,7 +11,7 @@ import { SESSION_CATEGORY_LABELS, SESSION_STATUS_LABELS, SESSION_TYPE_LABELS } f
 import { getStaffContext } from "@/lib/osa/staff-context";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatManilaDate, formatManilaDateTime } from "@/lib/utils/time";
 
 export const metadata: Metadata = {
   title: "Guidance sessions",
@@ -206,7 +206,7 @@ function SessionItem({ session }: { session: SessionRow }) {
         </div>
 
         <div className="shrink-0 text-right text-base text-muted-foreground">
-          <p>{formatManilaDate(session.started_at ?? session.scheduled_at)}</p>
+          <p>{formatManilaDateTime(session.started_at ?? session.scheduled_at)}</p>
           {session.follow_up_required && (
             <p className="mt-0.5 text-amber-800">Follow up by {formatManilaDate(session.follow_up_date)}</p>
           )}

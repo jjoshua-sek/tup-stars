@@ -26,7 +26,7 @@ import { summarizeRecord, type GlanceItem } from "@/lib/students/record-summary"
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { logAuditEvent } from "@/lib/utils/audit";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatIncidentWhen, formatManilaDate, formatManilaDateTime } from "@/lib/utils/time";
 import {
   CASE_STATUS_META,
   APPLICATION_STATUS_LABELS,
@@ -89,6 +89,7 @@ interface CaseRow {
   status: CaseStatus;
   confidentiality: string;
   incident_date: string;
+  incident_time: string | null;
   created_at: string;
   sanction_applied: string | null;
   violation_types: { name: string } | null;
@@ -321,7 +322,7 @@ export default async function StaffStudentRecordPage({
           db
             .from("violation_cases")
             .select(
-              "id, case_number, classification, status, confidentiality, incident_date, created_at, sanction_applied, violation_types(name)",
+              "id, case_number, classification, status, confidentiality, incident_date, incident_time, created_at, sanction_applied, violation_types(name)",
             )
             .eq("student_id", id)
             .order("created_at", { ascending: false })
@@ -548,7 +549,7 @@ export default async function StaffStudentRecordPage({
                                 tone="neutral"
                               />
                               <span className="text-sm text-muted-foreground">
-                                {formatManilaDate(session.scheduled_at ?? session.created_at)}
+                                {formatManilaDateTime(session.scheduled_at ?? session.created_at)}
                               </span>
                             </span>
                           </div>
@@ -595,7 +596,7 @@ export default async function StaffStudentRecordPage({
                           <ToneBadge label={meta.label} tone={meta.tone} />
                         </div>
                         <p className="mt-0.5 text-base text-muted-foreground">
-                          Filed {formatManilaDate(request.created_at)}
+                          Filed {formatManilaDateTime(request.created_at)}
                           {openHolds > 0 && (
                             <span className="text-red-700">
                               {" "}
@@ -714,7 +715,7 @@ export default async function StaffStudentRecordPage({
                           </div>
                           <p className="mt-0.5 text-base text-muted-foreground">
                             {document.semester}, {document.school_year} · uploaded{" "}
-                            {formatManilaDate(document.uploaded_at)}
+                            {formatManilaDateTime(document.uploaded_at)}
                           </p>
                         </Row>
                       ))}
@@ -745,7 +746,7 @@ export default async function StaffStudentRecordPage({
                             {concernCategoryLabel(concern.category)} ·{" "}
                             {CONCERN_STATUS_STYLES[concern.status as keyof typeof CONCERN_STATUS_STYLES]?.label ?? humanize(concern.status)}
                             {concern.urgency_level ? ` · ${humanize(concern.urgency_level)} urgency` : ""} ·{" "}
-                            {formatManilaDate(concern.created_at)}
+                            {formatManilaDateTime(concern.created_at)}
                           </p>
                         </Row>
                       ))}
@@ -878,8 +879,8 @@ function DisciplineSection({
                   </span>
                 </div>
                 <p className="mt-0.5 text-base text-muted-foreground">
-                  Incident {formatManilaDate(violationCase.incident_date)} · Filed{" "}
-                  {formatManilaDate(violationCase.created_at)}
+                  Incident {formatIncidentWhen(violationCase.incident_date, violationCase.incident_time)} · Filed{" "}
+                  {formatManilaDateTime(violationCase.created_at)}
                   {violationCase.sanction_applied ? ` · Sanction: ${violationCase.sanction_applied}` : ""}
                 </p>
               </Row>
@@ -1006,7 +1007,7 @@ function EarlyWarningSection({
                       tone={intervention.status === "completed" ? "success" : "info"}
                     />
                     <span className="text-sm text-muted-foreground">
-                      {formatManilaDate(intervention.scheduled_for ?? intervention.created_at)}
+                      {formatManilaDateTime(intervention.scheduled_for ?? intervention.created_at)}
                     </span>
                   </span>
                 </div>

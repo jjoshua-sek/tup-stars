@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { timeAgo } from "@/lib/utils/time";
+import { When } from "@/components/shared/when";
 import { concernCategoryLabel } from "@/lib/validations/concern";
 
 export const metadata: Metadata = {
@@ -174,9 +174,7 @@ export default async function ConcernsPage() {
                         <p className="font-display font-semibold leading-tight text-balance">
                           {concern.subject_line}
                         </p>
-                        <span className="text-sm text-muted-foreground whitespace-nowrap">
-                          {timeAgo(concern.created_at)}
-                        </span>
+                        <When at={concern.created_at} />
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">

@@ -20,7 +20,7 @@ import type { RiskTier } from "@/lib/risk/types";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatManilaDateTime } from "@/lib/utils/time";
 
 export const metadata: Metadata = {
   title: "Follow-ups",
@@ -231,11 +231,11 @@ function FollowUpItem({ item }: { item: InterventionRow }) {
         {item.rationale && <p className="max-w-prose text-base text-muted-foreground">{item.rationale}</p>}
 
         <p className="text-sm text-muted-foreground">
-          Started {formatManilaDate(item.created_at)}
+          Started {formatManilaDateTime(item.created_at)}
           {assessment && tier
             ? ` · Rated ${tier.label.toLowerCase()} (${Math.round(Number(assessment.risk_score) * 100)}%) at the time`
             : ""}
-          {item.completed_at ? ` · Finished ${formatManilaDate(item.completed_at)}` : ""}
+          {item.completed_at ? ` · Finished ${formatManilaDateTime(item.completed_at)}` : ""}
         </p>
 
         {item.outcome && (

@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatManilaDateTime, manilaWallClock, timeAgo } from "@/lib/utils/time";
+import { When } from "@/components/shared/when";
 import { RECEIVED_VIA_LABEL, receivedVia } from "@/lib/concerns/intake";
 import { byUrgencyThenNewest } from "@/lib/concerns/queue-order";
 import { concernCategoryLabel } from "@/lib/validations/concern";
@@ -200,7 +201,7 @@ export default async function StaffConcernDetailPage({
           { label: shortId(concern) },
         ]}
         title={concern.subject_line}
-        description={`From ${studentName}, ${timeAgo(concern.created_at)}.`}
+        description={`From ${studentName}, ${formatManilaDateTime(concern.created_at)} (${timeAgo(concern.created_at)}).`}
       >
         {student && (
           <Link href={`/staff/students/${student.id}`} className={cn(buttonVariants({ variant: "outline" }), "gap-1.5")}>
@@ -427,7 +428,7 @@ export default async function StaffConcernDetailPage({
                 >
                   <UrgencyBadge level={q.urgency_level} />
                   <span className="min-w-0 flex-1 text-base font-medium">{q.subject_line}</span>
-                  <span className="whitespace-nowrap text-sm text-muted-foreground">{timeAgo(q.created_at)}</span>
+                  <When at={q.created_at} />
                 </Link>
               </li>
             ))}

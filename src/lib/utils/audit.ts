@@ -43,6 +43,9 @@ type AuditAction =
   | "student_record_viewed"
   // A report downloaded as a file leaves STARS, so who took it is logged.
   | "report_exported"
+  // A confidential case's handover sheet opened, and the handover to CODI recorded.
+  | "codi_handover_viewed"
+  | "codi_handover_recorded"
   // Two-step sign-in (migration 00056): turned on or off by the account
   // itself, or turned off by the administrator for someone who lost their phone.
   | "two_step_turned_on"

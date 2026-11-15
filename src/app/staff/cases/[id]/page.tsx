@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRightIcon, ArrowUpRightIcon as ArrowUpRight, CaretDownIcon as ChevronDown, CalendarDotsIcon as CalendarClock, CalendarDotIcon as CalendarSearch, HandshakeIcon as Handshake, HardHatIcon as HardHat, ClockCounterClockwiseIcon as History, EnvelopeSimpleIcon as Mail, MapPinIcon as MapPin, ScalesIcon as Scale, UserIcon as User } from "@phosphor-icons/react/ssr";
+import { ArrowRightIcon, ArrowUpRightIcon as ArrowUpRight, CaretDownIcon as ChevronDown, CalendarDotsIcon as CalendarClock, CalendarDotIcon as CalendarSearch, HandshakeIcon as Handshake, HardHatIcon as HardHat, ClockCounterClockwiseIcon as History, EnvelopeSimpleIcon as Mail, MapPinIcon as MapPin, PrinterIcon as Printer, ScalesIcon as Scale, UserIcon as User } from "@phosphor-icons/react/ssr";
 
 import {
   ApologyFileLink,
@@ -49,6 +49,7 @@ import { getStaffContext } from "@/lib/osa/staff-context";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import {
+  formatIncidentWhen,
   formatManilaDateTime,
   formatManilaLongDate,
   formatManilaMonthDay,
@@ -670,6 +671,15 @@ export default async function StaffCaseDetailPage({
             Open student record
           </Link>
         )}
+        {violationCase.confidentiality === "codi" && (
+          <Link
+            href={`/staff/cases/${violationCase.id}/handover`}
+            className={cn(buttonVariants({ variant: "outline" }), "gap-1.5")}
+          >
+            <Printer className="h-4 w-4" />
+            CODI handover sheet
+          </Link>
+        )}
       </PageHeader>
 
       <div className="space-y-6">
@@ -723,9 +733,8 @@ export default async function StaffCaseDetailPage({
               )}
             </Detail>
             <Detail label="Complainant">{violationCase.complainant_name ?? "OSA-initiated"}</Detail>
-            <Detail label="Incident date">
-              {formatManilaLongDate(violationCase.incident_date)}
-              {violationCase.incident_time ? ` · ${violationCase.incident_time}` : ""}
+            <Detail label="Incident date and time">
+              {formatIncidentWhen(violationCase.incident_date, violationCase.incident_time, true)}
             </Detail>
             <Detail label="Location">{violationCase.incident_location ?? "Not given"}</Detail>
             <Detail label="Classification">
@@ -1004,7 +1013,7 @@ export default async function StaffCaseDetailPage({
                       {appeal.status === "filed" &&
                         (appeal.forwarded_at ? (
                           <p className="mt-2 text-sm text-muted-foreground">
-                            Forwarded {formatManilaLongDate(appeal.forwarded_at)}. Record the decision below when it comes back.
+                            Forwarded {formatManilaDateTime(appeal.forwarded_at)}. Record the decision below when it comes back.
                           </p>
                         ) : (
                           <ForwardAppealForm

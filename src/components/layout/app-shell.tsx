@@ -65,7 +65,9 @@ export function AppShell({
   // The full photo is still shown on the profile page and student detail views.
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted">
+    <div className="min-h-screen flex flex-col bg-muted print:min-h-0 print:bg-white">
+      {/* Printed pages (the CODI handover sheet) carry no header or menu. */}
+      <div className="contents print:hidden">
       <TupHeader
         onMenuClick={() => setSidebarOpen(true)}
         userName={userName}
@@ -76,17 +78,20 @@ export function AppShell({
         notificationCount={notificationCount}
         role={role}
       />
+      </div>
 
-      <div className="flex flex-1 lg:grid lg:grid-cols-[16rem_1fr]">
-        <Sidebar
-          role={role}
-          staffNav={staffNav}
-          badges={sidebarBadges}
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+      <div className="flex flex-1 lg:grid lg:grid-cols-[16rem_1fr] print:block">
+        <div className="contents print:hidden">
+          <Sidebar
+            role={role}
+            staffNav={staffNav}
+            badges={sidebarBadges}
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+        </div>
 
-        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 sm:py-7">
+        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 sm:py-7 print:p-0">
           {children}
         </main>
       </div>

@@ -60,6 +60,21 @@ export function formatManilaLongDate(value: DateInput): string {
   return formatManila(value, { month: "long", day: "numeric", year: "numeric" });
 }
 
+/** A TIME column, "14:30:00" or "14:30" → "2:30 PM". Already wall-clock, so no zone shift. */
+export function formatClockTime(value: string): string {
+  const [hour, minute] = value.split(":").map(Number);
+  return `${hour % 12 || 12}:${String(minute).padStart(2, "0")} ${hour >= 12 ? "PM" : "AM"}`;
+}
+
+/**
+ * An incident's DATE and optional TIME columns: "Sep 25, 2026, 2:30 PM", or
+ * "Sep 25, 2026, time not recorded" when the filer left the time out.
+ */
+export function formatIncidentWhen(date: string, time: string | null | undefined, long = false): string {
+  const day = long ? formatManilaLongDate(date) : formatManilaDate(date);
+  return time ? `${day}, ${formatClockTime(time)}` : `${day}, time not recorded`;
+}
+
 /** "Sep 25" */
 export function formatManilaMonthDay(value: DateInput): string {
   return formatManila(value, { month: "short", day: "numeric" });

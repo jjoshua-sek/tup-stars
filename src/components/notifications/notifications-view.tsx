@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { formatManilaMonthDay } from "@/lib/utils/time";
+import { formatManilaDateTime, formatManilaMonthDay } from "@/lib/utils/time";
 import type { NotificationRow } from "@/types/osa";
 
 const PRIORITY_META: Record<NotificationRow["priority"], { label: string; tone: Tone }> = {
@@ -185,7 +185,7 @@ function DeliveryNote({ status, sentAt }: { status: string | null; sentAt: strin
 
   const text =
     status === "sent"
-      ? `Emailed to your institutional address${sentAt ? ` on ${formatManilaMonthDay(sentAt)}` : ""}`
+      ? `Emailed to your institutional address${sentAt ? ` on ${formatManilaDateTime(sentAt)}` : ""}`
       : status === "queued" || status === "sending"
         ? "Email is on its way to your institutional address"
         : status === "undeliverable" || status === "bounced"

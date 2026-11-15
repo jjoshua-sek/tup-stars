@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { timeAgo } from "@/lib/utils/time";
+import { When } from "@/components/shared/when";
 import { RECEIVED_VIA_LABEL, receivedVia } from "@/lib/concerns/intake";
 import { byUrgencyThenNewest } from "@/lib/concerns/queue-order";
 import {
@@ -202,9 +202,7 @@ export default async function StaffConcernsPage({
                         <p className="text-lg font-semibold leading-snug text-balance">
                           {concern.subject_line}
                         </p>
-                        <span className="text-sm text-muted-foreground whitespace-nowrap pt-1">
-                          {timeAgo(concern.created_at)}
-                        </span>
+                        <When at={concern.created_at} className="pt-1" />
                       </div>
 
                       <p className="text-base">

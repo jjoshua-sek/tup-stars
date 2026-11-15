@@ -15,7 +15,7 @@ import { getStaffContext } from "@/lib/osa/staff-context";
 import { WAITING } from "@/lib/osa/today";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatManilaDateTime } from "@/lib/utils/time";
 import { CLEARANCE_STATUS_META, type ClearanceHold, type ClearanceStatus } from "@/types/osa";
 
 export const metadata: Metadata = {
@@ -264,9 +264,9 @@ function RequestItem({ request, canAct, stage }: { request: RequestRow; canAct: 
           </p>
           <p className="text-sm text-muted-foreground">
             <span className="whitespace-nowrap font-mono">{request.request_number}</span>
-            {" · "}Filed {formatManilaDate(request.created_at)}
+            {" · "}Filed {formatManilaDateTime(request.created_at)}
             {request.auto_checked_at
-              ? ` · Checked ${formatManilaDate(request.auto_checked_at)}: ${CHECK_RESULT_LABELS[request.auto_check_result ?? ""] ?? request.auto_check_result}`
+              ? ` · Checked ${formatManilaDateTime(request.auto_checked_at)}: ${CHECK_RESULT_LABELS[request.auto_check_result ?? ""] ?? request.auto_check_result}`
               : ""}
             {request.or_number ? ` · OR ${request.or_number}` : ""}
             {request.certificate_number ? ` · Certificate ${request.certificate_number}` : ""}

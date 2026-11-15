@@ -8,7 +8,7 @@ import { ToneBadge } from "@/components/osa/tone-badge";
 import { PageHeader } from "@/components/shared/page-header";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatManilaDate, formatManilaDateTime } from "@/lib/utils/time";
 import {
   CLEARANCE_STATUS_META,
   type ClearanceHold,
@@ -138,7 +138,7 @@ export default async function ClearancePage() {
                           <ToneBadge label={meta.label} tone={meta.tone} />
                         </div>
                         <p className="mt-0.5 font-mono text-sm text-muted-foreground">
-                          {request.request_number} · filed {formatManilaDate(request.created_at)}
+                          {request.request_number} · filed {formatManilaDateTime(request.created_at)}
                         </p>
                         <p className="mt-2 text-base leading-relaxed">
                           {STATUS_GUIDANCE[request.status]}
@@ -204,7 +204,7 @@ export default async function ClearancePage() {
                           {resolvedHolds.map((hold) => (
                             <li key={hold.id}>
                               {HOLD_LABELS[hold.hold_reason] ?? hold.hold_reason}: resolved{" "}
-                              {hold.resolved_at ? formatManilaDate(hold.resolved_at) : ""}
+                              {hold.resolved_at ? formatManilaDateTime(hold.resolved_at) : ""}
                             </li>
                           ))}
                         </ul>
@@ -220,7 +220,7 @@ export default async function ClearancePage() {
                     <div className="flex flex-wrap gap-x-6 gap-y-1 p-4 text-sm text-muted-foreground">
                       <span>Purpose: {request.purpose ?? "Not given"}</span>
                       {request.verified_at && (
-                        <span>Verified {formatManilaDate(request.verified_at)}</span>
+                        <span>Verified {formatManilaDateTime(request.verified_at)}</span>
                       )}
                       {request.valid_until && (
                         <span>Valid until {formatManilaDate(request.valid_until)}</span>
@@ -250,8 +250,8 @@ export default async function ClearancePage() {
                         <p className="font-mono text-sm text-muted-foreground">
                           {request.request_number} ·{" "}
                           {request.issued_at
-                            ? `released ${formatManilaDate(request.issued_at)}`
-                            : formatManilaDate(request.created_at)}
+                            ? `released ${formatManilaDateTime(request.issued_at)}`
+                            : formatManilaDateTime(request.created_at)}
                         </p>
                       </div>
                       <ToneBadge label={meta.label} tone={meta.tone} />

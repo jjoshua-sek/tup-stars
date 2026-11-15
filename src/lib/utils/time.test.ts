@@ -1,6 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
+  formatClockTime,
+  formatIncidentWhen,
   formatManila,
   formatManilaDate,
   formatManilaDateTime,
@@ -159,5 +161,18 @@ describe("manilaDayLabel", () => {
 
   it("gives the weekday and date after that", () => {
     expect(manilaDayLabel("2026-11-04T01:00:00Z", now)).toBe("Wednesday, November 4");
+  });
+});
+
+describe("incident date and time", () => {
+  it("writes a TIME column on a 12-hour clock", () => {
+    expect(formatClockTime("14:30:00")).toBe("2:30 PM");
+    expect(formatClockTime("00:05")).toBe("12:05 AM");
+    expect(formatClockTime("12:00:00")).toBe("12:00 PM");
+  });
+
+  it("joins the date and time, and says when the time is missing", () => {
+    expect(formatIncidentWhen("2026-11-12", "09:15:00")).toBe("Nov 12, 2026, 9:15 AM");
+    expect(formatIncidentWhen("2026-11-12", null, true)).toBe("November 12, 2026, time not recorded");
   });
 });

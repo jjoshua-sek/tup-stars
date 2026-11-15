@@ -167,7 +167,8 @@ export function FileCaseForm({
             return;
           }
           toast.success(result.message ?? "Case filed.");
-          if (result.caseId) router.push(`/staff/cases/${result.caseId}`);
+          if (result.nextHref) router.push(result.nextHref);
+          else if (result.caseId) router.push(`/staff/cases/${result.caseId}`);
           else router.push("/staff/cases");
         })
       }
