@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { FileTextIcon as FileText, GraduationCapIcon as GraduationCap, TrendDownIcon as TrendingDown, TrendUpIcon as TrendingUp } from "@phosphor-icons/react/ssr";
+import { ArrowSquareOutIcon, FileTextIcon as FileText, SealCheckIcon, GraduationCapIcon as GraduationCap, TrendDownIcon as TrendingDown, TrendUpIcon as TrendingUp } from "@phosphor-icons/react/ssr";
 
 import { EmptyState } from "@/components/osa/empty-state";
 import { ToneBadge, type Tone } from "@/components/osa/tone-badge";
@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaDate } from "@/lib/utils/time";
+import { formatManilaDateTime } from "@/lib/utils/time";
 import type { AcademicDocument, AcademicSnapshot } from "@/types/osa";
 import { getActiveTerm } from "@/lib/settings/active-term";
 import { recentTerms } from "@/lib/settings/term";
@@ -211,11 +211,46 @@ export default async function RecordsPage() {
                       </span>
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {document.file_name} · uploaded {formatManilaDate(document.uploaded_at)}
+                      {document.file_name} · uploaded {formatManilaDateTime(document.uploaded_at)}
                     </p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
                       {document.rejection_reason ?? meta.hint}
                     </p>
+                    {document.verified_at && (
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        Verified {formatManilaDateTime(document.verified_at)}
+                        {document.verification_method === "counter_scan"
+                          ? ", against the Registrar-stamped copy at the OSA counter"
+                          : document.verification_method === "on_screen"
+                            ? ", on screen by the OSA"
+                            : ""}
+                        .
+                      </p>
+                    )}
+                    {/* Links, not embedded files: each opens a fresh one-minute link (api/records/files). */}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <a
+                        href={`/api/records/files/${document.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium hover:bg-muted"
+                      >
+                        <ArrowSquareOutIcon className="h-4 w-4" aria-hidden="true" />
+                        Open the file you uploaded
+                      </a>
+                      {document.stamped_scan_path && (
+                        <a
+                          href={`/api/records/files/${document.id}?copy=stamped`}
+                          target="_blank"
+                          rel="noopener"
+                          className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-border px-3 text-base font-medium hover:bg-muted"
+                        >
+                          <SealCheckIcon className="h-4 w-4" aria-hidden="true" />
+                          Open the stamped copy
+                          {document.scanned_at ? ` (scanned ${formatManilaDateTime(document.scanned_at)})` : ""}
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <ToneBadge label={meta.label} tone={meta.tone} />
                 </li>
