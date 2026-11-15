@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MedalIcon as Award, CaretDownIcon as ChevronDown, HandHeartIcon as HandHeart } from "@phosphor-icons/react/ssr";
+import { MedalIcon as Award, CaretDownIcon as ChevronDown, HandHeartIcon as HandHeart, MagnifyingGlassIcon as Search } from "@phosphor-icons/react/ssr";
 
 import { EmptyState } from "@/components/osa/empty-state";
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
@@ -13,8 +13,28 @@ import type { ScholarshipCriterion } from "@/lib/scholarships/evaluate-eligibili
 import { RETENTION_META, checkRetention } from "@/lib/scholarships/retention";
 import { loose } from "@/lib/supabase/loose";
 import { createClient } from "@/lib/supabase/server";
-import { formatManilaMonthDay } from "@/lib/utils/time";
+import {
+  ALL,
+  VIEW_OPTIONS,
+  WAITING,
+  isOpenStatus,
+  ordinal,
+  parseQueueFilters,
+  queuePositions,
+  statusesFor,
+} from "@/lib/scholarships/queue";
+import { formatManilaDateTime, formatManilaMonthDay } from "@/lib/utils/time";
 import { APPLICATION_OPEN, APPLICATION_STATUS_LABELS, FUNDING_TYPE_LABELS, type Scholarship } from "@/types/osa";
+
+/** How many applications one view lists before asking for a narrower one. */
+const LIST_LIMIT = 200;
+
+const APPLICATION_COLUMNS =
+  "id, scholarship_id, status, school_year, semester, created_at, endorsement_notes, rejection_reason, scholarships(name, sponsor_name)";
+const STUDENT_COLUMNS = "students(id, first_name, last_name, student_number, program)";
+
+const FIELD_CLASS =
+  "h-11 rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-3 focus-visible:ring-tup-maroon-600/30";
 
 export const metadata: Metadata = {
   title: "Scholarships",
@@ -60,7 +80,11 @@ interface ApplicationRow {
  * student-side eligibility engine has something true to evaluate against, and
  * work the queue of students who have declared interest.
  */
-export default async function StaffScholarshipsPage() {
+export default async function StaffScholarshipsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string; number?: string; order?: string }>;
+}) {
   const staff = await getStaffContext();
   if (!staff?.isOsa) {
     return (
@@ -71,22 +95,48 @@ export default async function StaffScholarshipsPage() {
     );
   }
 
+  const filters = parseQueueFilters(await searchParams);
   const supabase = await createClient();
   const db = loose(supabase);
 
-  const [{ data: scholarshipRows }, { data: applicationRows }] = await Promise.all([
-    db
-      .from("scholarships")
-      .select("*, scholarship_criteria(id), scholarship_requirements(id)")
-      .order("name", { ascending: true }),
-    db
-      .from("scholarship_applications")
-      .select(
-        "id, scholarship_id, status, school_year, semester, created_at, endorsement_notes, rejection_reason, students(id, first_name, last_name, student_number, program), scholarships(name, sponsor_name)",
-      )
-      .order("created_at", { ascending: false })
-      .limit(200),
-  ]);
+  // The listed applications. Searching by student number joins students as
+  // !inner, so an application whose student does not match drops out.
+  const statuses = statusesFor(filters.view);
+  let listRequest = db
+    .from("scholarship_applications")
+    .select(`${APPLICATION_COLUMNS}, ${filters.number ? STUDENT_COLUMNS.replace("students(", "students!inner(") : STUDENT_COLUMNS}`);
+  if (statuses) listRequest = listRequest.in("status", statuses);
+  if (filters.number) listRequest = listRequest.ilike("students.student_number", `%${filters.number}%`);
+
+  const [{ data: scholarshipRows }, { data: listedRows }, { data: openRows }, { data: awardedRows }, statusCounts] =
+    await Promise.all([
+      db
+        .from("scholarships")
+        .select("*, scholarship_criteria(id), scholarship_requirements(id)")
+        .order("name", { ascending: true }),
+      listRequest
+        .order("created_at", { ascending: filters.order === "oldest" })
+        .order("id", { ascending: true })
+        .limit(LIST_LIMIT),
+      // Every open application, slim, for each one's place in its program's line.
+      db.from("scholarship_applications").select("id, scholarship_id, created_at").in("status", APPLICATION_OPEN),
+      // The Scholars section checks every awarded student, whatever the view.
+      db
+        .from("scholarship_applications")
+        .select(`${APPLICATION_COLUMNS}, ${STUDENT_COLUMNS}`)
+        .eq("status", "awarded")
+        .order("created_at", { ascending: true }),
+      // Counts for the View dropdown, one exact count per status.
+      Promise.all(
+        Object.keys(APPLICATION_STATUS_LABELS).map(async (status) => {
+          const { count } = await db
+            .from("scholarship_applications")
+            .select("id", { count: "exact", head: true })
+            .eq("status", status);
+          return [status, count ?? 0] as const;
+        }),
+      ),
+    ]);
 
   const scholarships =
     (scholarshipRows as Array<
@@ -95,12 +145,21 @@ export default async function StaffScholarshipsPage() {
         scholarship_requirements: unknown[] | null;
       }
     > | null) ?? [];
-  const applications = (applicationRows as ApplicationRow[] | null) ?? [];
+  const listed = (listedRows as ApplicationRow[] | null) ?? [];
+  const awarded = (awardedRows as ApplicationRow[] | null) ?? [];
+  const positions = queuePositions(
+    (openRows as Array<{ id: string; scholarship_id: string; created_at: string }> | null) ?? [],
+  );
+
+  const countOf = new Map<string, number>(statusCounts);
+  const waitingCount = APPLICATION_OPEN.reduce((sum, status) => sum + (countOf.get(status) ?? 0), 0);
+  const allCount = [...countOf.values()].reduce((sum, n) => sum + n, 0);
+  const viewCount = (value: string) =>
+    value === WAITING ? waitingCount : value === ALL ? allCount : (countOf.get(value) ?? 0);
+  const viewLabel = VIEW_OPTIONS.find((option) => option.value === filters.view)?.label ?? "Waiting for the OSA";
+  const filtered = filters.view !== WAITING || filters.number !== "" || filters.order !== "oldest";
 
   const active = scholarships.filter((scholarship) => scholarship.is_active);
-  const pending = applications.filter((application) => APPLICATION_OPEN.includes(application.status));
-  const decided = applications.filter((application) => !APPLICATION_OPEN.includes(application.status));
-  const awarded = applications.filter((application) => application.status === "awarded");
 
   // Scholars after the award (checklist F3): do they still meet the grade
   // and conduct requirements, on their latest verified grades?
@@ -141,27 +200,106 @@ export default async function StaffScholarshipsPage() {
         description="Students who intend to apply, the scholars who must keep their grades up, and the programs students are matched against."
       />
 
-      {/* Applications waiting on the OSA */}
+      {/* Applications, waiting on the OSA by default, first come first served */}
       <section>
         <h2 className="font-display text-lg font-semibold tracking-tight">
-          Waiting for the OSA
+          Applications
           <span className="ml-2 rounded-full bg-muted px-2 text-base font-normal tabular-nums text-muted-foreground">
-            {pending.length}
+            {waitingCount} waiting
           </span>
         </h2>
         <p className="mb-3 mt-0.5 text-base text-muted-foreground">
-          Check each student&apos;s documents, then endorse, send to the sponsor, or decline.
+          Oldest first, so students are served in the order they applied. Check each student&apos;s documents, then
+          endorse, send to the sponsor, or decline.
         </p>
-        {pending.length === 0 ? (
+
+        <form method="get" className="mb-4 flex flex-wrap items-end gap-3" role="search">
+          <div>
+            <label htmlFor="queue-view" className="mb-1 block text-base font-medium">
+              View
+            </label>
+            <select id="queue-view" name="view" defaultValue={filters.view} className={FIELD_CLASS}>
+              {VIEW_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} ({viewCount(option.value)})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="queue-order" className="mb-1 block text-base font-medium">
+              Order by date applied
+            </label>
+            <select id="queue-order" name="order" defaultValue={filters.order} className={FIELD_CLASS}>
+              <option value="oldest">Oldest first (first come, first served)</option>
+              <option value="newest">Newest first</option>
+            </select>
+          </div>
+
+          <div className="min-w-0 flex-1 basis-56">
+            <label htmlFor="queue-number" className="mb-1 block text-base font-medium">
+              Student number
+            </label>
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <input
+                id="queue-number"
+                name="number"
+                type="search"
+                defaultValue={filters.number}
+                placeholder="e.g. TUPM-24-0123"
+                className={`${FIELD_CLASS} w-full pl-9`}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="h-11 rounded-md bg-tup-maroon-600 px-5 text-base font-medium text-white hover:bg-tup-maroon-700 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-tup-maroon-600/40 focus-visible:ring-offset-2"
+          >
+            Show
+          </button>
+
+          {filtered && (
+            <Link
+              href="/staff/scholarships"
+              className="h-11 content-center text-base font-medium text-tup-maroon-700 underline-offset-2 hover:underline"
+            >
+              Back to the waiting list
+            </Link>
+          )}
+        </form>
+
+        <p className="mb-3 text-base text-muted-foreground" aria-live="polite">
+          {listed.length === 0
+            ? "No applications match."
+            : `${viewLabel}: ${listed.length}${listed.length === LIST_LIMIT ? `, the first ${LIST_LIMIT} shown` : ""}${
+                filters.number ? ` for student numbers containing ${filters.number}` : ""
+              }, ${filters.order === "oldest" ? "oldest first" : "newest first"}.`}
+        </p>
+
+        {listed.length === 0 ? (
           <EmptyState
             icon={HandHeart}
-            title="Nobody waiting"
-            description="Students land here when they press “I intend to apply” on their scholarships page."
+            title={filtered ? "Nothing in this view" : "Nobody waiting"}
+            description={
+              filtered
+                ? "Try another view, or clear the student number."
+                : "Students land here when they press “I intend to apply” on their scholarships page."
+            }
           />
         ) : (
           <ul className="space-y-3">
-            {pending.map((application) => (
-              <ApplicationItem key={application.id} application={application} />
+            {listed.map((application) => (
+              <ApplicationItem
+                key={application.id}
+                application={application}
+                place={isOpenStatus(application.status) ? positions.get(application.id) : undefined}
+              />
             ))}
           </ul>
         )}
@@ -284,29 +422,11 @@ export default async function StaffScholarshipsPage() {
           )}
         </div>
       </details>
-
-      {/* Decided applications: done work, folded. */}
-      {decided.length > 0 && (
-        <details className="group rounded-xl border border-border bg-card">
-          <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-5 text-base font-medium [&::-webkit-details-marker]:hidden">
-            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
-            Decided applications
-            <span className="font-normal text-muted-foreground">
-              ({decided.length}, endorsed, sent, awarded, declined or withdrawn)
-            </span>
-          </summary>
-          <ul className="space-y-3 border-t border-border p-4">
-            {decided.map((application) => (
-              <ApplicationItem key={application.id} application={application} />
-            ))}
-          </ul>
-        </details>
-      )}
     </div>
   );
 }
 
-function ApplicationItem({ application }: { application: ApplicationRow }) {
+function ApplicationItem({ application, place }: { application: ApplicationRow; place?: number }) {
   return (
     <li className="rounded-xl border border-border bg-card p-4">
       <div className="min-w-0 space-y-1">
@@ -334,6 +454,15 @@ function ApplicationItem({ application }: { application: ApplicationRow }) {
             tone={STATUS_TONE[application.status] ?? "neutral"}
           />
           <span className="text-sm text-muted-foreground">School year {application.school_year}</span>
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Applied {formatManilaDateTime(application.created_at)}
+          {place != null && (
+            <>
+              {" · "}
+              <strong className="font-semibold text-foreground">{ordinal(place)} in line</strong> for this scholarship
+            </>
+          )}
         </p>
         {(application.endorsement_notes || application.rejection_reason) && (
           <p className="text-base text-muted-foreground">{application.rejection_reason ?? application.endorsement_notes}</p>
