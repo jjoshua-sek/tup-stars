@@ -18,9 +18,18 @@ export type YearLevel = (typeof YEAR_LEVELS)[number];
 
 export const STUDENT_NUMBER = /^TUPM-\d{2}-\d{4}$/;
 
-/** Login email for a student number — the same derivation the login form uses. */
-export function loginEmailFor(studentNumber: string): string {
-  return `${studentNumber.trim().toLowerCase()}@tup.edu.ph`;
+/**
+ * Staff sign in with a staff ID, never a student number (migration 00059):
+ * STAFF-26-0001. YY is the year the account was made, NNNN a running number.
+ */
+export const STAFF_ID = /^STAFF-\d{2}-\d{4}$/;
+
+/** Either kind of sign-in ID: what the administrator's tools accept. */
+export const LOGIN_ID = /^(TUPM|STAFF)-\d{2}-\d{4}$/;
+
+/** Login email for a student number or staff ID — the same derivation the login form uses. */
+export function loginEmailFor(loginId: string): string {
+  return `${loginId.trim().toLowerCase()}@tup.edu.ph`;
 }
 
 export interface EnrollmentRecord {

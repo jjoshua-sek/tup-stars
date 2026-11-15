@@ -6,8 +6,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import {
+  LOGIN_ID,
   MAX_ROWS,
-  STUDENT_NUMBER,
+  STAFF_ID,
   parseEnrollmentList,
   revalidateRecord,
   type EnrollmentRecord,
@@ -185,7 +186,7 @@ const staffSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(STUDENT_NUMBER, "Login ID must look like TUPM-XX-XXXX."),
+    .regex(STAFF_ID, "Staff ID must look like STAFF-YY-NNNN, for example STAFF-26-0002."),
   full_name: z.string().trim().min(2, "Enter the staff member's full name.").max(120),
   department: z.string().trim().min(2, "Enter a department.").max(120),
   position: z.string().trim().min(2, "Enter a position.").max(120),
@@ -430,8 +431,8 @@ export async function sendStaffPasswordReset(formData: FormData): Promise<Result
   // login form uses — not employee_id, which is free text on older records.
   const { data: authUser, error: authError } = await service.auth.admin.getUserById(member.user_id);
   const loginId = authUser?.user?.email?.split("@")[0]?.toUpperCase() ?? "";
-  if (authError || !STUDENT_NUMBER.test(loginId)) {
-    return { error: "This staff account's login ID isn't in TUPM-XX-XXXX form, so a link can't be addressed to it." };
+  if (authError || !LOGIN_ID.test(loginId)) {
+    return { error: "This staff account's sign-in ID isn't a staff ID (STAFF-YY-NNNN), so a link can't be addressed to it. Run migration 00059." };
   }
 
   const [firstName, ...rest] = sanitizeText(member.full_name, 120).split(/\s+/).filter(Boolean);
@@ -495,7 +496,7 @@ export async function turnOffTwoStepFor(formData: FormData): Promise<Result> {
   if (!admin) return { error: "Only an administrator can turn off two-step sign-in for an account." };
 
   const loginId = String(formData.get("login_id") ?? "").trim().toUpperCase();
-  if (!STUDENT_NUMBER.test(loginId)) return { error: "Type the login ID as TUPM-XX-XXXX." };
+  if (!LOGIN_ID.test(loginId)) return { error: "Type a student number (TUPM-YY-NNNN) or a staff ID (STAFF-YY-NNNN)." };
 
   const service = createAdminClient();
   const userId = await findUserIdByLoginId(service, loginId);

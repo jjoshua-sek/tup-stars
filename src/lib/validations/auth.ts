@@ -1,22 +1,35 @@
 import { z } from "zod";
 
+import { STAFF_ID, STUDENT_NUMBER } from "@/lib/accounts/enrollment";
+
 /**
- * Login form validation.
- * Mirrors TUP-Manila ERS login UX: student_number + password + birth_date.
+ * Sign-in validation. The page has two tabs:
  *
- * - student_number format: TUPM-XX-XXXX (XX = 2-digit year, XXXX = 4-digit sequence)
- *   Staff/admin accounts use a placeholder student-number format
- *   (e.g., TUPM-26-0000) to keep the login UI consistent.
- * - birth_date is enforced server-side ONLY for users with role = 'student'
- *   (admins/staff bypass this check since they have no students row).
+ * - Student: student number (TUPM-YY-NNNN), password and birth date, as on
+ *   the TUP ERS. The birth date is checked against the student's record.
+ * - Staff: staff ID (STAFF-YY-NNNN) and password. Staff have no birth date
+ *   on record, and their IDs never look like student numbers (00059).
  */
+export const staffLoginSchema = z.object({
+  staff_id: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(STAFF_ID, "Type your staff ID as STAFF-YY-NNNN (for example STAFF-26-0001)."),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password must be at most 72 characters"),
+});
+
+export type StaffLoginInput = z.infer<typeof staffLoginSchema>;
+
 export const loginSchema = z.object({
   student_number: z
     .string()
-    .regex(
-      /^TUPM-\d{2}-\d{4}$/,
-      "Student number must be in format TUPM-XX-XXXX (e.g., TUPM-21-0001)"
-    ),
+    .trim()
+    .toUpperCase()
+    .regex(STUDENT_NUMBER, "Type your student number as TUPM-YY-NNNN (for example TUPM-22-0148)."),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

@@ -138,8 +138,8 @@ export function CreateAccountForm({ allowStaff = true }: { allowStaff?: boolean 
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Login ID" hint="Staff use the same TUPM-XX-XXXX format">
-            <input name="login_id" required placeholder="TUPM-99-0100" className={inputClass} />
+          <Field label="Staff ID" hint="STAFF-YY-NNNN: the year the account is made, then the next free number">
+            <input name="login_id" required placeholder="STAFF-26-0002" className={inputClass} />
           </Field>
           <Field label="Full name">
             <input name="full_name" required maxLength={120} className={inputClass} />

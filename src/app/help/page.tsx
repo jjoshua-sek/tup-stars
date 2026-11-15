@@ -50,8 +50,9 @@ export default async function HelpPage() {
           <Section title="Signing in">
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                Students sign in with their student number (for example TUPM-22-0148), their password
-                and their birth date. Staff sign in with their login ID and password.
+                Students choose the Student tab and sign in with their student number (for example
+                TUPM-22-0148), their password and their birth date. Staff choose the Staff tab and sign in
+                with their staff ID (for example STAFF-26-0001) and password.
               </li>
               <li>
                 Accounts are created by the Office of Student Affairs. The first time, the OSA emails a

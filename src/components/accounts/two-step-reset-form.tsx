@@ -35,7 +35,7 @@ export function TwoStepResetForm() {
     <form action={submit} className="flex flex-wrap items-end gap-2">
       <div className="space-y-1.5">
         <label htmlFor="two-step-login-id" className="block text-base font-medium">
-          Login ID
+          Student number or staff ID
         </label>
         <input
           id="two-step-login-id"
@@ -46,8 +46,8 @@ export function TwoStepResetForm() {
             setLoginId(event.target.value);
             setConfirming(false);
           }}
-          placeholder="TUPM-XX-XXXX"
-          className="h-10 w-48 rounded-md border border-border bg-background px-3 font-mono text-base uppercase focus:border-tup-maroon-600 focus:outline-none"
+          placeholder="TUPM-22-0148 or STAFF-26-0001"
+          className="h-10 w-64 max-w-full rounded-md border border-border bg-background px-3 font-mono text-base uppercase focus:border-tup-maroon-600 focus:outline-none"
         />
       </div>
       <button

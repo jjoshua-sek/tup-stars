@@ -41,6 +41,10 @@ describe("anonymizeText", () => {
     expect(anonymizeText("Call +63 917-123-4567.", names)).toBe("Call [phone].");
   });
 
+  it("removes staff IDs too (STAFF-YY-NNNN, migration 00059)", () => {
+    expect(anonymizeText("STAFF-26-0001 took my statement.", names)).toBe("[student number] took my statement.");
+  });
+
   it("keeps dates and ordinary words", () => {
     expect(anonymizeText("On May 3 the projector in Room 304 broke.", names)).toBe(
       "On May 3 the projector in Room 304 broke.",
