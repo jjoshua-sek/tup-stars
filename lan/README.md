@@ -115,6 +115,21 @@ openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in /backups/sta
 
 The next 5-minute copy from the cloud replaces the data anyway; a restore matters only when the cloud is unreachable for a long time.
 
+### Checking that a backup restores
+
+Each backup is decrypted and read back in full before it is kept, so a file in `lan/backups` has opened at least once. To rehearse a real restore without touching the copy's data, restore into a scratch database and compare:
+
+```bash
+docker exec -it stars-sync sh
+psql "$LAN_DB_URL" -c "CREATE DATABASE restore_test"
+openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in /backups/stars-lan-YYYY-MM-DD_HHMM.dump.enc \
+  | pg_restore --no-owner --no-privileges -d "$(echo "$LAN_DB_URL" | sed -E 's#/[^/?]+(\?.*)?$#/restore_test\1#')"
+# compare row counts of a few tables in restore_test with the live database, then:
+psql "$LAN_DB_URL" -c "DROP DATABASE restore_test"
+```
+
+Rehearsed on November 15, 2026: a 0.8 MB backup restored in 22 seconds with no errors, and all 88 tables matched the live database row for row (651 rows). The same drill found that backups from November 1 to 15 were empty (32 bytes): the copy loop ran the day's backup while the database was still starting after the laptop booted, and the failure went unnoticed. Since then a failed or unreadable backup is deleted and retried on the next pass.
+
 ## Changing the address
 
 Run `node lan/setup.mjs --host <new address>`, then `node lan/stars.mjs up`. The address is built into STARS, so it rebuilds, and devices need the same certificate as before.
