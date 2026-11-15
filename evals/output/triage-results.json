@@ -1,0 +1,362 @@
+{
+  "C01": {
+    "id": "C01",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a classmate has been following them from the IT building to the LRT since last week and continues to message them despite being asked to stop. They feel scared to attend their 7 PM class because of this behavior. The student is requesting help to stop the harassment and ensure their safety.",
+    "ms": 1226
+  },
+  "C02": {
+    "id": "C02",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a man has been following them from the TUP gate to the jeep boarding area for several days. They are now afraid to go home at night and are requesting assistance.",
+    "ms": 842
+  },
+  "C03": {
+    "id": "C03",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student received a message from their blockmate stating they would wait for them after the 3 PM class to cause harm. The student is scared to attend class the next day and is seeking protection and guidance.",
+    "ms": 1110
+  },
+  "C04": {
+    "id": "C04",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Guidance and Counseling Office",
+    "deptKey": "guidance",
+    "summary": "The student reports failing two subjects and has not told their parents. They are experiencing thoughts that everyone would be better off without them and do not want to wake up tomorrow, indicating suicidal ideation. They are seeking someone to talk to about these feelings.",
+    "ms": 1040
+  },
+  "C05": {
+    "id": "C05",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reported that around 6 PM yesterday, while walking home, a man wearing a TUP uniform grabbed them. They later saw the same individual on campus again. The student is seeking assistance regarding this incident.",
+    "ms": 794
+  },
+  "C06": {
+    "id": "C06",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that their ex-boyfriend from another section continues to call and message them daily from new accounts despite being blocked and asked to stop. Yesterday, the ex waited outside the student's classroom. The student is requesting that the behavior cease and that appropriate action be taken.",
+    "ms": 1124
+  },
+  "C07": {
+    "id": "C07",
+    "raw": "high",
+    "final": "high",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that during a one-on-one consultation in the professor's faculty room, the professor placed his hand on the student's thigh and asked them to return alone after class for a grade. The student left immediately and has another class with the professor on Thursday. They are seeking appropriate action and protection.",
+    "ms": 1043
+  },
+  "C08": {
+    "id": "C08",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reported that two other students got into a fight in the canteen, during which one punched the student's friend, causing a bleeding nose. The aggressors are still on campus and continue to threaten them. The student is asking for immediate intervention and safety measures.",
+    "ms": 1930
+  },
+  "C09": {
+    "id": "C09",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Physical Plant and Facilities",
+    "deptKey": "facilities",
+    "summary": "The student reported that live wires are hanging from the ceiling fan in Room 305 of the Engineering building, and a classmate received a small electric shock this morning while the class continues there. They are requesting that the hazard be addressed immediately.",
+    "ms": 848
+  },
+  "C10": {
+    "id": "C10",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a person threatened to beat them up if they report again and showed a knife in their bag, doing so in front of others. They are seeking protection and appropriate action regarding the threat. The student asked to mark the concern as low priority, but the content indicates a serious safety risk.",
+    "ms": 893
+  },
+  "H01": {
+    "id": "H01",
+    "raw": "high",
+    "final": "high",
+    "department": "Guidance and Counseling Office",
+    "deptKey": "guidance",
+    "summary": "The student reports that blockmates have been posting edited photos of them in the block group chat and laughing about it for the past two weeks, causing embarrassment. They are asking for help to stop the behavior and address the harassment.",
+    "ms": 917
+  },
+  "H02": {
+    "id": "H02",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student, who has a hearing impairment, reports that a professor refused to allow them to sit in the front of the class or use captions and publicly stated that people like them should not be in engineering. They are requesting intervention to address the discriminatory behavior and to obtain the necessary accommodations.",
+    "ms": 915
+  },
+  "H03": {
+    "id": "H03",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student was given an INC because their professor said the final exam paper was lost. They need the complete grades by Friday to avoid termination of their CHED scholarship.",
+    "ms": 963
+  },
+  "H04": {
+    "id": "H04",
+    "raw": "high",
+    "final": "high",
+    "department": "Accounting / Cashier",
+    "deptKey": "cashier",
+    "summary": "The student’s enrollment is on hold because the system shows an unpaid balance from last year, even though they have already paid and possess the official receipt. Enrollment closes tomorrow, and they will be dropped if the issue is not resolved. They are requesting that the hold be lifted and the payment be correctly reflected.",
+    "ms": 944
+  },
+  "H05": {
+    "id": "H05",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Scholarship and Financial Assistance (OSA)",
+    "deptKey": "scholarship",
+    "summary": "The student received a notice that their Tulong Dunong grant was terminated due to alleged GWA issues, but their actual GWA is 1.75, which meets the requirement. They are requesting clarification and reinstatement of the scholarship before the payout list is finalized this week.",
+    "ms": 585
+  },
+  "H06": {
+    "id": "H06",
+    "raw": "high",
+    "final": "high",
+    "department": "Guidance and Counseling Office",
+    "deptKey": "guidance",
+    "summary": "The student reports that classmates call them hurtful names and mock them daily because they are gay, doing so in front of the entire class while the professor does not intervene. They are seeking action to stop the harassment and to address the discriminatory treatment.",
+    "ms": 636
+  },
+  "H07": {
+    "id": "H07",
+    "raw": "high",
+    "final": "high",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a peer from another college follows them on Instagram and repeatedly posts rude, sexual jokes on every photo they upload. The student has deleted the comments, but the peer continues to harass them using other accounts. They are requesting help to stop the harassment.",
+    "ms": 1039
+  },
+  "H08": {
+    "id": "H08",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student sees a library hold on their graduation clearance despite having returned all books and receiving confirmation from the library. They are requesting the hold be removed before the Monday deadline for this year's graduation submission.",
+    "ms": 640
+  },
+  "H09": {
+    "id": "H09",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student reports that a meme using their face was posted on the TUP Freedom Wall page, drawing many comments and ridicule. They feel embarrassed and are hesitant to attend their organization because of the situation. The student is seeking assistance to address the harassment and stop the spread of the meme.",
+    "ms": 824
+  },
+  "H10": {
+    "id": "H10",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student passed all requirements to join a college organization, but the officers refused membership because the student is Muslim and cannot attend events during Friday prayers. They are requesting that the denial be addressed and that they be allowed to join the organization.",
+    "ms": 827
+  },
+  "M01": {
+    "id": "M01",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student reports that their adviser changed the Chapter 3 thesis deadline to Friday, but two team members are ill. They are asking OSA to request a one‑week extension on their behalf.",
+    "ms": 817
+  },
+  "M02": {
+    "id": "M02",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Accounting / Cashier",
+    "deptKey": "cashier",
+    "summary": "The student accidentally paid their miscellaneous fee twice via GCash and has both reference numbers. They are requesting a refund for the second payment.",
+    "ms": 821
+  },
+  "M03": {
+    "id": "M03",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student reports that their Certificate of Registration (COR) incorrectly shows the program as BSIE instead of their actual program, BSIT. They need a corrected COR to complete ID validation next week.",
+    "ms": 727
+  },
+  "M04": {
+    "id": "M04",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Physical Plant and Facilities",
+    "deptKey": "facilities",
+    "summary": "The aircon in Room 402 of the Main Building has been broken for a week, causing the room to become very hot during afternoon classes. The student is requesting that the aircon be repaired promptly because some students are experiencing dizziness.",
+    "ms": 915
+  },
+  "M05": {
+    "id": "M05",
+    "raw": "medium",
+    "final": "medium",
+    "department": "MIS / IT Services",
+    "deptKey": "it",
+    "summary": "The student’s portal account was locked after resetting their password, preventing them from viewing grades and checking the upcoming exam schedule. They are requesting that the account be unlocked so they can access this information.",
+    "ms": 722
+  },
+  "M06": {
+    "id": "M06",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student reports that two of their subjects are scheduled at the same time on Tuesdays from 1:00 to 4:00 PM. They are asking for the conflict to be resolved before the second week of classes begins.",
+    "ms": 1021
+  },
+  "M07": {
+    "id": "M07",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student lost their school ID and is being denied entry by the guards. Midterm exams begin next Monday, and they are requesting a fast replacement ID.",
+    "ms": 1233
+  },
+  "M08": {
+    "id": "M08",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Accounting / Cashier",
+    "deptKey": "cashier",
+    "summary": "The student was charged a 500‑peso fine by the library for a book they claim they returned on time. The library is requiring payment before the end of the month, and the student is contesting the fine. They are asking for the fine to be reviewed and waived.",
+    "ms": 1136
+  },
+  "M09": {
+    "id": "M09",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student reports that a subject's grade has not been posted on the portal even though the semester has ended. They need the grade to renew their scholarship next month.",
+    "ms": 724
+  },
+  "M10": {
+    "id": "M10",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student needs a certificate of good moral character for an internship application due next week and is asking how to request it and how long the process will take.",
+    "ms": 1225
+  },
+  "L01": {
+    "id": "L01",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student lost their school ID last week and is asking for the steps to obtain a replacement and the associated fee. They request information on the replacement process and cost.",
+    "ms": 513
+  },
+  "L02": {
+    "id": "L02",
+    "raw": "low",
+    "final": "low",
+    "department": "Physical Plant and Facilities",
+    "deptKey": "facilities",
+    "summary": "The student notes that there are not enough benches and shade in the area near the gym, where many students wait between classes. They are requesting additional benches and shading structures to be installed.",
+    "ms": 1122
+  },
+  "L03": {
+    "id": "L03",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student reports that the prices of meals in the canteen have increased compared to the previous semester. They are asking for more affordable food options for students.",
+    "ms": 690
+  },
+  "L04": {
+    "id": "L04",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student’s group wants to establish a new photography club and is asking what the requirements are for obtaining official recognition by the OSA. They are seeking guidance on the process and necessary documentation.",
+    "ms": 688
+  },
+  "L05": {
+    "id": "L05",
+    "raw": "low",
+    "final": "low",
+    "department": "Scholarship and Financial Assistance (OSA)",
+    "deptKey": "scholarship",
+    "summary": "The student is asking when the scholarship applications will open for the current year. They are requesting information about the opening date.",
+    "ms": 518
+  },
+  "L06": {
+    "id": "L06",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student thanks an OSA staff member for patiently helping them with their clearance last week and praises the service. They are not requesting any further action.",
+    "ms": 740
+  },
+  "L07": {
+    "id": "L07",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Physical Plant and Facilities",
+    "deptKey": "facilities",
+    "summary": "The student requests that the library extend its operating hours until 8 PM during exam weeks because many students lack a quiet place to study at home. They are asking for a change in the library schedule to accommodate this need.",
+    "ms": 716
+  },
+  "L08": {
+    "id": "L08",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student is asking whether wearing shorts is allowed on campus during PE day, as they could not find the information in the handbook. They are requesting clarification on the dress code policy for that day.",
+    "ms": 1328
+  },
+  "L09": {
+    "id": "L09",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student asks what color of ID lace first-year students should use this semester, noting they observed different colors at the gate. They are seeking clarification on the correct color.",
+    "ms": 936
+  },
+  "L10": {
+    "id": "L10",
+    "raw": "low",
+    "final": "low",
+    "department": "MIS / IT Services",
+    "deptKey": "it",
+    "summary": "The student finds the new STARS portal easy to use and is providing positive feedback. They are requesting that a search bar be added to the concerns page to locate older concerns more quickly.",
+    "ms": 676
+  }
+}

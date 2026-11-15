@@ -48,3 +48,6 @@ next-env.d.ts
 # risk model training (ml/README.md)
 /ml/.venv/
 __pycache__/
+
+# Evaluation documents are real students' records; never commit them
+/evals/documents/private/

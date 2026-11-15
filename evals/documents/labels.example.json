@@ -1,0 +1,33 @@
+[
+  {
+    "file": "member1-cor.pdf",
+    "documentType": "certificate_of_registration",
+    "expected": {
+      "student_number": "TUPM-22-0000",
+      "student_name": "DELA CRUZ, JUAN P.",
+      "school_year": "2026-2027",
+      "semester": "1st Semester",
+      "program": "BSIT",
+      "units_enrolled": 23,
+      "subjects": [
+        { "subject_code": "IT 311", "units": 3 },
+        { "subject_code": "IT 312", "units": 3 }
+      ]
+    }
+  },
+  {
+    "file": "member1-rating-slip.jpg",
+    "documentType": "rating_slip",
+    "expected": {
+      "student_number": "TUPM-22-0000",
+      "school_year": "2025-2026",
+      "semester": "2nd Semester",
+      "gwa": 1.75,
+      "units_enrolled": 21,
+      "subjects": [
+        { "subject_code": "IT 221", "units": 3, "grade": 1.5 },
+        { "subject_code": "IT 222", "units": 3, "grade": 2.0 }
+      ]
+    }
+  }
+]
