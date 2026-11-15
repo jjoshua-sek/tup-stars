@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { DownloadSimpleIcon as Download } from "@phosphor-icons/react/ssr";
 
 import { RestrictedNotice } from "@/components/osa/restricted-notice";
+import { BarRows, ChartCard, MonthlyColumns } from "@/components/reports/charts";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonVariants } from "@/components/ui/button";
 
 import { buildCollegeReport, totalRow } from "@/lib/osa/college-report";
 import { loadCollegeReportInput } from "@/lib/osa/college-report-data";
+import { casesByMonth, countBy } from "@/lib/osa/report-charts";
 import { getStaffContext } from "@/lib/osa/staff-context";
+import { concernCategoryLabel } from "@/lib/validations/concern";
 import { featuresToInputs, loadActiveRiskModel, loadRiskFeatures } from "@/lib/risk/load";
 import { scoreStudent } from "@/lib/risk/score";
 import { loose } from "@/lib/supabase/loose";
@@ -61,6 +64,7 @@ export default async function StaffReportsPage() {
     { count: scholarshipQueue },
     model,
     features,
+    { data: concernRows },
   ] = await Promise.all([
     db.from("violation_cases").select("classification, status, created_at").limit(2000),
     db
@@ -102,6 +106,7 @@ export default async function StaffReportsPage() {
       .in("status", APPLICATION_OPEN),
     loadActiveRiskModel(db),
     loadRiskFeatures(db, { limit: 500 }),
+    db.from("concerns").select("category").gte("created_at", termStartIso).limit(10000),
   ]);
 
   const collegeRows = buildCollegeReport(await loadCollegeReportInput(db, term, termStartIso));
@@ -128,6 +133,27 @@ export default async function StaffReportsPage() {
   }
 
   const scans = (accessAllowed ?? 0) + (accessDenied ?? 0);
+
+  // Chart data.
+  const months = casesByMonth(cases, new Date());
+  const atRiskTotal = tiers.critical + tiers.high + tiers.moderate;
+  const tierBars = [
+    { label: "Critical", value: tiers.critical },
+    { label: "High", value: tiers.high },
+    { label: "Moderate", value: tiers.moderate },
+  ];
+  const concernBars = countBy(
+    (concernRows as Array<{ category: string }> | null) ?? [],
+    (row) => concernCategoryLabel(row.category),
+  );
+  const collegeBars = collegeRows.some((row) => row.casesThisTerm > 0)
+    ? collegeRows
+        .map((row) => ({ label: row.college, value: row.casesThisTerm }))
+        .sort((a, b) => Number(a.label === "Not set") - Number(b.label === "Not set") || b.value - a.value)
+    : [];
+  const stageBars = [...byStatus.entries()]
+    .map(([status, count]) => ({ label: CASE_STATUS_META[status]?.label ?? status, value: count }))
+    .sort((a, b) => b.value - a.value);
 
   return (
     <div className="space-y-8">
@@ -181,6 +207,48 @@ export default async function StaffReportsPage() {
           ]}
         />
       </div>
+
+      {/* Charts: the same counts, drawn. */}
+      <section>
+        <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">Charts</h2>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <ChartCard
+            title="Cases filed by month"
+            description="The last six months. Point at a month for the minor, major and confidential split."
+          >
+            <MonthlyColumns buckets={months} />
+          </ChartCard>
+
+          <ChartCard
+            title="Students at risk, by tier"
+            description={
+              model
+                ? `${atRiskTotal} at risk on the active model.${tiers.low > 0 ? ` ${tiers.low} more ${tiers.low === 1 ? "scores low and is" : "score low and are"} not counted.` : ""}`
+                : "No risk model is active, so no tiers to show."
+            }
+          >
+            <BarRows
+              data={model ? tierBars : []}
+              barClass={(datum) =>
+                datum.label === "Critical"
+                  ? "bg-[var(--chart-tier-critical)]"
+                  : datum.label === "High"
+                    ? "bg-[var(--chart-tier-high)]"
+                    : "bg-[var(--chart-tier-moderate)]"
+              }
+              empty="No tiers to show."
+            />
+          </ChartCard>
+
+          <ChartCard title="Concerns this term, by category" description="What students and staff reported, largest first.">
+            <BarRows data={concernBars} empty="No concerns this term." />
+          </ChartCard>
+
+          <ChartCard title="Cases this term, by college" description="From the student's verified COR, or their program.">
+            <BarRows data={collegeBars} empty="No cases this term." />
+          </ChartCard>
+        </div>
+      </section>
 
       {/* Per college (checklist I5) */}
       <section>
@@ -252,42 +320,9 @@ export default async function StaffReportsPage() {
       </section>
 
       {/* Case pipeline */}
-      <section>
-        <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
-          Cases by stage
-        </h2>
-        {byStatus.size === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-8 text-center text-base text-muted-foreground">
-            No cases on file yet.
-          </p>
-        ) : (
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <ul className="divide-y divide-border">
-              {[...byStatus.entries()]
-                .sort((a, b) => b[1] - a[1])
-                .map(([status, count]) => {
-                  const share = Math.round((count / cases.length) * 100);
-                  return (
-                    <li key={status} className="flex items-center gap-3 px-4 py-2.5">
-                      <span className="w-40 shrink-0 text-base sm:w-56">
-                        {CASE_STATUS_META[status]?.label ?? status}
-                      </span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-tup-maroon-600"
-                          style={{ width: `${share}%` }}
-                        />
-                      </div>
-                      <span className="w-12 shrink-0 text-right text-base font-semibold tabular-nums">
-                        {count}
-                      </span>
-                    </li>
-                  );
-                })}
-            </ul>
-          </div>
-        )}
-      </section>
+      <ChartCard title="Cases by stage" description="Every case on file, by where it stands now.">
+        <BarRows data={stageBars} empty="No cases on file yet." />
+      </ChartCard>
 
       <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
         Risk tiers are computed live from the active model and reflect only students with

@@ -138,6 +138,12 @@
   --chart-3: #6d28d9; /* AI violet */
   --chart-4: #16a34a; /* success green */
   --chart-5: #2563eb; /* info blue */
+  /* Reports charts (components/reports/charts.tsx). Steps picked with the
+     dataviz palette validator: inside the lightness band, 3:1 on the card. */
+  --chart-bar: #9b2c3a;
+  --chart-tier-moderate: #d98290;
+  --chart-tier-high: #9b2c3a;
+  --chart-tier-critical: #5e1721;
 
   --radius: 0.5rem; /* 8px base — institutional, tighter than shadcn default */
 
@@ -176,6 +182,11 @@
   --chart-3: #a78bfa;
   --chart-4: #4ade80;
   --chart-5: #60a5fa;
+  /* On a dark card the stronger tier is the lighter step. */
+  --chart-bar: #c14e62;
+  --chart-tier-moderate: #9b2c3a;
+  --chart-tier-high: #c14e62;
+  --chart-tier-critical: #e9b9c0;
   --sidebar: #0a0a0a;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #c14e62;
