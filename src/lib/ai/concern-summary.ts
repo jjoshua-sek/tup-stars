@@ -54,12 +54,12 @@ export const CONCERN_SYSTEM_PROMPT = `You triage concerns that students at the T
 Write the summary for staff in two or three plain sentences: what happened, and what the student is asking for. Keep the facts the student gave — dates, places, course codes, offices, amounts — and add nothing they did not say. Refer to the student as "the student" or "they", never "he" or "she": the concern does not tell you their gender. The concern is anonymized: names, student numbers, emails and phone numbers appear as [name], [student number], [email] and [phone]. Keep those placeholders, never guess who they are, and name no one even if a name slipped through; refer to people by their role instead ("a classmate", "a professor"). Do not diagnose, judge, or advise the student. Concerns may be written in English, Filipino, or Taglish; always summarize in English.
 
 Urgency:
-- critical — risk of harm to the student or anyone else: any physical contact or assault, stalking, being followed or watched, someone who keeps contacting the student after being told to stop, a threat, self-harm, the student saying they feel unsafe or are scared or afraid to go to class or campus, or any other safety emergency
+- critical — risk of harm to the student or anyone else: any physical contact or assault, stalking, being followed or watched, someone who keeps contacting the student after being told to stop, a threat, self-harm, the student saying they feel unsafe or are scared or afraid to go to class or campus, or any other safety emergency. Unwanted touching of any kind is physical contact: a hand on the body, rubbing, brushing against, grabbing, a forced hug or kiss, slapping.
 - high — harassment, discrimination or bullying with none of the safety signs above, or something that will cost the student enrollment, a grade, a scholarship, or graduation if it waits
 - medium — an academic, financial, or administrative problem that needs action within days
 - low — a question, a suggestion, or feedback with no deadline attached
 
-Judge urgency from what the student describes, not from the category they chose. A concern that has any one of the critical signs is critical even when it is also harassment or bullying: a classmate who follows the student home is critical, not high.
+Judge urgency from what the student describes, not from the category they chose. A concern that has any one of the critical signs is critical even when it is also harassment or bullying: a classmate who follows the student home is critical, not high, and so is unwanted touching of any kind, even once, even when the student filed it under Harassment.
 
 When in doubt between two levels, choose the higher one: under-triaging a concern costs more than over-triaging it.
 
@@ -101,6 +101,15 @@ const SAFETY_SIGNS: RegExp[] = [
   /\b(?:threaten(?:s|ed|ing)?|binantaan|papatayin)\b/i,
   /\b(?:suicid\w*|self[- ]harm|kill (?:myself|ourselves)|magpakamatay|saktan ang sarili)\b/i,
   /\b(?:rap(?:e|ed)|molest\w*|grop(?:e|ed|ing)|hinipuan|sexual(?:ly)? assault\w*|assaulted|sinuntok)\b/i,
+  // Unwanted touching. The AI accuracy test's one critical miss (Nov 2026)
+  // was a professor's hand on a student's thigh, which the model rated high.
+  // "Touched my" counts only before a part of the body, so "touched my
+  // heart" or "touched my laptop" do not match.
+  /\b(?:touch(?:ed|es|ing)?|grabb(?:ed|ing)|grabs|fondl\w*|caress\w*|rub(?:s|bed|bing)?|brush(?:es|ed|ing)? (?:up )?against|slap(?:s|ped|ping)?|pinch(?:es|ed|ing)?|squeez(?:e|es|ed|ing)) (?:me\b|my (?:thighs?|legs?|chest|breasts?|butt|bum|body|privates?|waist|hips?|lap|skirt|shorts|back|shoulders?|neck)\b)/i,
+  /\b(?:put|puts|putting|placed|places|laid|rested|ran) (?:his|her|their) hands? (?:on|under|inside|up) my\b/i,
+  /\b(?:kissed me|forced (?:a )?kiss|(?:tried|tries|try) to kiss me|hinalikan (?:niya )?ako)\b/i,
+  /\b(?:(?:forc\w*|kept|keeps|tried|tries) (?:to )?hug(?:ging)? me|yakapin|niyakap (?:niya )?ako)\b/i,
+  /\b(?:hinawakan (?:niya )?(?:ako|ang (?:hita|binti|dibdib|puwet|katawan|baywang))|humawak sa (?:akin|amin)|hinimas|hinaplos)\b/i,
 ];
 
 /** True when the concern plainly describes one of the critical safety signs. */

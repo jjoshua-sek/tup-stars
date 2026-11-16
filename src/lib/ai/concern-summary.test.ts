@@ -95,6 +95,37 @@ describe("safety floor", () => {
       "I'm afraid I will fail Calculus.",
     ]) expect(hasSafetySign(text), text).toBe(false);
   });
+
+  it("reads unwanted touching, in English and Filipino", () => {
+    for (const text of [
+      "He put his hand on my thigh during consultation.",
+      "My seatmate keeps touching my legs under the table.",
+      "A guard grabbed my waist at the gate.",
+      "He touched me on the jeep and laughed.",
+      "Our org head kissed me without asking.",
+      "Hinawakan niya ang hita ko habang nagre-review kami.",
+      "May lalaking humawak sa akin sa may LRT.",
+      "Hinimas niya ang likod ko kahit ayaw ko.",
+      "A senior kept rubbing my shoulders during practice.",
+      "He brushes against my chest when he checks my work.",
+      "Someone slapped my butt at the elevator.",
+      "He tried to kiss me after group study.",
+      "Pinipilit niya akong yakapin tuwing uwian.",
+    ]) expect(hasSafetySign(text), text).toBe(true);
+  });
+
+  it("leaves everyday touching alone", () => {
+    for (const text of [
+      "The professor's speech touched my heart.",
+      "Someone touched my laptop in the library without asking.",
+      "Please get in touch with me about my scholarship.",
+      "I put my hand up to ask a question but was ignored.",
+      "Hinawakan ko ang pinto para sa kanila.",
+      "My eyes hurt when I rub my eyes after the lab.",
+      "I forgot to brush my teeth before the 7 AM class.",
+      "The touchscreen kiosk at the Registrar is broken.",
+    ]) expect(hasSafetySign(text), text).toBe(false);
+  });
 });
 
 describe("CONCERN_SUMMARY_JSON_SCHEMA", () => {

@@ -1,0 +1,92 @@
+{
+  "V01": {
+    "id": "V01",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that their varsity coach repeatedly pats their thigh during conversations after training, and attempts to sit farther away are ignored as the coach moves closer. They are requesting that the behavior stop and that appropriate action be taken.",
+    "ms": 759
+  },
+  "V02": {
+    "id": "V02",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reported that a man wearing a TUP lanyard pressed himself against them on the LRT from Pedro Gil to Recto despite there being space, and the student saw the same individual again at the campus gate. They are seeking assistance to address this unwanted contact and ensure their safety.",
+    "ms": 1207
+  },
+  "V03": {
+    "id": "V03",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a professor repeatedly pushes and drags them toward the professor during consultation sessions, even though the student tries to avoid it. They are requesting that this behavior stop and that appropriate action be taken.",
+    "ms": 1602
+  },
+  "V04": {
+    "id": "V04",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student was kissed on the cheek by a classmate without permission while they were in the canteen, and the classmate's friends laughed at them. They are reporting this incident and seeking appropriate action.",
+    "ms": 850
+  },
+  "V05": {
+    "id": "V05",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "During a field trip and later on the bus, a teacher repeatedly held the student's hand and would not release it when the student tried to pull away. The student reports this unwanted physical contact and is seeking appropriate action.",
+    "ms": 880
+  },
+  "V06": {
+    "id": "V06",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that an unknown person grabbed their bag strap and pulled them toward an empty stairwell in the Engineering building. They escaped and went to the guard for safety. The student is seeking assistance regarding this incident.",
+    "ms": 654
+  },
+  "W01": {
+    "id": "W01",
+    "raw": "low",
+    "final": "low",
+    "department": "Physical Plant and Facilities",
+    "deptKey": "facilities",
+    "summary": "The student notes that the new touch‑free faucets in the second‑floor comfort room are great and expresses gratitude to the installers. They are simply providing positive feedback.",
+    "ms": 607
+  },
+  "W02": {
+    "id": "W02",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student injured their back during PE class last Friday and was advised by a doctor to rest. They are asking how to obtain an excuse letter for this week's PE activities.",
+    "ms": 814
+  },
+  "W03": {
+    "id": "W03",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student asks whether graduates are allowed to hug on stage with their parents during the graduation program. They are seeking clarification on the policy for this practice.",
+    "ms": 802
+  },
+  "W04": {
+    "id": "W04",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student reports that a classmate repeatedly kicks their chair and pushes his desk into theirs during lectures, which has been happening for weeks. The professor has not addressed the behavior, and the student is asking for intervention to stop the harassment.",
+    "ms": 1362
+  }
+}

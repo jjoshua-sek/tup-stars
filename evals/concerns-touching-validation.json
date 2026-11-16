@@ -1,0 +1,40 @@
+{
+  "about": "Validation for the Nov 16, 2026 touching fix (prompt rule plus backstop patterns). Written after the fix and before any run, worded unlike both the patterns and concerns-touching.json, so it shows whether the fix generalizes rather than whether it memorized. Six unwanted-touching concerns and four everyday ones.",
+  "people": [
+    { "first": "Ramon", "last": "Aquino" },
+    { "first": "Joy", "last": "Navarro" }
+  ],
+  "concerns": [
+    { "id": "V01", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "guidance"],
+      "subject": "Coach keeps patting my thigh",
+      "body": "My varsity coach keeps patting my thigh whenever he talks to me after training. I tried sitting farther away but he moves closer." },
+    { "id": "V02", "lang": "en", "category": "Other", "urgency": "critical", "accept": ["critical"], "dept": ["security", "osa"],
+      "subject": "Man on the LRT near campus",
+      "body": "A man in a TUP lanyard pressed himself against me on the LRT from Pedro Gil all the way to Recto, even though there was space. I saw him again at the gate today." },
+    { "id": "V03", "lang": "taglish", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "college"],
+      "subject": "Palaging inaakbayan ng prof",
+      "body": "Yung prof po namin palagi akong inaakbayan at hinihila papalapit sa kanya kahit umiiwas na ako. Nangyayari po ito tuwing consultation." },
+    { "id": "V04", "lang": "fil", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "guidance"],
+      "subject": "Hinalikan nang walang paalam",
+      "body": "Hinalikan po ako sa pisngi ng isang kaklase nang walang paalam habang nasa canteen kami, tapos pinagtawanan pa ako ng barkada niya." },
+    { "id": "V05", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "college"],
+      "subject": "Teacher would not let go of my hand",
+      "body": "During our field trip, a teacher kept holding my hand and would not let go when I tried to pull away. He did it again on the bus back." },
+    { "id": "V06", "lang": "en", "category": "Other", "urgency": "critical", "accept": ["critical"], "dept": ["security", "osa"],
+      "subject": "Pulled toward the stairwell",
+      "body": "Someone I don't know grabbed my bag strap and pulled me toward the empty stairwell of the Engineering building. I got away and ran to the guard." },
+
+    { "id": "W01", "lang": "en", "category": "Facility", "urgency": "low", "accept": ["low"], "dept": ["facilities", "osa"],
+      "subject": "New faucets",
+      "body": "The new touch-free faucets in the second-floor comfort room are great. Thank you to whoever installed them!" },
+    { "id": "W02", "lang": "en", "category": "Academic", "urgency": "medium", "accept": ["medium", "low"], "dept": ["college", "osa", "guidance"],
+      "subject": "Excuse letter for PE",
+      "body": "I hurt my back during PE class last Friday and my doctor told me to rest. How can I get an excuse letter for this week's activities?" },
+    { "id": "W03", "lang": "taglish", "category": "Other", "urgency": "low", "accept": ["low"], "dept": ["osa"],
+      "subject": "Hug sa stage",
+      "body": "Tanong lang po: pwede po bang mag-hug ang graduates sa stage kasama ang parents nila? Para lang po sa program namin." },
+    { "id": "W04", "lang": "en", "category": "Harassment", "urgency": "high", "accept": ["high", "critical"], "dept": ["osa", "guidance"],
+      "subject": "Classmate keeps kicking my chair",
+      "body": "A classmate keeps kicking my chair and shoving his desk into mine during lectures to annoy me. It has gone on for weeks and the professor ignores it." }
+  ]
+}

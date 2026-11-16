@@ -2,6 +2,7 @@
  * Measures STARS's AI concern triage against the labelled set in concerns.json.
  *
  *   npx vite-node --config evals/vite.config.mjs evals/triage-eval.ts
+ *   EVAL_SET=concerns-touching npx vite-node …   (another set: evals/<name>.json)
  *
  * Each concern goes through the same path as the app: anonymized
  * (src/lib/ai/anonymize.ts), sent to Groq with the app's prompt and schema,
@@ -56,13 +57,15 @@ interface Result {
   error?: string;
 }
 
-const set = JSON.parse(fs.readFileSync(path.join(ROOT, "evals/concerns.json"), "utf8")) as {
+const SET = process.env.EVAL_SET ?? "concerns";
+const suffix = SET === "concerns" ? "" : `-${SET.replace(/^concerns-/, "")}`;
+const set = JSON.parse(fs.readFileSync(path.join(ROOT, `evals/${SET}.json`), "utf8")) as {
   people: Array<{ first: string; last: string }>;
   concerns: Concern[];
 };
 const OUT = path.join(ROOT, "evals/output");
 fs.mkdirSync(OUT, { recursive: true });
-const resultsFile = path.join(OUT, "triage-results.json");
+const resultsFile = path.join(OUT, `triage-results${suffix}.json`);
 const results: Record<string, Result> = fs.existsSync(resultsFile) ? JSON.parse(fs.readFileSync(resultsFile, "utf8")) : {};
 
 /** Sorts the model's free-text office into one of the labels concerns.json uses. Order matters. */
@@ -162,7 +165,7 @@ const errors = set.concerns.filter((c) => results[c.id]?.error && !results[c.id]
 const report = `# AI concern triage: evaluation
 
 Model: \`${model}\` on Groq (free plan), with STARS's prompt, schema and safety backstop. Run ${new Date().toISOString().slice(0, 10)}.
-Set: ${set.concerns.length} labelled concerns written by the research team (10 per urgency level; English, Filipino and Taglish), in \`evals/concerns.json\`. ${done.length} were scored${errors.length ? `; ${errors.length} failed (listed at the end)` : ""}.
+Set: ${set.concerns.length} labelled concerns written by the research team, in \`evals/${SET}.json\`. ${done.length} were scored${errors.length ? `; ${errors.length} failed (listed at the end)` : ""}.
 
 ## Urgency
 
@@ -210,5 +213,5 @@ ${errors.length ? `\n## Failed requests\n\n${errors.map((c) => `- ${c.id}: ${res
 
 The labels were written by the research team from the OSA's triage rules, not by OSA staff, and the concerns are made up, so the figures show how the triage follows those rules, not how it does on real concerns. The model runs at temperature 0.2, so a repeat run can differ slightly.
 `;
-fs.writeFileSync(path.join(OUT, "triage-report.md"), report);
-console.log(`\nScored ${done.length}/${set.concerns.length}. Correct ${fin.correct} (${pct(fin.correct, done.length)}), critical recall ${pct(fin.critHit, fin.crit)}, under-triaged ${fin.under}. Report: evals/output/triage-report.md`);
+fs.writeFileSync(path.join(OUT, `triage-report${suffix}.md`), report);
+console.log(`\nScored ${done.length}/${set.concerns.length}. Correct ${fin.correct} (${pct(fin.correct, done.length)}), critical recall ${pct(fin.critHit, fin.crit)}, under-triaged ${fin.under}. Report: evals/output/triage-report${suffix}.md`);

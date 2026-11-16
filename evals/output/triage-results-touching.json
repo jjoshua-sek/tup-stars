@@ -1,0 +1,92 @@
+{
+  "T01": {
+    "id": "T01",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "During org practice, a senior repeatedly rubbed the student's shoulders and back despite the student moving away, and other participants laughed. The student reports this ongoing unwanted physical contact and is asking for it to stop and for appropriate action to be taken.",
+    "ms": 1182
+  },
+  "T02": {
+    "id": "T02",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that their lab instructor brushes against their chest each time he checks their work at the bench, occurring every lab session. They feel dread about attending lab and are seeking intervention to stop this behavior.",
+    "ms": 1012
+  },
+  "T03": {
+    "id": "T03",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a shuttle driver touched their thigh while they were seated in the front of the vehicle yesterday on the way home. They do not want to ride that shuttle again and are seeking action to stop the driver from contacting them.",
+    "ms": 1407
+  },
+  "T04": {
+    "id": "T04",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that a classmate repeatedly forces them to be hugged after school, even after the student has told the classmate they do not want it, and the classmate pursues them on the stairs. They are asking for help to stop this behavior.",
+    "ms": 720
+  },
+  "T05": {
+    "id": "T05",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student was slapped on the butt by an unknown individual while waiting for the elevator in the CIT building this morning, and the perpetrator walked away laughing. They are reporting the incident and seeking appropriate action.",
+    "ms": 820
+  },
+  "T06": {
+    "id": "T06",
+    "raw": "critical",
+    "final": "critical",
+    "department": "Campus Security",
+    "deptKey": "security",
+    "summary": "The student reports that after a group study, a groupmate touched their waist and attempted to kiss them despite being pushed away. They are required to continue working together on the project and are seeking assistance.",
+    "ms": 851
+  },
+  "N01": {
+    "id": "N01",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student asks the OSA to connect their organization with the alumni office so they can invite a graduate to speak at their career talk next semester.",
+    "ms": 941
+  },
+  "N02": {
+    "id": "N02",
+    "raw": "medium",
+    "final": "medium",
+    "department": "Office of the Registrar",
+    "deptKey": "registrar",
+    "summary": "The student reports that the touchscreen kiosk at the Registrar has been broken all week, preventing them from printing their Certificate of Registration. They need the COR to complete ID validation next week.",
+    "ms": 1347
+  },
+  "N03": {
+    "id": "N03",
+    "raw": "low",
+    "final": "low",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student says that a message from [name] during Recognition Day was very touching and asks that it be shared on the university's official page so everyone can read it. They are requesting the posting of this message.",
+    "ms": 1199
+  },
+  "N04": {
+    "id": "N04",
+    "raw": "high",
+    "final": "high",
+    "department": "Office of Student Affairs",
+    "deptKey": "osa",
+    "summary": "The student reports that their blockmates have repeatedly touched their belongings and thrown their notes in the trash over the past three weeks, laughing when the student complains. They are seeking intervention to stop this behavior.",
+    "ms": 2643
+  }
+}

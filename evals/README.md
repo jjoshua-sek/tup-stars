@@ -12,6 +12,13 @@ Runs the 40 labelled concerns in `concerns.json` (10 per urgency level, in Engli
 
 The labels were written by the team from the urgency rules in `src/lib/ai/concern-summary.ts`. Having OSA staff label the same concerns, or adding real (anonymized) concerns, would make the figures stronger.
 
+`EVAL_SET=<name>` runs another file, `evals/<name>.json`, with its own results and report:
+
+- `concerns-touching`: ten concerns written after the first run missed a case of unwanted touching (C07). With the prompt as it was, the model rated all six touching concerns high; this set then guided the fix (a plainer urgency rule in the prompt and more backstop patterns).
+- `concerns-touching-validation`: ten more, written after the fix and before any run, worded unlike the patterns and the set above, to check that the fix generalizes. Do not tune the prompt or the patterns against this set, or it stops measuring anything.
+
+`output/triage-report-before-touching-fix.md` keeps the first run of the 40 (Nov 15, 2026) for comparison.
+
 ## Document reading
 
 ```bash

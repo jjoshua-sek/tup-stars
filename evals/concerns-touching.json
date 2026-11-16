@@ -1,0 +1,40 @@
+{
+  "about": "A fresh check, written after the safety backstop gained its touching patterns (Nov 16, 2026) and never used to write them: six concerns about unwanted touching, most worded unlike the patterns (rubbing, brushing against, a forced hug, a slap), and four everyday uses of 'touch' that must not be raised. Labels follow the same urgency rules as concerns.json.",
+  "people": [
+    { "first": "Paolo", "last": "Santos" },
+    { "first": "Liza", "last": "Mendoza" }
+  ],
+  "concerns": [
+    { "id": "T01", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "guidance"],
+      "subject": "Senior keeps rubbing my shoulders",
+      "body": "During our org practice, a senior kept rubbing my shoulders and back even when I moved away from him. He does it at every practice and the others just laugh." },
+    { "id": "T02", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "college"],
+      "subject": "Lab instructor brushes against me",
+      "body": "My lab instructor brushes against my chest every time he checks my work at the bench. It happens every session and I dread going to lab." },
+    { "id": "T03", "lang": "taglish", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "security"],
+      "subject": "Yung shuttle driver",
+      "body": "Yung driver po ng shuttle hinawakan ang hita ko habang nakaupo ako sa harap kahapon pauwi. Ayoko na po sumakay doon." },
+    { "id": "T04", "lang": "fil", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "guidance"],
+      "subject": "Pinipilit akong yakapin",
+      "body": "Pinipilit po akong yakapin ng kaklase ko tuwing uwian kahit ilang beses ko nang sinabi na ayaw ko. Hinahabol pa niya ako sa hagdan." },
+    { "id": "T05", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "security"],
+      "subject": "Slapped while waiting for the elevator",
+      "body": "A student I don't know slapped my butt while I was waiting for the elevator in the CIT building this morning, then walked away laughing." },
+    { "id": "T06", "lang": "en", "category": "Harassment", "urgency": "critical", "accept": ["critical"], "dept": ["osa", "guidance"],
+      "subject": "Groupmate tried to kiss me",
+      "body": "After our group study, Paolo Santos touched my waist and tried to kiss me even when I pushed him away. We still have to finish our project together." },
+
+    { "id": "N01", "lang": "en", "category": "Other", "urgency": "low", "accept": ["low"], "dept": ["osa"],
+      "subject": "Get in touch with alumni",
+      "body": "Can the OSA put our org in touch with the alumni office? We want to invite a graduate to speak at our career talk next semester." },
+    { "id": "N02", "lang": "en", "category": "Technical", "urgency": "medium", "accept": ["medium"], "dept": ["registrar", "it"],
+      "subject": "Touchscreen kiosk broken",
+      "body": "The touchscreen kiosk at the Registrar has been broken all week, so we cannot print our COR. We need it for ID validation next week." },
+    { "id": "N03", "lang": "taglish", "category": "Other", "urgency": "low", "accept": ["low"], "dept": ["osa"],
+      "subject": "Nakaka-touch na message",
+      "body": "Nakaka-touch po yung message ni Ma'am Liza Mendoza sa recognition day. Sana po ma-share sa official page para mabasa ng lahat." },
+    { "id": "N04", "lang": "en", "category": "Harassment", "urgency": "high", "accept": ["high"], "dept": ["osa", "guidance"],
+      "subject": "Blockmates keep messing with my things",
+      "body": "My blockmates touched my things again and threw my notes in the trash. It has been happening for three weeks and they laugh when I complain." }
+  ]
+}
