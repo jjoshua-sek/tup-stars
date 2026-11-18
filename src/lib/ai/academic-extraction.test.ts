@@ -5,6 +5,8 @@ import {
   MISMATCH_CONFIDENCE_CAP,
   buildPdfTextPrompt,
   hasUsableText,
+  expandDays,
+  normalizeMeeting,
   parseExtraction,
   toExtractedAcademicData,
   unitsAddUp,
@@ -52,6 +54,31 @@ describe("parseExtraction", () => {
     expect(parseExtraction(JSON.stringify({ ...ratingSlip, gwa: 6.5 }))).toMatchObject({ ok: false });
     expect(parseExtraction(JSON.stringify({ ...ratingSlip, units_failed: -3 }))).toMatchObject({ ok: false });
     expect(parseExtraction("Here are the grades: ...")).toMatchObject({ ok: false });
+  });
+
+  // Found by the document-reading test (evals/, Nov 2026): the vision model
+  // filled `college` with the university's name on rating-slip photos, and
+  // the 20-character limit threw the whole reading away.
+  it("keeps the reading when a text field comes back too long, dropping only that field", () => {
+    const parsed = parseExtraction(JSON.stringify({ ...ratingSlip, college: "Technological University of the Philippines Manila" }));
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.data.college).toBeNull();
+      expect(parsed.data.gwa).toBe(ratingSlip.gwa);
+    }
+    const longSchoolYear = parseExtraction(JSON.stringify({ ...ratingSlip, school_year: "School Year 2025-2026, Second Semester" }));
+    expect(longSchoolYear.ok && longSchoolYear.data.school_year).toBeNull();
+  });
+
+  it("keeps a college only as a code", () => {
+    const read = (college: string) => {
+      const parsed = parseExtraction(JSON.stringify({ ...ratingSlip, college }));
+      return parsed.ok ? parsed.data.college : "rejected";
+    };
+    expect(read("COS")).toBe("COS");
+    expect(read(" coe ")).toBe("COE");
+    expect(read("College of Science")).toBeNull();
+    expect(read("TUP Manila")).toBeNull();
   });
 });
 
@@ -144,5 +171,53 @@ describe("the units recheck", () => {
     expect(hint).toContain("add up to 6, but the document prints a total of 9");
     expect(hint).toContain("IT413-M, IT433-M");
     expect(hint).not.toContain("IT453-M");
+  });
+});
+
+// Found by the document-reading test (evals/, Nov 2026): on COR photos the
+// vision model wrote "M", "T/W" and "4:00 PM" instead of full day names and
+// 24-hour times, and the schedule import skipped every such row.
+describe("COR class meetings", () => {
+  const meeting = (day_of_week: string, start_time: string, end_time: string) =>
+    normalizeMeeting({ day_of_week, start_time, end_time, room: null });
+
+  it("reads TUP day codes, alone or run together", () => {
+    expect(expandDays("M")).toEqual(["Monday"]);
+    expect(expandDays("S")).toEqual(["Saturday"]);
+    expect(expandDays("T / W")).toEqual(["Tuesday", "Wednesday"]);
+    expect(expandDays("TTh")).toEqual(["Tuesday", "Thursday"]);
+    expect(expandDays("MWF")).toEqual(["Monday", "Wednesday", "Friday"]);
+    expect(expandDays("Thursday")).toEqual(["Thursday"]);
+    expect(expandDays("Sat")).toEqual(["Saturday"]);
+    expect(expandDays("TBA")).toEqual([]);
+  });
+
+  it("turns 12-hour times into 24-hour ones and splits combined days", () => {
+    expect(meeting("T/W", "4:30 PM", "6:00 PM")).toEqual([
+      { day_of_week: "Tuesday", start_time: "16:30", end_time: "18:00", room: null },
+      { day_of_week: "Wednesday", start_time: "16:30", end_time: "18:00", room: null },
+    ]);
+    expect(meeting("Monday", "12:00 PM", "3:00 PM")[0]).toMatchObject({ start_time: "12:00", end_time: "15:00" });
+    expect(meeting("Monday", "09:00", "12:00")[0]).toMatchObject({ start_time: "09:00", end_time: "12:00" });
+  });
+
+  it("corrects an AM/PM that cannot be right, and only then", () => {
+    expect(meeting("M", "4:00 AM", "7:00 PM")[0]).toMatchObject({ start_time: "16:00", end_time: "19:00" });
+    expect(meeting("S", "11:30 PM", "2:30 PM")[0]).toMatchObject({ start_time: "11:30", end_time: "14:30" });
+    expect(meeting("S", "7:00 AM", "10:00 AM")[0]).toMatchObject({ start_time: "07:00", end_time: "10:00" });
+  });
+
+  it("drops a degree read as the college, and normalizes the whole reading", () => {
+    const parsed = parseExtraction(JSON.stringify({
+      ...ratingSlip,
+      program: "BSIT",
+      college: "BSIT",
+      subjects: [{ subject_code: "IT413-M", description: null, units: 3, grade: null, schedule: [{ day_of_week: "T/W", start_time: "4:30 PM", end_time: "6:00 PM", room: "ONLINE" }] }],
+    }));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const data = toExtractedAcademicData(parsed.data);
+    expect(data.college).toBeUndefined();
+    expect(data.subjects?.[0].schedule?.map((m) => m.day_of_week)).toEqual(["Tuesday", "Wednesday"]);
   });
 });

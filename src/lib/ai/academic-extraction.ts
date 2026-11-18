@@ -16,7 +16,26 @@ import { z } from "zod";
 
 import type { ExtractedAcademicData } from "@/types/osa";
 
-const nullableString = (max: number) => z.string().max(max).nullable();
+/**
+ * An optional text field. One that comes back too long is dropped (null)
+ * rather than failing the whole reading: the officer verifies every
+ * document anyway, and a blank field costs less than no figures at all.
+ * The vision model once put the university's full name in `college` on a
+ * rating slip, which prints no college, and every such photo was rejected.
+ */
+const nullableString = (max: number) =>
+  z.preprocess((value) => (typeof value === "string" && value.trim().length > max ? null : value), z.string().max(max).nullable());
+
+/**
+ * A college as the COR prints it: a short code such as COS or COE. Anything
+ * else (a university's name, "College of Science") is dropped, since the
+ * value goes into the per-college reports and must be a code.
+ */
+const collegeCode = z.preprocess((value) => {
+  if (typeof value !== "string") return value;
+  const code = value.trim().toUpperCase();
+  return /^[A-Z]{2,8}$/.test(code) ? code : null;
+}, z.string().nullable());
 
 /** Philippine grading scale runs 1.00 (best) to 5.00 (failed). */
 const subjectSchema = z.object({
@@ -40,7 +59,7 @@ export const extractionSchema = z.object({
   school_year: nullableString(20),
   semester: nullableString(30),
   program: nullableString(120),
-  college: nullableString(20),
+  college: collegeCode,
   year_level: nullableString(30),
   gwa: z.number().min(1).max(5).nullable(),
   units_enrolled: z.number().min(0).max(60).nullable(),
@@ -196,6 +215,94 @@ function toGrade(grade: string | null): number | string | undefined {
   return /^\d(\.\d{1,2})?$/.test(trimmed) ? Number(trimmed) : trimmed;
 }
 
+/**
+ * TUP's day codes, as a COR prints them: M T W Th F S (Saturday) Su. The
+ * vision model often copies the code instead of the full day name the
+ * schema asks for, and the schedule import accepts only full names, so a
+ * photo of a COR used to import no classes at all (found Nov 2026).
+ */
+const DAY_WORDS: Record<string, string> = {
+  monday: "Monday", mon: "Monday",
+  tuesday: "Tuesday", tue: "Tuesday", tues: "Tuesday",
+  wednesday: "Wednesday", wed: "Wednesday",
+  thursday: "Thursday", thu: "Thursday", thur: "Thursday", thurs: "Thursday",
+  friday: "Friday", fri: "Friday",
+  saturday: "Saturday", sat: "Saturday",
+  sunday: "Sunday", sun: "Sunday",
+};
+/** Codes that can run together without a separator ("TTh", "MWF"); two letters are tried first. */
+const DAY_CODES: Record<string, string> = {
+  th: "Thursday", sa: "Saturday", su: "Sunday",
+  m: "Monday", t: "Tuesday", w: "Wednesday", r: "Thursday", f: "Friday", s: "Saturday",
+};
+
+/** "T/W" → [Tuesday, Wednesday]; "TTh" → [Tuesday, Thursday]; "MWF" → three days; "Mon" → [Monday]; unreadable → []. */
+export function expandDays(value: string): string[] {
+  const text = value.trim().toLowerCase().replace(/\.$/, "");
+  if (DAY_WORDS[text]) return [DAY_WORDS[text]];
+  const parts = text.split(/[\s/,&+-]+/).filter(Boolean);
+  if (parts.length > 1) return parts.flatMap(expandDays);
+  const days: string[] = [];
+  let rest = text;
+  while (rest) {
+    const code = [rest.slice(0, 2), rest.slice(0, 1)].find((c) => DAY_CODES[c]);
+    if (!code) return [];
+    days.push(DAY_CODES[code]);
+    rest = rest.slice(code.length);
+  }
+  return days;
+}
+
+/** "4:00 PM" → 960, "16:00" → 960, "12:00 AM" → 0; null when unreadable. */
+function toMinutes(value: string): number | null {
+  const match = value.trim().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([ap])?\.?\s*m?\.?$/i);
+  if (!match) return null;
+  let hours = Number(match[1]);
+  const mins = Number(match[2]);
+  const meridiem = match[3]?.toLowerCase();
+  if (meridiem) {
+    if (hours < 1 || hours > 12) return null;
+    hours = (hours % 12) + (meridiem === "p" ? 12 : 0);
+  }
+  return hours > 23 || mins > 59 ? null : hours * 60 + mins;
+}
+
+const asClock = (minutes: number) => `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+
+/** A class lasts more than zero minutes and at most six hours. */
+const plausible = (start: number, end: number) => end > start && end - start <= 6 * 60;
+
+/**
+ * One meeting in the schema's form: a full day name, 24-hour times. A class
+ * that cannot be right as read (ends before it starts, or runs past six
+ * hours) gets its start moved by twelve hours when that gives a plausible
+ * class: "4:00 AM–7:00 PM" is 4–7 PM, and a COR's "11:30 PM–2:30 PM" is
+ * 11:30 AM–2:30 PM. Otherwise the times stay as read, for the officer.
+ */
+export function normalizeMeeting(meeting: { day_of_week: string; start_time: string; end_time: string; room: string | null }) {
+  let start = toMinutes(meeting.start_time);
+  const end = toMinutes(meeting.end_time);
+  if (start !== null && end !== null && !plausible(start, end)) {
+    const shifted = [start + 12 * 60, start - 12 * 60].find((s) => s >= 0 && s < 24 * 60 && plausible(s, end));
+    if (shifted !== undefined) start = shifted;
+  }
+  const days = expandDays(meeting.day_of_week);
+  return (days.length ? days : [meeting.day_of_week]).map((day) => ({
+    day_of_week: day,
+    start_time: start !== null ? asClock(start) : meeting.start_time,
+    end_time: end !== null ? asClock(end) : meeting.end_time,
+    room: meeting.room,
+  }));
+}
+
+/** A degree such as BSIT or ABComm read where the college goes is not a college. */
+function collegeOrNull(college: string | null, program: string | null): string | null {
+  if (!college) return null;
+  if (/^(?:BS|AB)[A-Z]/.test(college)) return null;
+  if (program && college.toUpperCase() === program.trim().toUpperCase()) return null;
+  return college;
+}
+
 /** Drops nulls so the stored JSON matches the ExtractedAcademicData shape. */
 export function toExtractedAcademicData(raw: AcademicExtraction): ExtractedAcademicData {
   const clean = <T>(value: T | null): T | undefined => (value === null ? undefined : value);
@@ -207,7 +314,7 @@ export function toExtractedAcademicData(raw: AcademicExtraction): ExtractedAcade
     school_year: clean(raw.school_year),
     semester: clean(raw.semester),
     program: clean(raw.program),
-    college: clean(raw.college),
+    college: clean(collegeOrNull(raw.college, raw.program)),
     year_level: clean(raw.year_level),
     gwa: clean(raw.gwa),
     units_enrolled: clean(raw.units_enrolled),
@@ -220,7 +327,7 @@ export function toExtractedAcademicData(raw: AcademicExtraction): ExtractedAcade
       units: clean(subject.units),
       grade: toGrade(subject.grade),
       schedule: subject.schedule.length
-        ? subject.schedule.map((meeting) => ({
+        ? subject.schedule.flatMap(normalizeMeeting).map((meeting) => ({
             day_of_week: meeting.day_of_week,
             start_time: meeting.start_time,
             end_time: meeting.end_time,
