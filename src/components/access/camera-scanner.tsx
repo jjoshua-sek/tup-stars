@@ -56,7 +56,20 @@ export function CameraScanner({ onScan, className }: CameraScannerProps) {
 
         await instance.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 260, height: 260 } },
+          {
+            fps: 10,
+            // A square picture, so the video fills the square box below. On an
+            // iPhone the camera otherwise sent a picture of another shape: the
+            // video sat at the top of the box while the frame corners were drawn
+            // over all of it, so a QR held inside the corners was half outside
+            // what the camera saw (found in the Nov 2026 demo rehearsal).
+            aspectRatio: 1,
+            // The scanning square follows the picture actually received.
+            qrbox: (width: number, height: number) => {
+              const side = Math.floor(Math.min(width, height) * 0.75);
+              return { width: side, height: side };
+            },
+          },
           (decodedText: string) => onScanRef.current(decodedText),
           // Per-frame "no QR found" callback — firing a state update here
           // would re-render the kiosk ten times a second.
@@ -96,7 +109,7 @@ export function CameraScanner({ onScan, className }: CameraScannerProps) {
   return (
     <div className={className}>
       <div className="relative overflow-hidden rounded-xl border-2 border-white/20 bg-black">
-        <div id={ELEMENT_ID} className="w-full [&_video]:w-full [&_video]:object-cover" />
+        <div id={ELEMENT_ID} className="aspect-square w-full [&_video]:!h-full [&_video]:!w-full [&_video]:object-cover" />
 
         {!ready && !error && (
           <div className="absolute inset-0 grid place-content-center gap-2 justify-items-center text-white/70">
