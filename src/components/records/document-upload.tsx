@@ -202,7 +202,9 @@ export function DocumentUpload({ terms }: DocumentUploadProps) {
         <FileUp className="mr-1 inline h-3 w-3" />
         Best: the file from ERS. For the COR, use Enrollment → Certificate of Registration. For the
         rating slip, open Grades → Student&apos;s Rating Slip, then Print → Save as PDF (its download
-        button saves an empty file). A clear phone photo also works. Bring the Registrar-stamped
+        button saves an empty file). A phone photo also works: lay the page flat, unfolded, in good
+        light, and take it from straight above so the whole page fills the picture. A tilted or
+        folded photo can be misread. Bring the Registrar-stamped
         copies when you validate your ID: the OSA checks them against this upload. Your file is
         private; only you and the OSA can open it.
       </p>
