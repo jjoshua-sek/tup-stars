@@ -9,13 +9,17 @@ import { STAFF_ID, STUDENT_NUMBER } from "@/lib/accounts/enrollment";
  *   the TUP ERS. The birth date is checked against the student's record.
  * - Staff: staff ID (STAFF-YY-NNNN) and password. Staff have no birth date
  *   on record, and their IDs never look like student numbers (00059).
+ *
+ * IDs must be typed exactly, in capital letters: "STAFF-26-0001" signs in,
+ * "staff-26-0001" or "Staff-26-0001" is refused, and the same for TUPM.
+ * Nothing is upper-cased for the person. Only spaces around the ID are
+ * dropped, since a pasted or autofilled ID often carries one.
  */
 export const staffLoginSchema = z.object({
   staff_id: z
     .string()
     .trim()
-    .toUpperCase()
-    .regex(STAFF_ID, "Type your staff ID as STAFF-YY-NNNN (for example STAFF-26-0001)."),
+    .regex(STAFF_ID, "Type your staff ID exactly, in capital letters: STAFF-YY-NNNN (for example STAFF-26-0001)."),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -28,8 +32,7 @@ export const loginSchema = z.object({
   student_number: z
     .string()
     .trim()
-    .toUpperCase()
-    .regex(STUDENT_NUMBER, "Type your student number as TUPM-YY-NNNN (for example TUPM-22-0148)."),
+    .regex(STUDENT_NUMBER, "Type your student number exactly, in capital letters: TUPM-YY-NNNN (for example TUPM-22-0148)."),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

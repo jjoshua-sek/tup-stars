@@ -403,6 +403,10 @@ function StudentFields({ disabled, isLoading, isInCooldown, onSubmit }: FieldsPr
           id="student_number"
           placeholder="TUPM-22-0000"
           autoComplete="username"
+          // IDs are exact, in capitals (validations/auth.ts); this only opens a phone's keyboard in capitals.
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
           disabled={disabled}
           {...register("student_number")}
           className={errors.student_number ? "border-destructive" : ""}
@@ -461,6 +465,9 @@ function StaffFields({ disabled, isLoading, isInCooldown, onSubmit }: FieldsProp
           id="staff_id"
           placeholder="STAFF-26-0000"
           autoComplete="username"
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
           disabled={disabled}
           {...register("staff_id")}
           className={errors.staff_id ? "border-destructive" : ""}
